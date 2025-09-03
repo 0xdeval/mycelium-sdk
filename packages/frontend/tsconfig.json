@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@mycelium-sdk/core/*": ["../sdk/src/*"],
+      "@mycelium/frontend/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*", "../sdk/src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
