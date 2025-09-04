@@ -1,15 +1,28 @@
-# frontend
+# Mycelium SDK frontend demo
 
-To install dependencies:
+This is demo UI to show the Mycelium SDK functionalities. Check the guide below to run the demo UI
+
+## Dependencies
+
+1. bun >= 1.2.17
+2. node >= 22.11.0
+
+## Installation
+
+1. To install dependencies:
 
 ```bash
 bun install
 ```
 
-To run:
+2. Copy `.env.example` to `.env` and set necessary variables
+
+3. Make sure that Mycelium SDK is built in `package/sdk`
+
+4. To run:
 
 ```bash
-bun run index.ts
+bun run dev
 ```
 
-This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+5. Open `localhost:3000`

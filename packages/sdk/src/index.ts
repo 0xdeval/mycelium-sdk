@@ -1,3 +1,9 @@
+export type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
+export type { EmbeddedWallet } from "@/wallet/base/wallets/EmbeddedWallet";
+export type { WalletNamespace } from "@/wallet/WalletNamespace";
+export type { ChainManager } from "@/tools/ChainManager";
+export type { TokenBalance } from "@/types/token";
+
 import { ChainManager } from "@/tools/ChainManager";
 import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
 import { WalletNamespace } from "@/wallet/WalletNamespace";
@@ -7,8 +13,9 @@ import { DefaultSmartWalletProvider } from "@/wallet/providers/DefaultSmartWalle
 import { WalletProvider } from "@/wallet/WalletProvider";
 import type { EmbeddedWalletProvider } from "@/wallet/base/providers/EmbeddedWalletProvider";
 import { PrivyEmbeddedWalletProvider } from "./wallet/providers/PrivyEmbeddedWalletProvider";
+import { PrivyClient } from "@privy-io/server-auth";
 
-class MyceliumSDK {
+export class MyceliumSDK {
   public readonly wallet: WalletNamespace;
   private _chainManager: ChainManager;
   // private lendProvider?: LendProvider;
@@ -43,8 +50,14 @@ class MyceliumSDK {
    */
   private createWalletProvider(config: MyceliumSDKConfig["walletsConfig"]) {
     if (config.embeddedWalletConfig.provider.type === "privy") {
+      const privyClient = new PrivyClient(
+        config.embeddedWalletConfig.provider.providerConfig.appId,
+        config.embeddedWalletConfig.provider.providerConfig.appSecret
+      );
+
       this.embeddedWalletProvider = new PrivyEmbeddedWalletProvider(
-        config.embeddedWalletConfig.provider.privyClient,
+        // config.embeddedWalletConfig.provider.privyClient,
+        privyClient,
         this._chainManager
         // this.lendProvider!
       );

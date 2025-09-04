@@ -11,12 +11,15 @@ export abstract class EmbeddedWallet {
   /** The wallet's Ethereum address */
   public readonly address: Address;
 
+  public readonly walletId?: string;
+
   /**
    * Create an embedded wallet instance
    * @param address - The wallet's Ethereum address
    */
-  constructor(address: Address) {
+  constructor(address: Address, walletId?: string) {
     this.address = address;
+    this.walletId = walletId;
   }
 
   /**

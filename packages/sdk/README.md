@@ -1,15 +1,34 @@
-# sdk
+# Mycelium SDK
 
-To install dependencies:
+The current SDK scope cover the following features:
+
+1. Create embedded / smart wallets
+2. Top up a wallet with test tokens
+3. Earn yield using tokens (TBD)
+
+Current SDK is an NPM library, but it already could be used as a local library in `package/frontend`
+
+## Requirements
+
+1. bun >= 1.2.17
+2. node >= 22.11.0
+
+## Installation
+
+Build dependencies:
 
 ```bash
-bun install
+
+bun i
+
 ```
 
-To run:
+To build:
 
 ```bash
-bun run src/index.ts
+
+bun run build
+
 ```
 
-This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+When an SDK is built, then it could be used in package/frontend

@@ -1,4 +1,4 @@
-import type { SupportedChainId } from "@/config/constants";
+import type { SupportedChainId } from "@/constants/chains";
 
 /**
  * Detailed token balance information

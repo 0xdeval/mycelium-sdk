@@ -1,4 +1,3 @@
-// import { chainById } from "@eth-optimism/viem/chains";
 import { type Chain, createPublicClient, http, type PublicClient } from "viem";
 import type { BundlerClient, SmartAccount } from "viem/account-abstraction";
 import { createBundlerClient } from "viem/account-abstraction";
@@ -6,9 +5,6 @@ import { createBundlerClient } from "viem/account-abstraction";
 import type { SUPPORTED_CHAIN_IDS } from "@/constants/chains";
 import type { ChainConfig } from "@/types/chain";
 import { chainById } from "@/utils/chains";
-// import type { ChainConfig } from "@/types/chain.js";
-
-// type chainById = Record<number, Chain>;
 
 /**
  * Chain Manager Service

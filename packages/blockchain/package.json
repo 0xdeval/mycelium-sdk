@@ -1,4 +1,9 @@
 {
+  "name": "blockchain",
+  "scripts": {
+    "dev": "bash scripts/run.sh",
+    "start": "bash scripts/run.sh"
+  },
   "dependencies": {
     "@types/express": "^5.0.3",
     "dotenv": "^17.2.2"

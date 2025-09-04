@@ -60,8 +60,9 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
         // this.lendProvider
       );
       return walletInstance;
-    } catch {
-      throw new Error(`Failed to create wallet`);
+    } catch (error) {
+      console.error("Failed to create wallet: ", error);
+      throw new Error(`Failed to create wallet: ${error}`);
     }
   }
 

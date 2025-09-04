@@ -2,12 +2,12 @@ import type { Address, LocalAccount } from "viem";
 import { pad } from "viem";
 import { type WebAuthnAccount } from "viem/account-abstraction";
 
-import { smartWalletFactoryAbi } from "@/abis/smartWalletFactory.js";
+import { smartWalletFactoryAbi } from "@/abis/smartWalletFactory";
 import { smartWalletFactoryAddress } from "@/constants/addresses";
 import type { ChainManager } from "@/tools/ChainManager";
 // import type { LendProvider } from "@/types/lend.js";
 import { DefaultSmartWallet } from "@/wallet/DefaultSmartWallet";
-import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider.js";
+import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
 
 /**
  * Smart Wallet Provider

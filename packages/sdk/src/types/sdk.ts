@@ -1,6 +1,5 @@
 import type { PrivyClient } from "@privy-io/server-auth";
-
-import type { ChainConfig } from "@/types/chain.js";
+import type { ChainConfig } from "@/types/chain";
 
 /**
  * Verbs SDK configuration
@@ -66,6 +65,13 @@ export type EmbeddedWalletProviderConfig = PrivyEmbeddedWalletProviderConfig;
 export interface PrivyEmbeddedWalletProviderConfig {
   /** Embedded wallet provider type */
   type: "privy";
-  /** Privy client instance */
-  privyClient: PrivyClient;
+  /** Privy client provider config */
+  providerConfig: {
+    /** Privy params */
+    appId: string;
+    /** Privy party app secret */
+    appSecret: string;
+  };
+  // /** Privy client instance */
+  // privyClient: PrivyClient;
 }

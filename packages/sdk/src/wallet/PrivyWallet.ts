@@ -30,7 +30,7 @@ import type { TransactionData } from "@/types/transaction";
  * @description Wallet implementation using Privy service
  */
 export class PrivyWallet extends EmbeddedWallet {
-  public walletId: string;
+  public override walletId: string;
   private privyClient: PrivyClient;
   private chainManager: ChainManager;
   //   private lendProvider: LendProvider;
@@ -47,7 +47,7 @@ export class PrivyWallet extends EmbeddedWallet {
     chainManager: ChainManager
     // lendProvider: LendProvider
   ) {
-    super(address);
+    super(address, walletId);
     this.privyClient = privyClient;
     this.walletId = walletId;
     this.chainManager = chainManager;
