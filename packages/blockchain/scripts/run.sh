@@ -10,8 +10,6 @@ if [ -f .env ]; then
 fi
 
 # --- defaults ---
-ANVIL_PORT="${ANVIL_PORT:-8545}"
-BUNDLER_PORT="${ALTO_PORT:-4337}"
 EXPRESS_PORT="${EXPRESS_PORT:-3001}"
 EXPRESS_ENTRY="${EXPRESS_ENTRY:-src/service.ts}"
 NODE_CMD="${NODE_CMD:-bun}" 
@@ -30,39 +28,52 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+
 # ========== Check if services are running ==========
+check_service_with_retry() {
+  local service_name="$1"
+  local port="$2"
+  local method="$3"
+  local check_function="$4"
+  
+  echo "🔍 Checking $service_name on port $port..."
+  
+  for attempt in $(seq 1 $MAX_RETRIES); do
+    if $check_function; then
+      echo "✅ $service_name is running on port $port"
+      return 0
+    else
+      if [ $attempt -lt $MAX_RETRIES ]; then
+        echo "❌ $service_name not available (attempt $attempt/$MAX_RETRIES)"
+        echo "   Retrying in ${RETRY_DELAY} seconds..."
+        sleep $RETRY_DELAY
+      else
+        echo "❌ $service_name failed to start after $MAX_RETRIES attempts"
+        echo "   Please start $service_name first"
+        return 1
+      fi
+    fi
+  done
+}
+
+
 check_anvil() {
-  curl -s -X POST "http://127.0.0.1:${ANVIL_PORT}" \
+  curl -s -X POST "${FORK_RPC_URL}" \
     -H "Content-Type: application/json" \
     -d '{"jsonrpc":"2.0","id":1,"method":"eth_chainId","params":[]}' \
     | grep -q '"result"' 2>/dev/null
 }
 
 check_bundler() {
-  curl -s -X POST "http://127.0.0.1:${BUNDLER_PORT}" \
+  curl -s -X POST "${BUNDLER_URL}" \
     -H "Content-Type: application/json" \
     -d '{"jsonrpc":"2.0","id":1,"method":"eth_supportedEntryPoints","params":[]}' \
     | grep -q '"result"' 2>/dev/null
 }
 
-# Check services
-echo "🔍 Checking services..."
-
-if check_anvil; then
-  echo "✅ Anvil is running on port ${ANVIL_PORT}"
-else
-  echo "❌ Anvil is not running on port ${ANVIL_PORT}"
-  echo "   Please start Anvil first"
-  exit 1
-fi
-
-if check_bundler; then
-  echo "✅ Bundler is running on port ${BUNDLER_PORT}"
-else
-  echo "❌ Bundler is not running on port ${BUNDLER_PORT}"
-  echo "   Please start the bundler first"
-  exit 1
-fi
+# Check services with retry
+check_service_with_retry "Anvil" "$FORK_RPC_URL" "eth_chainId" "check_anvil" || exit 1
+check_service_with_retry "Bundler" "$BUNDLER_URL" "eth_supportedEntryPoints" "check_bundler" || exit 1
 
 # ========== Start Express ==========
 echo "🌐 Starting Express on :$EXPRESS_PORT -> $EXPRESS_ENTRY"
@@ -74,8 +85,8 @@ echo "📜 Logs:"
 echo "  Express: tail -f $EXPRESS_LOG"
 echo
 echo "🔗 Dev endpoints:"
-echo "  Anvil:    http://127.0.0.1:${ANVIL_PORT}"
-echo "  Bundler:  http://127.0.0.1:${BUNDLER_PORT}"
+echo "  Anvil fork:    ${FORK_RPC_URL}"
+echo "  Bundler:  ${BUNDLER_URL}"
 echo "  Express:  http://127.0.0.1:${EXPRESS_PORT}"
 echo
 echo "🏃 Running. Press Ctrl+C to stop."

@@ -1,6 +1,6 @@
 # Blockchain Service
 
-A local blockchain service with Anvil and Express API for testing and development.
+A local blockchain service with Express API for testing and development
 
 ## 🚀 Quick Start
 
@@ -17,14 +17,14 @@ Create a `.env` file in the `packages/blockchain` directory:
 
 ```bash
 # Required
-MAINNET_RPC="public or not RPC URL"
+MAINNET_RPC="<public or private rpc>"
+FORK_RPC_URL="<your mainnet fork url>"
+BUNDLER_URL="<your bundler url for fork>"
 
-# Optional (with defaults)
-ANVIL_PORT=8545
-ANVIL_CHAIN_ID=1
-ANVIL_BLOCK_TIME=1
-ANVIL_DEFAULT_BALANCE_ETH=100
+# Optional
 EXPRESS_PORT=3001
+NODE_CMD=bun
+EXPRESS_ENTRY=src/service.ts
 ```
 
 ### Launch Service
@@ -33,16 +33,15 @@ EXPRESS_PORT=3001
 # Navigate to blockchain package
 cd packages/blockchain
 
-# Make script executable (first time only)
-chmod +x scripts/run.sh
+# Add all mandatory variables to .env
+cp .env.example .env
 
-# Launch the service
-./scripts/run.sh
+# Launch faucets for your fork and a bundler
+bash ./scripts/run.sh
 ```
 
 This will start:
 
-- **Anvil**: Local Ethereum node on port 8545
 - **Express API**: Faucet service on port 3001
 
 ## 🎯 API Endpoints

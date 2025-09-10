@@ -1,6 +1,0 @@
-packages:
-  - "src"
-  - "scripts/localDeployer"
-  - "test/e2e"
-  # exclude packages that are inside test directories
-  - "!**/lib/**"
