@@ -6,8 +6,9 @@ A local blockchain service with Anvil and Express API for testing and developmen
 
 ### Prerequisites
 
-- [Anvil](https://book.getfoundry.sh/anvil/) installed
-- [Bun](https://bun.sh/) or Node.js
+- [Anvil](https://book.getfoundry.sh/anvil/): 1.2.3+
+- pnpm: 8.15.4+
+- node: v24.7.0+
 - Environment variables configured
 
 ### Environment Setup
