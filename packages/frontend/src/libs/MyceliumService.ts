@@ -1,5 +1,4 @@
 import MyceliumSDK from "@mycelium-sdk/core";
-import { sepolia } from "viem/chains";
 import type { WalletRecord } from "./WalletDatabase";
 import type { SmartWallet, TokenBalance } from "@mycelium-sdk/core";
 
@@ -40,9 +39,9 @@ export class MyceliumService {
         },
         chains: [
           {
-            chainId: sepolia.id,
-            rpcUrl: sepolia.rpcUrls.default.http[0],
-            bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
+            chainId: 31337,
+            rpcUrl: "http://127.0.0.1:8545",
+            // bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
           },
         ],
       });

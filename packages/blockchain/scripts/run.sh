@@ -21,7 +21,7 @@ ANVIL_DEFAULT_BALANCE_ETH="${ANVIL_DEFAULT_BALANCE_ETH:-100}"
 
 EXPRESS_PORT="${EXPRESS_PORT:-3001}"
 EXPRESS_ENTRY="${EXPRESS_ENTRY:-src/service.ts}"
-NODE_CMD="${NODE_CMD:-bun}"                 
+NODE_CMD="${NODE_CMD:-bun}"
 
 if [ -z "${MAINNET_RPC}" ]; then
   echo "❌ MAINNET_RPC is required (set it in .env)"
