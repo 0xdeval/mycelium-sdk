@@ -1,15 +1,13 @@
 {
   "name": "mycelium-monorepo",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "packageManager": "pnpm@8.15.4",
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "clean": "turbo run clean",
-    "dev": "turbo run dev"
+    "dev": "turbo run dev --filter=./packages/*"
   },
   "devDependencies": {
     "turbo": "^2.5.6",
