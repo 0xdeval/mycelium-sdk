@@ -15,6 +15,9 @@ import type { EmbeddedWalletProvider } from "@/wallet/base/providers/EmbeddedWal
 import { PrivyEmbeddedWalletProvider } from "./wallet/providers/PrivyEmbeddedWalletProvider";
 import { PrivyClient } from "@privy-io/server-auth";
 
+export { BeefyProtocol } from "./protocols/implementations/BeefyProtocol";
+export type { VaultInfo, VaultBalance } from "./types/protocol";
+
 export class MyceliumSDK {
   public readonly wallet: WalletNamespace;
   private _chainManager: ChainManager;

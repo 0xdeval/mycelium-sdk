@@ -6,6 +6,7 @@ export const SUPPORTED_CHAIN_IDS = [
   base.id,
   baseSepolia.id,
   sepolia.id,
+  31337,
 ] as const;
 
 export type SupportedChainId = (typeof SUPPORTED_CHAIN_IDS)[number];
