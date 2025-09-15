@@ -40,8 +40,8 @@ export class MyceliumService {
         },
         chains: [
           {
-            chainId: sepolia.id,
-            rpcUrl: sepolia.rpcUrls.default.http[0],
+            chainId: process.env.NEXT_PUBLIC_CHAIN_ID! as any,
+            rpcUrl: process.env.NEXT_PUBLIC_RPC_URL!,
             bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
           },
         ],
