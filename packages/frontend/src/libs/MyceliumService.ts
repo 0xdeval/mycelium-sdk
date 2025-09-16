@@ -39,9 +39,9 @@ export class MyceliumService {
         },
         chains: [
           {
-            chainId: 31337,
-            rpcUrl: "http://127.0.0.1:8545",
-            // bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
+            chainId: process.env.NEXT_PUBLIC_CHAIN_ID! as any,
+            rpcUrl: process.env.NEXT_PUBLIC_RPC_URL!,
+            bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
           },
         ],
       });
