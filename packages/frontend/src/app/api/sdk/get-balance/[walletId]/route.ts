@@ -16,7 +16,9 @@ export async function GET(
     }
 
     const myceliumService = MyceliumService.getInstance();
+    console.log("=== About to call init() ===");
     await myceliumService.init();
+    console.log("=== init() completed ===");
 
     try {
       const balances = await myceliumService.getWalletBalance(walletId);

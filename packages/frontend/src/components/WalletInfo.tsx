@@ -131,7 +131,7 @@ export default function WalletInfo({
                 >
                   <Text fontSize="lg" fontWeight="bold" color="blue.700">
                     {walletData &&
-                      walletData.balances
+                      walletData?.balances
                         .map(
                           (balance) =>
                             balance.formattedBalance + " " + balance.symbol

@@ -11,10 +11,13 @@ export const usdcFaucetImpersonate = async (
     if (!to) return res.status(400).json({ error: "`to` is required" });
 
     // Known USDC-rich addresses (Uniswap pools, large holders)
-    const richAddress = "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8"; // Uniswap V3 USDC/ETH pool
+    const richAddress = "0x0b0a5886664376f59c351ba3f598c8a8b4d0a6f3"; // Uniswap V3 USDC/ETH pool
 
     // Impersonate the rich address
     await rpcCall("anvil_impersonateAccount", [richAddress] as any);
+
+    // Give the impersonated address some ETH for gas
+    await rpcCall("anvil_setBalance", [richAddress, "0x56BC75E2D630000000"] as any); // 100 ETH
 
     // Convert USDC amount to wei (6 decimals)
     const usdcAmount = BigInt(Math.floor(parseFloat(amountUsdc) * 10 ** 6));
@@ -29,10 +32,10 @@ export const usdcFaucetImpersonate = async (
     const txHash = await rpcCall("eth_sendTransaction", [
       {
         from: richAddress,
-        to: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC contract address (replace with real)
+        to: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC contract address (replace with real)
         data: transferData,
         gas: "0x186A0", // 100,000 gas
-        gasPrice: "0x0", // Free gas
+        gasPrice: "0x3B9ACA00",  // 1 gwei (1000000000 wei)
       },
     ] as any);
 

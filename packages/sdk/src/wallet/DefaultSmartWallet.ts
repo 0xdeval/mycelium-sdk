@@ -217,7 +217,8 @@ export class DefaultSmartWallet extends SmartWallet {
       const hash = await bundlerClient.sendUserOperation({
         account,
         calls,
-        paymaster: true,
+        paymaster: false,
+        gas: 'auto', // Автоматическая оценка газа
       });
       await bundlerClient.waitForUserOperationReceipt({
         hash,

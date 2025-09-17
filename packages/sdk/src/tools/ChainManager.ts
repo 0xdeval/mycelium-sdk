@@ -13,10 +13,7 @@ import { chainById } from "@/utils/chains";
  */
 export class ChainManager {
   /** Map of chain IDs to their corresponding public clients */
-  private publicClients: Map<
-    (typeof SUPPORTED_CHAIN_IDS)[number],
-    PublicClient
-  >;
+  private publicClients: Map<string, PublicClient>;
   /** Configuration for each supported chain */
   private chainConfigs: ChainConfig[];
 
@@ -36,7 +33,7 @@ export class ChainManager {
    * @throws Error if no client is configured for the chain ID
    */
   getPublicClient(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): PublicClient {
-    const client = this.publicClients.get(chainId);
+    const client = this.publicClients.get(chainId.toString());
     if (!client) {
       throw new Error(`No public client configured for chain ID: ${chainId}`);
     }
@@ -129,18 +126,15 @@ export class ChainManager {
    */
   private createPublicClients(
     chains: ChainConfig[]
-  ): Map<(typeof SUPPORTED_CHAIN_IDS)[number], PublicClient> {
-    const clients = new Map<
-      (typeof SUPPORTED_CHAIN_IDS)[number],
-      PublicClient
-    >();
+  ): Map<string, PublicClient> {
+    const clients = new Map<string, PublicClient>();
 
     for (const chainConfig of chains) {
       const chain = chainById[chainConfig.chainId];
       if (!chain) {
         throw new Error(`Chain not found for ID: ${chainConfig.chainId}`);
       }
-      if (clients.has(chainConfig.chainId)) {
+      if (clients.has(chainConfig.chainId.toString())) {
         throw new Error(
           `Public client already configured for chain ID: ${chainConfig.chainId}`
         );
@@ -150,7 +144,7 @@ export class ChainManager {
         transport: http(chainConfig.rpcUrl),
       });
 
-      clients.set(chainConfig.chainId, client);
+      clients.set(chainConfig.chainId.toString(), client);
     }
 
     return clients;

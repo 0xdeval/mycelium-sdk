@@ -22,6 +22,13 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   async deposit(amount: string, vaultInfo: VaultInfo, walletAddress: Address, chainId: SupportedChainId, smartWallet: SmartWallet): Promise<VaultTransactionResult> {
+    console.log('VaultInfo:', vaultInfo);
+    console.log('TokenDecimals:', vaultInfo.tokenDecimals);
+    
+    if (!vaultInfo.tokenDecimals) {
+      throw new Error('TokenDecimals is undefined');
+    }
+    
     const amountWei = parseUnits(amount, vaultInfo.tokenDecimals);
 
       const smartWalletAddress = await smartWallet.getAddress();
@@ -29,19 +36,15 @@ export class BeefyProtocol extends BaseProtocol {
     address: smartWalletAddress
   });
     
-    console.log('====== Code: ====== ', code, smartWalletAddress);
+    console.log('====== Code: ====== ', vaultInfo.tokenAddress, vaultInfo.earnContractAddress, walletAddress, chainId);
   
-  if (code === '0x') {
-    console.log('Smart Wallet not deployed, deploying...', smartWalletAddress);
-    // Развертываем Smart Wallet пустой транзакцией
-    const deployData = {
-      to: "0x5E2Bd40bcC8a85186A9d7E5E23bb58a6CFEbA9b7" as const,
-      value: 0n,
-      data: '0x' as const,
-    };
-    await smartWallet.send(deployData, chainId);
-  }
-      const allowance = await this.checkAllowance(vaultInfo.tokenAddress, vaultInfo.earnContractAddress, walletAddress, chainId);
+  // Убираем проверку развертывания - пусть bundler сам развернет
+  // if (!code || code === '0x') {
+  //   console.log('Smart Wallet not deployed, skipping deployment...', smartWalletAddress);
+  //   throw new Error('Smart wallet is not deployed. Please deploy it first or check the address.');
+  // }
+
+  const allowance = await this.checkAllowance(vaultInfo.tokenAddress, vaultInfo.earnContractAddress, walletAddress, chainId);
   
   if (allowance < amountWei) {
     const approveData = {

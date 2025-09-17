@@ -54,7 +54,7 @@ Fund an address with ETH for testing.
 curl -X POST http://localhost:3001/faucet \
   -H "Content-Type: application/json" \
   -d '{
-    "to": "0x1234567890123456789012345678901234567890",
+    "to": "0xc6fA9CFFe212E8a64ee9DEF670d85B7105DB13BB",
     "amountEth": "0.5"
   }'
 ```
@@ -77,7 +77,7 @@ Fund an address with USDC using Anvil impersonation.
 curl -X POST http://localhost:3001/faucet-usdc \
   -H "Content-Type: application/json" \
   -d '{
-    "to": "0x1234567890123456789012345678901234567890",
+    "to": "0xc6fA9CFFe212E8a64ee9DEF670d85B7105DB13BB",
     "amountUsdc": "1000"
   }'
 ```

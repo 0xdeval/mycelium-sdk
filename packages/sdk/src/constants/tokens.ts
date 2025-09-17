@@ -10,7 +10,7 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
       [mainnet.id]: "0x0000000000000000000000000000000000000000",
       [unichain.id]: "0x0000000000000000000000000000000000000000",
       [base.id]: "0x0000000000000000000000000000000000000000",
-      [baseSepolia.id]: "0x0000000000000000000000000000000000000000",
+      // [baseSepolia.id]: "0x0000000000000000000000000000000000000000",
       [sepolia.id]: "0x0000000000000000000000000000000000000000",
       // Anvil
       31337: "0x0000000000000000000000000000000000000000",
@@ -25,6 +25,7 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
       [unichain.id]: "0x078d782b760474a361dda0af3839290b0ef57ad6",
       [baseSepolia.id]: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
       [sepolia.id]: "0xf08A50178dfcDe18524640EA6618a1f965821715",
+      [base.id]: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
       // Anvil
       31337: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     },

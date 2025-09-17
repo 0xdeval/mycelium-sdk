@@ -17,6 +17,7 @@ export class MyceliumService {
   }
 
   async init(): Promise<void> {
+    console.log("=== MyceliumService.init() called ===");
     if (this.initialized) return;
 
     try {
@@ -39,7 +40,7 @@ export class MyceliumService {
         },
         chains: [
           {
-            chainId: process.env.NEXT_PUBLIC_CHAIN_ID! as any,
+            chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID!) as any,
             rpcUrl: process.env.NEXT_PUBLIC_RPC_URL!,
             bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
           },
