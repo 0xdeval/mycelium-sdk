@@ -17,6 +17,7 @@
     "dist"
   ],
   "scripts": {
+    "dev": "pnpm run build",
     "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean --tsconfig tsconfig.build.json",
     "watch": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch --tsconfig tsconfig.build.json"
   },

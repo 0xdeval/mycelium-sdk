@@ -40,7 +40,7 @@ export abstract class SmartWallet {
    * @returns Promise resolving to the transaction hash
    */
   abstract send(
-    transactionData: TransactionData, // TODO: Add a correct type
+    transactionData: TransactionData,
     chainId: SupportedChainId
   ): Promise<Hash>;
 

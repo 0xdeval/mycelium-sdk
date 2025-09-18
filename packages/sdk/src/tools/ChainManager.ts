@@ -59,6 +59,13 @@ export class ChainManager {
       chain: this.getChain(chainId),
       transport: http(bundlerUrl),
     });
+
+    console.log("Bundler setup:", {
+      account,
+      client,
+      transport: http(bundlerUrl),
+      chain: this.getChain(chainId),
+    });
     return createBundlerClient({
       account,
       client,

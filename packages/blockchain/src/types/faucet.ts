@@ -12,3 +12,10 @@ export interface FaucetResponse {
   transactionHash?: string;
   impersonatedAddress?: string;
 }
+
+export interface DropFundsResponse {
+  ok: boolean;
+  address: string;
+  balanceEth: string;
+  balanceUsdc: string;
+}

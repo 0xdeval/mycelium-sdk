@@ -1,0 +1,21 @@
+import { rpcCall } from "@/utils";
+
+export const getEth = async ({
+  to,
+  amountEth,
+}: {
+  to: string;
+  amountEth: string;
+}) => {
+  try {
+    // Use a more reasonable balance value that Anvil can handle
+    const wei = BigInt(Math.floor(parseFloat(amountEth) * 1e18));
+    const hex = "0x" + wei.toString(16);
+
+    await rpcCall("anvil_setBalance", [to, hex] as any);
+
+    return true;
+  } catch (e) {
+    return false;
+  }
+};

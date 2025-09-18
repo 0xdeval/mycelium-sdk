@@ -97,6 +97,9 @@ export class MyceliumService {
     });
 
     const tokens = await wallet.getBalance();
+
+    console.log("all tokens info:", tokens);
+
     return tokens.map((token) => {
       return {
         symbol: token.symbol,

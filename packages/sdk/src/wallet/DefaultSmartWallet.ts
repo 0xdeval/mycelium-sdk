@@ -148,6 +148,8 @@ export class DefaultSmartWallet extends SmartWallet {
         return fetchERC20Balance(this.chainManager, address, token);
       }
     );
+
+    console.log("tokenBalancePromises", tokenBalancePromises);
     const ethBalancePromise = fetchETHBalance(this.chainManager, address);
 
     return Promise.all([ethBalancePromise, ...tokenBalancePromises]);
@@ -213,13 +215,30 @@ export class DefaultSmartWallet extends SmartWallet {
         chainId,
         account
       );
-      const calls = [transactionData];
+
+      // const uo = await bundlerClient.prepareUserOperation({
+      //   account,
+      //   calls: [transactionData],
+      //   paymaster: false,
+      // });
+
+      // console.log("Smart wallet account and bundler client", {
+      //   account,
+      //   bundlerClient,
+      // });
+      console.log("Transaction data", transactionData);
       const hash = await bundlerClient.sendUserOperation({
         account,
-        calls,
-        paymaster: false,
-        gas: 'auto', // Автоматическая оценка газа
+        // callData: uo.callData,
+        calls: [
+          {
+            to: transactionData.to,
+            value: transactionData.value ?? 0n,
+            data: transactionData.data,
+          },
+        ],
       });
+      console.log("Hash", hash);
       await bundlerClient.waitForUserOperationReceipt({
         hash,
       });
