@@ -45,6 +45,20 @@ export abstract class SmartWallet {
   ): Promise<Hash>;
 
   /**
+   * Send a batch of transactions using this smart wallet. The order of the transactions is important
+   * and it will be used to execute them in the same order.
+   * @description Executes a batch of transactions through the smart wallet, handling gas sponsorship
+   * and ERC-4337 UserOperation creation automatically.
+   * @param transactionData[] - The transaction data array to execute. Order is important.
+   * @param chainId - Target blockchain chain ID
+   * @returns Promise resolving to the transaction hash
+   */
+  abstract sendBatch(
+    transactionData: TransactionData[],
+    chainId: SupportedChainId
+  ): Promise<Hash>;
+
+  /**
    * Send tokens to another address
    * @description Prepares transaction data for sending tokens from this smart wallet
    * to a recipient address. Returns transaction data that can be executed via send().

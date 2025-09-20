@@ -8,7 +8,7 @@ export interface ProtocolInfo {
   website: string;
   logo: string;
   supportedChains: number[];
-  riskLevel: 'low' | 'medium' | 'high';
+  riskLevel: "low" | "medium" | "high";
 }
 
 // Base interface for vaults/pools
@@ -23,7 +23,7 @@ export interface VaultInfo {
   earnedTokenAddress: Address;
   oracle: string;
   oracleId: string;
-  status: 'active' | 'paused' | 'deprecated';
+  status: "active" | "paused" | "deprecated";
   createdAt: number;
   platformId: string;
   assets: string[];
@@ -50,16 +50,42 @@ export interface VaultTransactionResult {
 }
 
 // Balance information for vault
+// export interface VaultBalance {
+//   balance: string;
+//   shares: string;
+//   value: string;
+// }
 export interface VaultBalance {
-  balance: string;
   shares: string;
-  value: string;
+  ppfs?: string;
+  depositedAmount: string;
 }
 
 // Base operations
 export interface VaultOperations {
-  deposit(amount: string, vaultInfo: VaultInfo, walletAddress: Address, chainId: SupportedChainId, smartWallet: SmartWallet): Promise<VaultTransactionResult>;
-  withdraw(shares: string, vaultInfo: VaultInfo, walletAddress: Address, chainId: SupportedChainId, smartWallet: SmartWallet): Promise<VaultTransactionResult>;
-  withdrawAll(vaultInfo: VaultInfo, walletAddress: Address, chainId: SupportedChainId, smartWallet: SmartWallet): Promise<VaultTransactionResult>;
-  getBalance(vaultInfo: VaultInfo, walletAddress: Address, chainId: SupportedChainId): Promise<VaultBalance>;
+  deposit(
+    amount: string,
+    vaultInfo: VaultInfo,
+    walletAddress: Address,
+    chainId: SupportedChainId,
+    smartWallet: SmartWallet
+  ): Promise<VaultTransactionResult>;
+  withdraw(
+    shares: string,
+    vaultInfo: VaultInfo,
+    walletAddress: Address,
+    chainId: SupportedChainId,
+    smartWallet: SmartWallet
+  ): Promise<VaultTransactionResult>;
+  withdrawAll(
+    vaultInfo: VaultInfo,
+    walletAddress: Address,
+    chainId: SupportedChainId,
+    smartWallet: SmartWallet
+  ): Promise<VaultTransactionResult>;
+  getBalance(
+    vaultInfo: VaultInfo,
+    walletAddress: Address,
+    chainId: SupportedChainId
+  ): Promise<VaultBalance>;
 }

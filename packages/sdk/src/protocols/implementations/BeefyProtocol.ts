@@ -1,6 +1,6 @@
-import { BaseProtocol } from "../base/BaseProtocol";
+import { BaseProtocol } from "@/protocols/base/BaseProtocol";
 import { beefyVaultAbi } from "@/abis/protocols/beefyVault";
-import { parseUnits, createWalletClient, http, type Address } from "viem";
+import { parseUnits, type Address, formatUnits } from "viem";
 import type {
   VaultInfo,
   VaultTransactionResult,
@@ -8,7 +8,7 @@ import type {
 } from "@/types/protocol";
 import type { ChainManager } from "@/tools/ChainManager";
 import type { SupportedChainId } from "@/constants/chains";
-import type { LocalAccount } from "viem";
+import type { PublicClient } from "viem";
 import { encodeFunctionData } from "viem";
 import { erc20Abi } from "viem";
 import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
@@ -39,26 +39,9 @@ export class BeefyProtocol extends BaseProtocol {
       throw new Error("TokenDecimals is undefined");
     }
 
+    let operationsCallData = [];
+
     const rawDepositAmount = parseUnits(amount, vaultInfo.tokenDecimals);
-
-    const smartWalletAddress = await smartWallet.getAddress();
-    const code = await this.chainManager.getPublicClient(chainId).getCode({
-      address: smartWalletAddress,
-    });
-
-    console.log(
-      "====== Code: ====== ",
-      vaultInfo.tokenAddress,
-      vaultInfo.earnContractAddress,
-      walletAddress,
-      chainId
-    );
-
-    // Убираем проверку развертывания - пусть bundler сам развернет
-    // if (!code || code === '0x') {
-    //   console.log('Smart Wallet not deployed, skipping deployment...', smartWalletAddress);
-    //   throw new Error('Smart wallet is not deployed. Please deploy it first or check the address.');
-    // }
 
     const allowance = await this.checkAllowance(
       vaultInfo.tokenAddress,
@@ -67,12 +50,9 @@ export class BeefyProtocol extends BaseProtocol {
       chainId
     );
 
-    console.log(">>>>>> Allowance: >>>>>> ", { allowance, rawDepositAmount });
-
     if (allowance < rawDepositAmount) {
       const approveData = {
         to: vaultInfo.tokenAddress,
-        value: BigInt(0),
         data: encodeFunctionData({
           abi: erc20Abi,
           functionName: "approve",
@@ -80,14 +60,11 @@ export class BeefyProtocol extends BaseProtocol {
         }),
       };
 
-      console.log(">>>>>> Approve Data: >>>>>> ", approveData);
-      const approveHash = await smartWallet.send(approveData, chainId);
-      console.log(">>>>>> Approve Hash: >>>>>> ", approveHash);
+      operationsCallData.push(approveData);
     }
 
     const depositData = {
       to: vaultInfo.earnContractAddress,
-      value: BigInt(0),
       data: encodeFunctionData({
         abi: beefyVaultAbi,
         functionName: "deposit",
@@ -95,74 +72,48 @@ export class BeefyProtocol extends BaseProtocol {
       }),
     };
 
-    const hash = await smartWallet.send(depositData, chainId);
-    // const allowance = await this.checkAllowance(vaultInfo.tokenAddress, vaultInfo.earnContractAddress, walletAddress, chainId);
-    // if (allowance < amountWei) {
-    //   await this.approveToken(vaultInfo.tokenAddress, vaultInfo.earnContractAddress, amountWei, walletAddress, chainId, account);
-    // }
+    operationsCallData.push(depositData);
 
-    // const walletClient = createWalletClient({
-    //   account,
-    //   chain: this.chainManager.getChain(chainId),
-    //   transport: http(this.chainManager.getRpcUrl(chainId)),
-    // });
-
-    // const hash = await walletClient.writeContract({
-    //   address: vaultInfo.earnContractAddress,
-    //   abi: beefyVaultAbi,
-    //   functionName: "deposit",
-    //   args: [amountWei],
-    // });
+    const hash = await smartWallet.sendBatch(operationsCallData, chainId);
 
     return { hash, success: true };
   }
 
-  async withdraw(
-    shares: string,
-    vaultInfo: VaultInfo,
-    walletAddress: Address,
-    chainId: SupportedChainId,
-    smartWallet: SmartWallet
-  ): Promise<VaultTransactionResult> {
-    const sharesWei = parseUnits(shares, vaultInfo.tokenDecimals);
-    return { hash: "", success: true };
-    // const walletClient = createWalletClient({
-    //   account,
-    //   chain: this.chainManager.getChain(chainId),
-    //   transport: http(this.chainManager.getRpcUrl(chainId)),
-    // });
-
-    // const hash = await walletClient.writeContract({
-    //   address: vaultInfo.earnContractAddress,
-    //   abi: beefyVaultAbi,
-    //   functionName: "withdraw",
-    //   args: [sharesWei],
-    // });
-
-    // return { hash, success: true };
+  async withdraw(): Promise<VaultTransactionResult> {
+    throw new Error("'withdraw' is not yet implemented");
   }
 
-  async withdrawAll(
-    vaultInfo: VaultInfo,
-    walletAddress: Address,
-    chainId: SupportedChainId,
-    smartWallet: SmartWallet
-  ): Promise<VaultTransactionResult> {
-    return { hash: "", success: true };
-    // const walletClient = createWalletClient({
-    //   account,
-    //   chain: this.chainManager.getChain(chainId),
-    //   transport: http(this.chainManager.getRpcUrl(chainId)),
-    // });
+  async withdrawAll(): Promise<VaultTransactionResult> {
+    throw new Error("'withdrawAll' is not yet implemented");
+  }
 
-    // const hash = await walletClient.writeContract({
-    //   address: vaultInfo.earnContractAddress,
-    //   abi: beefyVaultAbi,
-    //   functionName: "withdrawAll",
-    //   args: [],
-    // });
+  /**
+   * @description Read the price per full share from the vault
+   *
+   * @param publicClient
+   * @param vaultAddress
+   * @returns
+   */
+  private async readPpfs(publicClient: PublicClient, vaultAddress: Address) {
+    let ppfs: bigint;
+    try {
+      ppfs = await publicClient.readContract({
+        address: vaultAddress,
+        abi: beefyVaultAbi,
+        functionName: "getPricePerFullShare",
+      });
+    } catch {
+      console.log(
+        "Couldn't get data from getPricePerFullShare, using pricePerShare..."
+      );
+      ppfs = await publicClient.readContract({
+        address: vaultAddress,
+        abi: beefyVaultAbi,
+        functionName: "pricePerShare",
+      });
+    }
 
-    // return { hash, success: true };
+    return ppfs;
   }
 
   async getBalance(
@@ -171,17 +122,37 @@ export class BeefyProtocol extends BaseProtocol {
     chainId: SupportedChainId
   ): Promise<VaultBalance> {
     const publicClient = this.chainManager.getPublicClient(chainId);
-    const balance = await publicClient.readContract({
+
+    // 'share' is a share of moo tokens that a user received after a deposit
+    const shares = await publicClient.readContract({
       address: vaultInfo.earnContractAddress,
       abi: beefyVaultAbi,
       functionName: "balanceOf",
       args: [walletAddress],
     });
 
+    if (shares === 0n) {
+      return {
+        shares: "0",
+        depositedAmount: "0",
+      };
+    }
+
+    // 'ppfs' is a Price Per Full Share per one base token. For example, 1.0 share == 1 USDC
+    const ppfs = await this.readPpfs(
+      publicClient,
+      vaultInfo.earnContractAddress
+    );
+
+    const ONE_E18 = 10n ** 18n;
+
+    // 'underlying' is an actual price of a base token in the vault that a user deposited
+    const underlyingRaw = (shares * ppfs) / ONE_E18;
+
     return {
-      balance: balance.toString(),
-      shares: balance.toString(),
-      value: balance.toString(),
+      shares: formatUnits(shares, 18),
+      ppfs: formatUnits(ppfs, 18),
+      depositedAmount: formatUnits(underlyingRaw, vaultInfo.tokenDecimals),
     };
   }
 }

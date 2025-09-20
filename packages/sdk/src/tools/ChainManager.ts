@@ -51,21 +51,24 @@ export class ChainManager {
     chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
     account: SmartAccount
   ): BundlerClient {
+    const rpcUrl = this.getRpcUrl(chainId);
     const bundlerUrl = this.getBundlerUrl(chainId);
     if (!bundlerUrl) {
       throw new Error(`No bundler URL configured for chain ID: ${chainId}`);
     }
+
+    console.log("Public client setup:", { bundlerUrl, chainId });
     const client = createPublicClient({
       chain: this.getChain(chainId),
-      transport: http(bundlerUrl),
+      transport: http(rpcUrl),
     });
 
-    console.log("Bundler setup:", {
-      account,
-      client,
-      transport: http(bundlerUrl),
-      chain: this.getChain(chainId),
-    });
+    // console.log("Bundler setup:", {
+    //   account,
+    //   client,
+    //   transport: http(bundlerUrl),
+    //   chain: this.getChain(chainId),
+    // });
     return createBundlerClient({
       account,
       client,

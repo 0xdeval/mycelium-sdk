@@ -149,7 +149,6 @@ export class DefaultSmartWallet extends SmartWallet {
       }
     );
 
-    console.log("tokenBalancePromises", tokenBalancePromises);
     const ethBalancePromise = fetchETHBalance(this.chainManager, address);
 
     return Promise.all([ethBalancePromise, ...tokenBalancePromises]);
@@ -216,29 +215,43 @@ export class DefaultSmartWallet extends SmartWallet {
         account
       );
 
-      // const uo = await bundlerClient.prepareUserOperation({
-      //   account,
-      //   calls: [transactionData],
-      //   paymaster: false,
-      // });
-
-      // console.log("Smart wallet account and bundler client", {
-      //   account,
-      //   bundlerClient,
-      // });
-      console.log("Transaction data", transactionData);
       const hash = await bundlerClient.sendUserOperation({
         account,
-        // callData: uo.callData,
-        calls: [
-          {
-            to: transactionData.to,
-            value: transactionData.value ?? 0n,
-            data: transactionData.data,
-          },
-        ],
+        calls: [transactionData],
       });
-      console.log("Hash", hash);
+
+      // Wait for the transaction to be included in a block
+      await bundlerClient.waitForUserOperationReceipt({
+        hash,
+      });
+
+      return hash;
+    } catch (error) {
+      throw new Error(
+        `Failed to send transaction: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  async sendBatch(
+    transactionData: TransactionData[],
+    chainId: SupportedChainId
+  ): Promise<Hash> {
+    try {
+      const account = await this.getCoinbaseSmartAccount(chainId);
+      const bundlerClient = this.chainManager.getBundlerClient(
+        chainId,
+        account
+      );
+
+      // Wait for the transaction to be included in a block
+      const hash = await bundlerClient.sendUserOperation({
+        account,
+        calls: transactionData,
+      });
+
       await bundlerClient.waitForUserOperationReceipt({
         hash,
       });

@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Box, 
-  Heading, 
-  VStack, 
-  Text, 
-  Button, 
-  Input, 
+import {
+  Box,
+  Heading,
+  VStack,
+  Text,
+  Button,
+  Input,
   HStack,
   Badge,
   Spinner,
-  Code
+  Code,
 } from "@chakra-ui/react";
 
 interface VaultCardProps {
@@ -75,73 +75,83 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
       //   pricePerFullShare: "1028897364641329041",
       //   lastHarvest: 1755347807
       // };
-      
-const testVaultInfo = {
-  id: "compound-base-usdc",
-  name: "USDC",
-  type: "standard",
-  token: "USDC",
-  tokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  tokenDecimals: 6,
-  earnedToken: "mooCompoundBaseUSDC",
-  earnedTokenAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-  earnContractAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-  oracle: "tokens",
-  oracleId: "USDC",
-  status: "active",
-  createdAt: 1711975000,
-  platformId: "compound",
-  assets: ["USDC"],
-  risks: [
-    "COMPLEXITY_LOW",
-    "BATTLE_TESTED",
-    "IL_NONE",
-    "MCAP_LARGE",
-    "PLATFORM_ESTABLISHED",
-    "AUDIT",
-    "CONTRACTS_VERIFIED"
-  ],
-  strategyTypeId: "lendingNoBorrow",
-  buyTokenUrl: "https://swap.defillama.com/?chain=base&from=0x0000000000000000000000000000000000000000&to=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  network: "base",
-  zaps: [
-    {
-      strategyId: "single"
-    }
-  ],
-  lendingOracle: {
-    provider: "chainlink",
-    address: "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B"
-  },
-  isGovVault: false,
-  chain: "base",
-  strategy: "0x2b4eF83aeE6bb3Dd5253dAa7d0756Ef5bD95f40f",
-  pricePerFullShare: "1101411076034236632",
-  lastHarvest: 1757617949
+
+      const testVaultInfo = {
+        id: "compound-base-usdc",
+        name: "USDC",
+        type: "standard",
+        token: "USDC",
+        tokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        tokenDecimals: 6,
+        earnedToken: "mooCompoundBaseUSDC",
+        earnedTokenAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
+        earnContractAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
+        oracle: "tokens",
+        oracleId: "USDC",
+        status: "active",
+        createdAt: 1711975000,
+        platformId: "compound",
+        assets: ["USDC"],
+        risks: [
+          "COMPLEXITY_LOW",
+          "BATTLE_TESTED",
+          "IL_NONE",
+          "MCAP_LARGE",
+          "PLATFORM_ESTABLISHED",
+          "AUDIT",
+          "CONTRACTS_VERIFIED",
+        ],
+        strategyTypeId: "lendingNoBorrow",
+        buyTokenUrl:
+          "https://swap.defillama.com/?chain=base&from=0x0000000000000000000000000000000000000000&to=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        network: "base",
+        zaps: [
+          {
+            strategyId: "single",
+          },
+        ],
+        lendingOracle: {
+          provider: "chainlink",
+          address: "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B",
+        },
+        isGovVault: false,
+        chain: "base",
+        strategy: "0x2b4eF83aeE6bb3Dd5253dAa7d0756Ef5bD95f40f",
+        pricePerFullShare: "1101411076034236632",
+        lastHarvest: 1757617949,
       };
       setVaultInfo(testVaultInfo);
-      await loadVaultBalance();
     } catch (err) {
-      setError(`Failed to initialize vault: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Failed to initialize vault: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
     }
   };
 
+  useEffect(() => {
+    if (vaultInfo && walletAddress) {
+      loadVaultBalance();
+    }
+  }, [vaultInfo, walletAddress]);
+
   const loadVaultBalance = async () => {
     if (!vaultInfo || !walletAddress) return;
-    
+
     try {
       const response = await fetch(`/api/sdk/vault-balance`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletId,
           walletAddress,
           vaultInfo,
-          chainId: 8453
-        })
+          chainId: 8453,
+        }),
       });
-      
+
       const data = await response.json();
+
+      console.log("Balance data >>>>> ", data);
       if (data.success) {
         setVaultBalance(data.balance);
       } else {
@@ -149,7 +159,9 @@ const testVaultInfo = {
       }
     } catch (err) {
       console.error("Failed to load vault balance:", err);
-      setError(`Failed to load balance: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Failed to load balance: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
     }
   };
 
@@ -165,17 +177,17 @@ const testVaultInfo = {
 
     try {
       const response = await fetch(`/api/sdk/vault-deposit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletId,
           walletAddress,
           vaultInfo,
           amount: depositAmount,
-          chainId: 8453
-        })
+          chainId: 8453,
+        }),
       });
-      
+
       const data = await response.json();
       if (data.success) {
         setSuccess(`Deposit successful! Transaction hash: ${data.hash}`);
@@ -185,7 +197,9 @@ const testVaultInfo = {
         setError(data.error);
       }
     } catch (err) {
-      setError(`Deposit failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Deposit failed: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -203,17 +217,17 @@ const testVaultInfo = {
 
     try {
       const response = await fetch(`/api/sdk/vault-withdraw`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletId,
           walletAddress,
           vaultInfo,
           amount: withdrawAmount,
-          chainId: 8453
-        })
+          chainId: 8453,
+        }),
       });
-      
+
       const data = await response.json();
       if (data.success) {
         setSuccess(`Withdraw successful! Transaction hash: ${data.hash}`);
@@ -223,7 +237,9 @@ const testVaultInfo = {
         setError(data.error);
       }
     } catch (err) {
-      setError(`Withdraw failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Withdraw failed: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -241,16 +257,16 @@ const testVaultInfo = {
 
     try {
       const response = await fetch(`/api/sdk/vault-withdraw-all`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletId,
           walletAddress,
           vaultInfo,
-          chainId: 8453
-        })
+          chainId: 8453,
+        }),
       });
-      
+
       const data = await response.json();
       if (data.success) {
         setSuccess(`Withdraw all successful! Transaction hash: ${data.hash}`);
@@ -259,7 +275,9 @@ const testVaultInfo = {
         setError(data.error);
       }
     } catch (err) {
-      setError(`Withdraw all failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(
+        `Withdraw all failed: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -276,6 +294,7 @@ const testVaultInfo = {
     );
   }
 
+  console.log("VaultBalance >>>>> ", vaultBalance);
   return (
     <Box>
       <Heading size="lg" mb={4}>
@@ -283,13 +302,27 @@ const testVaultInfo = {
       </Heading>
 
       {error && (
-        <Box p={4} bg="red.50" borderRadius="md" border="1px" borderColor="red.200" mb={4}>
+        <Box
+          p={4}
+          bg="red.50"
+          borderRadius="md"
+          border="1px"
+          borderColor="red.200"
+          mb={4}
+        >
           <Text color="red.600">{error}</Text>
         </Box>
       )}
 
       {success && (
-        <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200" mb={4}>
+        <Box
+          p={4}
+          bg="green.50"
+          borderRadius="md"
+          border="1px"
+          borderColor="green.200"
+          mb={4}
+        >
           <Text color="green.600">{success}</Text>
         </Box>
       )}
@@ -297,7 +330,13 @@ const testVaultInfo = {
       {vaultInfo && (
         <VStack gap={4} align="stretch">
           {/* Vault Info */}
-          <Box p={4} bg="blue.50" borderRadius="md" border="1px" borderColor="blue.200">
+          <Box
+            p={4}
+            bg="blue.50"
+            borderRadius="md"
+            border="1px"
+            borderColor="blue.200"
+          >
             <HStack justify="space-between" mb={2}>
               <Text fontWeight="bold" color="blue.700">
                 {vaultInfo.name}
@@ -305,7 +344,7 @@ const testVaultInfo = {
               <Badge colorScheme="green">{vaultInfo.status}</Badge>
             </HStack>
             <Text fontSize="sm" color="blue.600" mb={1}>
-              Protocol: {vaultInfo.platformId?.toUpperCase() || 'BEEFY'}
+              Protocol: {vaultInfo.platformId?.toUpperCase() || "BEEFY"}
             </Text>
             <Text fontSize="sm" color="blue.600">
               Token: {vaultInfo.token} → {vaultInfo.earnedToken}
@@ -313,20 +352,26 @@ const testVaultInfo = {
           </Box>
 
           {/* Current Balance */}
-          <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200">
+          <Box
+            p={4}
+            bg="green.50"
+            borderRadius="md"
+            border="1px"
+            borderColor="green.200"
+          >
             <Text fontWeight="bold" color="green.700" mb={2}>
               Your Vault Balance
             </Text>
             {vaultBalance ? (
               <VStack gap={1} align="stretch">
                 <Text fontSize="lg" fontWeight="bold">
-                  {vaultBalance.balance / 10 ** vaultInfo.earnedTokenDecimals} {vaultInfo.earnedToken}
+                  {vaultBalance.shares} {vaultInfo.earnedToken}
                 </Text>
                 <Text fontSize="sm" color="green.600">
-                  Shares: { vaultBalance.shares / 10 ** vaultInfo.earnedTokenDecimals }
+                  Shares: {vaultBalance.ppfs}
                 </Text>
                 <Text fontSize="sm" color="green.600">
-                  Value: {vaultBalance.value / 10 ** vaultInfo.earnedTokenDecimals} {vaultInfo.token}
+                  Value: {vaultBalance.depositedAmount} {vaultInfo.token}
                 </Text>
               </VStack>
             ) : (

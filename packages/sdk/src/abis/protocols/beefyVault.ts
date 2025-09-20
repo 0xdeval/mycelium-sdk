@@ -6,7 +6,6 @@ import type { Abi } from "viem";
  * https://github.com/beefyfinance/beefy-contracts
  */
 export const beefyVaultAbi = [
-  // Deposit functions
   {
     name: "deposit",
     type: "function",
@@ -26,8 +25,7 @@ export const beefyVaultAbi = [
     inputs: [],
     outputs: [],
   },
-  
-  // Withdraw functions
+
   {
     name: "withdraw",
     type: "function",
@@ -47,7 +45,7 @@ export const beefyVaultAbi = [
     inputs: [],
     outputs: [],
   },
-  
+
   // View functions
   {
     name: "balanceOf",
@@ -78,8 +76,14 @@ export const beefyVaultAbi = [
       },
     ],
   },
-  
-  // Price per share (crucial for Beefy vaults)
+  {
+    name: "pricePerShare",
+    type: "function",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+
   {
     name: "getPricePerFullShare",
     type: "function",
@@ -92,8 +96,7 @@ export const beefyVaultAbi = [
       },
     ],
   },
-  
-  // Token information
+
   {
     name: "token",
     type: "function",
@@ -142,8 +145,7 @@ export const beefyVaultAbi = [
       },
     ],
   },
-  
-  // Strategy functions
+
   {
     name: "strategy",
     type: "function",
@@ -156,8 +158,7 @@ export const beefyVaultAbi = [
       },
     ],
   },
-  
-  // Emergency functions
+
   {
     name: "panic",
     type: "function",
@@ -179,8 +180,7 @@ export const beefyVaultAbi = [
     inputs: [],
     outputs: [],
   },
-  
-  // Events
+
   {
     name: "Deposit",
     type: "event",
