@@ -5,30 +5,41 @@ import type {
   VaultInfo,
   VaultTransactionResult,
   VaultBalance,
-} from "@/types/protocol";
+} from "@/types/protocols/beefy";
 import type { ChainManager } from "@/tools/ChainManager";
 import type { SupportedChainId } from "@/constants/chains";
 import type { PublicClient } from "viem";
 import { encodeFunctionData } from "viem";
 import { erc20Abi } from "viem";
 import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
+import { MOCK_BEEFY_VAULTS } from "@/constants/mocks";
 
 export class BeefyProtocol extends BaseProtocol {
-  constructor(chainManager: ChainManager) {
-    super(chainManager, {
-      id: "beefy",
-      name: "Beefy Finance",
-      website: "https://beefy.finance",
-      logo: "/logos/beefy.png",
-      supportedChains: [1],
-      riskLevel: "medium",
-    });
+  async init(chainManager: ChainManager): Promise<void> {
+    // TODO: Add more necessary parameters for the protocol init
+    this.chainManager = chainManager;
+  }
+
+  // TODO: Implement the logic of fetching vaults for the protocol
+  async getVaults(): Promise<VaultInfo[]> {
+    return MOCK_BEEFY_VAULTS;
+  }
+
+  // TODO: Implement the logic of getting the best vault for the protocol
+  async getBestVault(): Promise<VaultInfo> {
+    const vaults = await this.getVaults();
+
+    if (vaults.length === 0) {
+      throw new Error("No vaults found");
+    }
+
+    return vaults[0]!;
   }
 
   async deposit(
     amount: string,
     vaultInfo: VaultInfo,
-    walletAddress: Address,
+    // walletAddress: Address,
     chainId: SupportedChainId,
     smartWallet: SmartWallet
   ): Promise<VaultTransactionResult> {
@@ -39,6 +50,8 @@ export class BeefyProtocol extends BaseProtocol {
       throw new Error("TokenDecimals is undefined");
     }
 
+    const currentAddress = await smartWallet.getAddress();
+
     let operationsCallData = [];
 
     const rawDepositAmount = parseUnits(amount, vaultInfo.tokenDecimals);
@@ -46,7 +59,7 @@ export class BeefyProtocol extends BaseProtocol {
     const allowance = await this.checkAllowance(
       vaultInfo.tokenAddress,
       vaultInfo.earnContractAddress,
-      walletAddress,
+      currentAddress,
       chainId
     );
 
@@ -121,7 +134,7 @@ export class BeefyProtocol extends BaseProtocol {
     walletAddress: Address,
     chainId: SupportedChainId
   ): Promise<VaultBalance> {
-    const publicClient = this.chainManager.getPublicClient(chainId);
+    const publicClient = this.chainManager!.getPublicClient(chainId);
 
     // 'share' is a share of moo tokens that a user received after a deposit
     const shares = await publicClient.readContract({

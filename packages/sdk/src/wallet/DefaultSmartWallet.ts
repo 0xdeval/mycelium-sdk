@@ -25,6 +25,8 @@ import {
 } from "@/utils/assets";
 import { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
 import type { TransactionData } from "@/types/transaction";
+import type { VaultTransactionResult } from "@/types/protocols/beefy";
+import type { Protocol, ProtocolInfo } from "@/types/protocols/general";
 
 /**
  * Smart Wallet Implementation
@@ -46,6 +48,10 @@ export class DefaultSmartWallet extends SmartWallet {
   private chainManager: ChainManager;
   /** Nonce used for deterministic address generation (defaults to 0) */
   private nonce?: bigint;
+  /** Protocol provider */
+  private protocolProvider: Protocol["instance"];
+  /** Protocol info */
+  private protocolInfo: ProtocolInfo;
 
   /**
    * Create a Smart Wallet instance
@@ -63,6 +69,8 @@ export class DefaultSmartWallet extends SmartWallet {
     signer: LocalAccount,
     chainManager: ChainManager,
     // lendProvider: LendProvider,
+    protocolProvider: Protocol["instance"],
+    protocolInfo: ProtocolInfo,
     deploymentAddress?: Address,
     signerOwnerIndex?: number,
     nonce?: bigint
@@ -75,6 +83,8 @@ export class DefaultSmartWallet extends SmartWallet {
     this.chainManager = chainManager;
     // this.lendProvider = lendProvider;
     this.nonce = nonce;
+    this.protocolProvider = protocolProvider;
+    this.protocolInfo = protocolInfo;
   }
 
   /**
@@ -152,6 +162,33 @@ export class DefaultSmartWallet extends SmartWallet {
     const ethBalancePromise = fetchETHBalance(this.chainManager, address);
 
     return Promise.all([ethBalancePromise, ...tokenBalancePromises]);
+  }
+
+  /**
+   * Make a deposit to a protocol vault that was selected before on the initialization step
+   */
+  async earn(
+    amount: string,
+    chainId: SupportedChainId
+  ): Promise<VaultTransactionResult> {
+    const isChainSupportedByProtocol =
+      this.protocolInfo.supportedChains.includes(chainId);
+    if (!isChainSupportedByProtocol) {
+      throw new Error(
+        `Chain ${chainId} is not supported by protocol ${this.protocolInfo.name}`
+      );
+    }
+
+    const vaultInfo = await this.protocolProvider.getBestVault();
+
+    const depositTransactionResult = this.protocolProvider.deposit(
+      amount,
+      vaultInfo,
+      chainId,
+      this
+    );
+
+    return depositTransactionResult;
   }
 
   //   /**

@@ -1,15 +1,6 @@
-import type { Address, LocalAccount } from "viem";
 import type { SupportedChainId } from "@/constants/chains";
 import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
-// Base interface for all protocols
-export interface ProtocolInfo {
-  id: string;
-  name: string;
-  website: string;
-  logo: string;
-  supportedChains: number[];
-  riskLevel: "low" | "medium" | "high";
-}
+import type { Address } from "viem";
 
 // Base interface for vaults/pools
 export interface VaultInfo {
@@ -27,7 +18,6 @@ export interface VaultInfo {
   createdAt: number;
   platformId: string;
   assets: string[];
-  migrationIds: string[];
   risks: string[];
   strategyTypeId: string;
   network: string;
@@ -40,6 +30,12 @@ export interface VaultInfo {
   strategy: Address;
   pricePerFullShare: string;
   lastHarvest: number;
+  buyTokenUrl?: string;
+  lendingOracle?: {
+    provider: string;
+    address: Address;
+  };
+  migrationIds?: string[];
 }
 
 // Transaction result for vault operations
