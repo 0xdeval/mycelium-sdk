@@ -5,12 +5,9 @@ import { type WebAuthnAccount } from "viem/account-abstraction";
 import { smartWalletFactoryAbi } from "@/abis/smartWalletFactory";
 import { smartWalletFactoryAddress } from "@/constants/addresses";
 import type { ChainManager } from "@/tools/ChainManager";
-// import type { LendProvider } from "@/types/lend.js";
 import { DefaultSmartWallet } from "@/wallet/DefaultSmartWallet";
 import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
 import type { Protocol, ProtocolInfo } from "@/types/protocols/general";
-import type { VaultTransactionResult } from "@/types/protocols/beefy";
-import type { SupportedChainId } from "@/constants/chains";
 
 /**
  * Smart Wallet Provider
@@ -65,7 +62,6 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       this.chainManager,
       //   this.lendProvider,
       this.protocolProvider,
-      this.protocolInfo,
       undefined,
       undefined,
       nonce
@@ -92,11 +88,11 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
     });
 
     // Factory is the same accross all chains, so we can use the first chain to get the wallet address
-    const supportedChains = this.chainManager.getSupportedChains();
-    if (!supportedChains.length) {
+    const supportedChain = this.chainManager.getSupportedChain();
+    if (!supportedChain) {
       throw new Error("No supported chains configured");
     }
-    const publicClient = this.chainManager.getPublicClient(supportedChains[0]!);
+    const publicClient = this.chainManager.getPublicClient(supportedChain);
     const smartWalletAddress = await publicClient.readContract({
       abi: smartWalletFactoryAbi,
       address: smartWalletFactoryAddress,
@@ -127,7 +123,6 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       this.chainManager,
       //   this.lendProvider,
       this.protocolProvider,
-      this.protocolInfo,
       walletAddress,
       ownerIndex
     );

@@ -3,19 +3,23 @@ export type { EmbeddedWallet } from "@/wallet/base/wallets/EmbeddedWallet";
 export type { WalletNamespace } from "@/wallet/WalletNamespace";
 export type { ChainManager } from "@/tools/ChainManager";
 export type { TokenBalance } from "@/types/token";
+export type {
+  VaultTransactionResult,
+  VaultBalance,
+} from "@/types/protocols/beefy";
 
 import { ChainManager } from "@/tools/ChainManager";
 import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
 import { WalletNamespace } from "@/wallet/WalletNamespace";
 import { type MyceliumSDKConfig } from "@/types/sdk";
-import { unichain } from "viem/chains";
+import { base } from "viem/chains";
 import { DefaultSmartWalletProvider } from "@/wallet/providers/DefaultSmartWalletProvider";
 import { WalletProvider } from "@/wallet/WalletProvider";
 import type { EmbeddedWalletProvider } from "@/wallet/base/providers/EmbeddedWalletProvider";
 import { PrivyEmbeddedWalletProvider } from "./wallet/providers/PrivyEmbeddedWalletProvider";
 import { PrivyClient } from "@privy-io/server-auth";
 import { ProtocolRouter } from "./router/ProtocolRouter";
-import type { Protocol, ProtocolInfo } from "./types/protocols/general";
+import type { Protocol } from "./types/protocols/general";
 
 export { BeefyProtocol } from "./protocols/implementations/BeefyProtocol";
 
@@ -29,16 +33,18 @@ export class MyceliumSDK {
 
   constructor(config: MyceliumSDKConfig) {
     this._chainManager = new ChainManager(
-      config.chains || [
-        {
-          chainId: unichain.id,
-          rpcUrl: unichain.rpcUrls.default.http[0],
-        },
-      ]
+      config.chain || {
+        chainId: base.id,
+        rpcUrl: base.rpcUrls.default.http[0],
+      }
     );
 
+    const protocolsRouterConfig = config.protocolsRouterConfig || {
+      riskLevel: "medium",
+    };
+
     // protocolsRouterConfig is the abstract settings that are clear for a dev, e.g. risk level, basic apy, etc
-    this.protocol = this.findProtocol(config.protocolsRouterConfig);
+    this.protocol = this.findProtocol(protocolsRouterConfig);
 
     this.wallet = this.createWalletNamespace(config.walletsConfig);
   }
@@ -64,11 +70,7 @@ export class MyceliumSDK {
     // 4. Smart router should somehow save selected protocols here for future use of this particular integrator
     // 5. Smart router will return the best protocol here
 
-    const protocolRouter = new ProtocolRouter(
-      config.riskLevel,
-      config.minApy,
-      config.apiKey
-    );
+    const protocolRouter = new ProtocolRouter(config!, this.chainManager);
 
     const protocol: Protocol = protocolRouter.recommend();
 

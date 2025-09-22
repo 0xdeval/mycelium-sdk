@@ -1,17 +1,15 @@
+import type { SupportedChainId } from "@/constants/chains";
 import { availableProtocols } from "@/constants/protocols";
 import { ProtocolRouterBase } from "@/router/base/ProtocolRouterBase";
+import type { ChainManager } from "@/tools/ChainManager";
 import type {
   Protocol,
   ProtocolsRouterConfig,
 } from "@/types/protocols/general";
 
 export class ProtocolRouter extends ProtocolRouterBase {
-  constructor(
-    riskLevel: ProtocolsRouterConfig["riskLevel"],
-    minApy?: ProtocolsRouterConfig["minApy"],
-    apiKey?: ProtocolsRouterConfig["apiKey"]
-  ) {
-    super(riskLevel, minApy, apiKey);
+  constructor(config: ProtocolsRouterConfig, chainManager: ChainManager) {
+    super(config.riskLevel, chainManager, config.minApy, config.apiKey);
   }
 
   getProtocols(): Protocol[] {
@@ -33,6 +31,12 @@ export class ProtocolRouter extends ProtocolRouterBase {
     return allAvailableProtocols;
   }
 
+  isProtocolSupportedChain(chainIds: SupportedChainId[]): boolean {
+    return chainIds.some(
+      (chainId) => this.chainManager.getSupportedChain() === chainId
+    );
+  }
+
   recommend(): Protocol {
     const protocols = this.getProtocols();
 
@@ -42,7 +46,11 @@ export class ProtocolRouter extends ProtocolRouterBase {
       // Check if protocol matches risk level
       const riskMatches = protocol.info.riskLevel === this.riskLevel;
 
-      return riskMatches;
+      const isSupportedChain = this.isProtocolSupportedChain(
+        protocol.info.supportedChains
+      );
+
+      return riskMatches && isSupportedChain;
     });
 
     if (eligibleProtocols.length === 0) {

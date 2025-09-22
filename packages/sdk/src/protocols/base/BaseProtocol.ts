@@ -40,13 +40,17 @@ export abstract class BaseProtocol {
   abstract getBestVault(): Promise<VaultInfo>;
 
   /**
+   * Method defines and return a pool where a user could already have deposited funds previously
+   */
+  abstract fetchDepositedVaults(
+    smartWallet: SmartWallet
+  ): Promise<VaultInfo | null>;
+
+  /**
    * Deposit funds into a vault
    */
   abstract deposit(
     amount: string,
-    vaultInfo: VaultInfo,
-    // walletAddress: Address,
-    chainId: SupportedChainId,
     smartWallet: SmartWallet
   ): Promise<VaultTransactionResult>;
 
@@ -76,8 +80,7 @@ export abstract class BaseProtocol {
    */
   abstract getBalance(
     vaultInfo: VaultInfo,
-    walletAddress: Address,
-    chainId: SupportedChainId
+    walletAddress: Address // chainId: SupportedChainId
   ): Promise<VaultBalance>;
 
   /**
@@ -87,7 +90,6 @@ export abstract class BaseProtocol {
     tokenAddress: Address,
     spenderAddress: Address,
     amount: bigint,
-    walletAddress: Address,
     chainId: SupportedChainId,
     account: LocalAccount
   ): Promise<string> {

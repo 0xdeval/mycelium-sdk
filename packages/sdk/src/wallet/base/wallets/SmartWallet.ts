@@ -4,6 +4,10 @@ import type { SupportedChainId } from "@/constants/chains";
 import type { TokenBalance } from "@/types/token";
 import type { AssetIdentifier } from "@/utils/assets";
 import type { TransactionData } from "@/types/transaction";
+import type {
+  VaultBalance,
+  VaultTransactionResult,
+} from "@/types/protocols/beefy";
 
 /**
  * Base smart wallet class
@@ -72,6 +76,21 @@ export abstract class SmartWallet {
     asset: AssetIdentifier,
     recipientAddress: Address
   ): Promise<TransactionData>; // TODO: Add a correct type
+
+  /**
+   * Start earning yield from depositing to a vault of a selected protocol
+   *
+   * @param amount - Amount to earn in human-readable format
+   * @param chainId - Target blockchain chain ID for a protocol's vault
+   * @returns Promise resolving to the transaction hash
+   */
+  abstract earn(amount: string): Promise<VaultTransactionResult>;
+
+  /**
+   * Get the balance of deposited funds to a vault of a selected protocol
+   * @returns Promise resolving to the balance of deposited funds to a vault
+   */
+  abstract getEarnBalance(): Promise<VaultBalance | null>;
 
   //   /**
   //    * Withdraw tokens from this smart wallet to a fiat

@@ -15,61 +15,142 @@ import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
 import { MOCK_BEEFY_VAULTS } from "@/constants/mocks";
 
 export class BeefyProtocol extends BaseProtocol {
+  private vaultInfo: VaultInfo | undefined;
+  private allVaults: VaultInfo[] = [];
+  private selectedChainId: SupportedChainId | undefined;
+
+  /**
+   * @description Initialize the protocol with all necessary parameters for it
+   * @param chainManager
+   */
   async init(chainManager: ChainManager): Promise<void> {
     // TODO: Add more necessary parameters for the protocol init
     this.chainManager = chainManager;
+
+    // TODO: Remove multiple chains support for now. Leave only one chain for SDK overall
+    this.selectedChainId = chainManager.getSupportedChain();
+    this.allVaults = await this.getVaults();
   }
 
-  // TODO: Implement the logic of fetching vaults for the protocol
+  /**
+   * @description Fetch all vaults for the protocol
+   * @returns
+   */
+
   async getVaults(): Promise<VaultInfo[]> {
-    return MOCK_BEEFY_VAULTS;
+    // TODO: Implement the logic of fetching vaults for the protocol
+    const allVaults = MOCK_BEEFY_VAULTS;
+
+    for (const vault of allVaults) {
+      vault.chainId = this.chainManager!.getChainIdByName(
+        vault.chain
+      ) as SupportedChainId;
+    }
+
+    // Filter vaults by selectedChainId if it's set
+    if (this.selectedChainId) {
+      const filteredVaults = allVaults.filter(
+        (vault) => vault.chainId === this.selectedChainId
+      );
+      console.log(
+        `Filtered ${filteredVaults.length} vaults for chain ${this.selectedChainId}`
+      );
+      return filteredVaults;
+    } else {
+      throw new Error("Selected chain id is not set");
+    }
   }
 
-  // TODO: Implement the logic of getting the best vault for the protocol
+  /**
+   * @description Get the best vault for the protocol to deposit based on the given parameters
+   * @returns
+   */
   async getBestVault(): Promise<VaultInfo> {
-    const vaults = await this.getVaults();
-
-    if (vaults.length === 0) {
+    // TODO: Implement the logic of getting the best vault for the protocol
+    // TODO: Also implement logic of getting the best vault among all supported by the protocol chains
+    // TODO: Check and take into account that a user could already have deposit to a vault
+    if (this.allVaults.length === 0) {
       throw new Error("No vaults found");
     }
 
-    return vaults[0]!;
+    const bestVault = this.allVaults[0]!;
+
+    return { ...bestVault };
   }
 
+  /**
+   * @description Fetch a vault where a user deposited funds previously
+   * @param smartWallet
+   * @returns
+   */
+  async fetchDepositedVaults(
+    smartWallet: SmartWallet
+  ): Promise<VaultInfo | null> {
+    // TODO: Support logic for fetching info about vaults where a user already deposited funds previously:
+    // 1. Fetch all vaults
+    // 2. Check balance of each vault token for a provided wallet address
+    // 3. Return all vaults where the balance is greater than 0. It means a user deposited to this vault previously
+
+    // Currently mock:
+    let depositedVaults: VaultInfo | null = null;
+    const userAddress = await smartWallet.getAddress();
+    for (const vault of this.allVaults) {
+      const balance = await this.getBalance(vault, userAddress);
+      if (parseInt(balance.depositedAmount) > 0) {
+        depositedVaults = vault;
+      }
+    }
+
+    return depositedVaults;
+  }
+
+  /**
+   * @description Deposit funds into a best vault for the protocol OR to the same vault where a user deposited previously
+   * @param amount
+   * @param smartWallet
+   * @returns
+   */
   async deposit(
     amount: string,
-    vaultInfo: VaultInfo,
-    // walletAddress: Address,
-    chainId: SupportedChainId,
     smartWallet: SmartWallet
   ): Promise<VaultTransactionResult> {
-    console.log("VaultInfo:", vaultInfo);
-    console.log("TokenDecimals:", vaultInfo.tokenDecimals);
+    // Check if a user deposited previously to any vault of the protocol
+    const depositedVault = await this.fetchDepositedVaults(smartWallet);
+    if (depositedVault) {
+      this.vaultInfo = depositedVault;
+    } else {
+      // Find the best pool to deposit for a protocol
+      this.vaultInfo = await this.getBestVault();
+    }
 
-    if (!vaultInfo.tokenDecimals) {
+    console.log("VaultInfo:", this.vaultInfo);
+    console.log("TokenDecimals:", this.vaultInfo!.tokenDecimals);
+
+    if (!this.vaultInfo!.tokenDecimals) {
       throw new Error("TokenDecimals is undefined");
     }
 
+    // const chainId = this.vaultInfo!.chainId!;
     const currentAddress = await smartWallet.getAddress();
 
     let operationsCallData = [];
 
-    const rawDepositAmount = parseUnits(amount, vaultInfo.tokenDecimals);
+    const rawDepositAmount = parseUnits(amount, this.vaultInfo!.tokenDecimals);
 
     const allowance = await this.checkAllowance(
-      vaultInfo.tokenAddress,
-      vaultInfo.earnContractAddress,
+      this.vaultInfo!.tokenAddress,
+      this.vaultInfo!.earnContractAddress,
       currentAddress,
-      chainId
+      this.selectedChainId!
     );
 
     if (allowance < rawDepositAmount) {
       const approveData = {
-        to: vaultInfo.tokenAddress,
+        to: this.vaultInfo!.tokenAddress,
         data: encodeFunctionData({
           abi: erc20Abi,
           functionName: "approve",
-          args: [vaultInfo.earnContractAddress, rawDepositAmount],
+          args: [this.vaultInfo!.earnContractAddress, rawDepositAmount],
         }),
       };
 
@@ -77,7 +158,7 @@ export class BeefyProtocol extends BaseProtocol {
     }
 
     const depositData = {
-      to: vaultInfo.earnContractAddress,
+      to: this.vaultInfo!.earnContractAddress,
       data: encodeFunctionData({
         abi: beefyVaultAbi,
         functionName: "deposit",
@@ -87,15 +168,24 @@ export class BeefyProtocol extends BaseProtocol {
 
     operationsCallData.push(depositData);
 
-    const hash = await smartWallet.sendBatch(operationsCallData, chainId);
+    const hash = await smartWallet.sendBatch(
+      operationsCallData,
+      this.selectedChainId!
+    );
 
     return { hash, success: true };
   }
 
+  /**
+   * @description Partially withdraw funds from a vault
+   */
   async withdraw(): Promise<VaultTransactionResult> {
     throw new Error("'withdraw' is not yet implemented");
   }
 
+  /**
+   * @description Withdraw all funds from a vault
+   */
   async withdrawAll(): Promise<VaultTransactionResult> {
     throw new Error("'withdrawAll' is not yet implemented");
   }
@@ -129,12 +219,22 @@ export class BeefyProtocol extends BaseProtocol {
     return ppfs;
   }
 
+  /**
+   * @description Get the balance of deposited funds to a vault
+   *
+   * @param vaultInfo
+   * @param walletAddress
+   * @returns
+   */
   async getBalance(
     vaultInfo: VaultInfo,
-    walletAddress: Address,
-    chainId: SupportedChainId
+    walletAddress: Address
   ): Promise<VaultBalance> {
-    const publicClient = this.chainManager!.getPublicClient(chainId);
+    // const chainId = vaultInfo.chainId!;
+
+    const publicClient = this.chainManager!.getPublicClient(
+      this.selectedChainId!
+    );
 
     // 'share' is a share of moo tokens that a user received after a deposit
     const shares = await publicClient.readContract({

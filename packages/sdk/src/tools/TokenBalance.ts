@@ -16,24 +16,24 @@ export async function fetchETHBalance(
   chainManager: ChainManager,
   walletAddress: Address
 ): Promise<TokenBalance> {
-  const supportedChains = chainManager.getSupportedChains();
-  const chainBalancePromises = supportedChains.map(async (chainId) => {
-    const publicClient = chainManager.getPublicClient(chainId);
-    const balance = await publicClient.getBalance({
-      address: walletAddress,
-    });
-    return { chainId, balance, formattedBalance: formatEther(balance) };
+  const supportedChain = chainManager.getSupportedChain();
+
+  const publicClient = chainManager.getPublicClient(supportedChain);
+  const balance = await publicClient.getBalance({
+    address: walletAddress,
   });
-  const chainBalances = await Promise.all(chainBalancePromises);
-  const totalBalance = chainBalances.reduce(
-    (total, { balance }) => total + balance,
-    0n
-  );
+
   return {
     symbol: "ETH",
-    totalBalance,
-    totalFormattedBalance: formatEther(totalBalance),
-    chainBalances,
+    totalBalance: balance,
+    totalFormattedBalance: formatEther(balance),
+    chainBalances: [
+      {
+        chainId: supportedChain,
+        balance,
+        formattedBalance: formatEther(balance),
+      },
+    ],
   };
 }
 
@@ -45,36 +45,26 @@ export async function fetchERC20Balance(
   walletAddress: Address,
   token: TokenInfo
 ): Promise<TokenBalance> {
-  const supportedChains = chainManager.getSupportedChains();
-  const chainsWithToken = supportedChains.filter((chainId) =>
-    getTokenAddress(token.symbol, chainId)
-  );
+  const supportedChain = chainManager.getSupportedChain();
 
-  const chainBalancePromises = chainsWithToken.map(async (chainId) => {
-    const balance = await fetchERC20BalanceForChain(
-      token,
-      chainId,
-      walletAddress,
-      chainManager
-    );
-    return {
-      chainId,
-      balance,
-      formattedBalance: formatUnits(balance, token.decimals),
-    };
-  });
-
-  const chainBalances = await Promise.all(chainBalancePromises);
-  const totalBalance = chainBalances.reduce(
-    (total, { balance }) => total + balance,
-    0n
+  const balance = await fetchERC20BalanceForChain(
+    token,
+    supportedChain,
+    walletAddress,
+    chainManager
   );
 
   return {
     symbol: token.symbol,
-    totalBalance,
-    totalFormattedBalance: formatUnits(totalBalance, token.decimals),
-    chainBalances,
+    totalBalance: balance,
+    totalFormattedBalance: formatUnits(balance, token.decimals),
+    chainBalances: [
+      {
+        chainId: supportedChain,
+        balance,
+        formattedBalance: formatUnits(balance, token.decimals),
+      },
+    ],
   };
 }
 

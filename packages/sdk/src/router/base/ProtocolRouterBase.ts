@@ -1,3 +1,5 @@
+import type { SupportedChainId } from "@/constants/chains";
+import type { ChainManager } from "@/tools/ChainManager";
 import { ApiKeysValidator } from "@/tools/ApiKeysValidator";
 import type {
   Protocol,
@@ -22,6 +24,9 @@ export abstract class ProtocolRouterBase {
   /** The API key validator instance */
   public readonly apiKeyValidator: ApiKeysValidator = new ApiKeysValidator();
 
+  /** The chain manager instance */
+  public readonly chainManager: ChainManager;
+
   /**
    * Create a protocol router instance
    * @param riskLevel - The risk level the is required by an integrator
@@ -29,12 +34,14 @@ export abstract class ProtocolRouterBase {
    */
   constructor(
     riskLevel: ProtocolsRouterConfig["riskLevel"],
+    chainManager: ChainManager,
     minApy?: ProtocolsRouterConfig["minApy"],
     apiKey?: ProtocolsRouterConfig["apiKey"]
   ) {
     this.riskLevel = riskLevel;
     this.minApy = minApy;
     this.apiKey = apiKey;
+    this.chainManager = chainManager;
   }
 
   /**
@@ -42,6 +49,12 @@ export abstract class ProtocolRouterBase {
    * @returns Promise resolving to an array of protocols
    */
   abstract getProtocols(): Protocol[];
+
+  /**
+   * Check if a protocol is supported by the chain id that was provided to the SDK
+   * @param chainIds
+   */
+  abstract isProtocolSupportedChain(chainIds: SupportedChainId[]): boolean;
 
   /**
    * Recommend a protocol based on a router config

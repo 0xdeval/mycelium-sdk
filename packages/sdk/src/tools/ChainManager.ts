@@ -2,7 +2,8 @@ import { type Chain, createPublicClient, http, type PublicClient } from "viem";
 import type { BundlerClient, SmartAccount } from "viem/account-abstraction";
 import { createBundlerClient } from "viem/account-abstraction";
 
-import type { SUPPORTED_CHAIN_IDS } from "@/constants/chains";
+import type { SUPPORTED_CHAIN_IDS, SupportedChainId } from "@/constants/chains";
+import { CHAINS_MAP } from "@/constants/chains";
 import type { ChainConfig } from "@/types/chain";
 import { chainById } from "@/utils/chains";
 
@@ -13,17 +14,20 @@ import { chainById } from "@/utils/chains";
  */
 export class ChainManager {
   /** Map of chain IDs to their corresponding public clients */
-  private publicClients: Map<string, PublicClient>;
+  private publicClient: PublicClient;
   /** Configuration for each supported chain */
-  private chainConfigs: ChainConfig[];
+  private chainConfigs: ChainConfig;
+  /** Map of chain names to their corresponding chain IDs */
+  private chainNames: Record<string, Chain>;
 
   /**
    * Initialize the ChainManager with chain configurations
    * @param chains - Array of chain configurations
    */
-  constructor(chains: ChainConfig[]) {
+  constructor(chains: ChainConfig) {
     this.chainConfigs = chains;
-    this.publicClients = this.createPublicClients(chains);
+    this.publicClient = this.createPublicClient(chains);
+    this.chainNames = CHAINS_MAP;
   }
 
   /**
@@ -33,7 +37,7 @@ export class ChainManager {
    * @throws Error if no client is configured for the chain ID
    */
   getPublicClient(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): PublicClient {
-    const client = this.publicClients.get(chainId.toString());
+    const client = this.publicClient;
     if (!client) {
       throw new Error(`No public client configured for chain ID: ${chainId}`);
     }
@@ -63,12 +67,6 @@ export class ChainManager {
       transport: http(rpcUrl),
     });
 
-    // console.log("Bundler setup:", {
-    //   account,
-    //   client,
-    //   transport: http(bundlerUrl),
-    //   chain: this.getChain(chainId),
-    // });
     return createBundlerClient({
       account,
       client,
@@ -84,7 +82,7 @@ export class ChainManager {
    * @throws Error if no chain config is found for the chain ID
    */
   getRpcUrl(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): string {
-    const chainConfig = this.chainConfigs.find((c) => c.chainId === chainId);
+    const chainConfig = this.chainConfigs;
     if (!chainConfig) {
       throw new Error(`No chain config found for chain ID: ${chainId}`);
     }
@@ -100,7 +98,7 @@ export class ChainManager {
   getBundlerUrl(
     chainId: (typeof SUPPORTED_CHAIN_IDS)[number]
   ): string | undefined {
-    const chainConfig = this.chainConfigs.find((c) => c.chainId === chainId);
+    const chainConfig = this.chainConfigs;
     if (!chainConfig) {
       throw new Error(`No chain config found for chain ID: ${chainId}`);
     }
@@ -124,8 +122,8 @@ export class ChainManager {
    * Get all supported chain IDs
    * @returns Array of supported chain IDs
    */
-  getSupportedChains() {
-    return this.chainConfigs.map((c) => c.chainId);
+  getSupportedChain() {
+    return this.chainConfigs.chainId;
   }
 
   /**
@@ -134,29 +132,22 @@ export class ChainManager {
    * @returns Map of chain IDs to their corresponding public clients
    * @throws Error if a chain is not found or already configured
    */
-  private createPublicClients(
-    chains: ChainConfig[]
-  ): Map<string, PublicClient> {
-    const clients = new Map<string, PublicClient>();
+  private createPublicClient(chain: ChainConfig): PublicClient {
+    const chainObject = chainById[chain.chainId];
 
-    for (const chainConfig of chains) {
-      const chain = chainById[chainConfig.chainId];
-      if (!chain) {
-        throw new Error(`Chain not found for ID: ${chainConfig.chainId}`);
-      }
-      if (clients.has(chainConfig.chainId.toString())) {
-        throw new Error(
-          `Public client already configured for chain ID: ${chainConfig.chainId}`
-        );
-      }
-      const client = createPublicClient({
-        chain,
-        transport: http(chainConfig.rpcUrl),
-      });
+    const client = createPublicClient({
+      chain: chainObject,
+      transport: http(chain.rpcUrl),
+    });
 
-      clients.set(chainConfig.chainId.toString(), client);
+    return client;
+  }
+
+  getChainIdByName(name: string): SupportedChainId {
+    const chain = this.chainNames[name];
+    if (!chain) {
+      throw new Error(`Chain not found for name: ${name}`);
     }
-
-    return clients;
+    return chain.id;
   }
 }

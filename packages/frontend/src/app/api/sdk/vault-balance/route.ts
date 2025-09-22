@@ -17,24 +17,21 @@ export async function POST(request: NextRequest) {
     const myceliumService = MyceliumService.getInstance();
     await myceliumService.init();
 
-    const beefyProtocol = new BeefyProtocol(
-      myceliumService.getSDK()!.chainManager
-    );
+    // const beefyProtocol = new BeefyProtocol(
+    //   myceliumService.getSDK()!.chainManager
+    // );
 
-    const embeddedWallet = await myceliumService
-      .getSDK()!
-      .wallet.getEmbeddedWallet({ walletId });
-    // const account = await embeddedWallet.account();
+    // const smartWallet = await myceliumService
+    //   .getSDK()!
+    //   .wallet.getSmartWalletWithEmbeddedSigner({ walletId });
 
-    const smartWallet = await myceliumService
-      .getSDK()!
-      .wallet.getSmartWalletWithEmbeddedSigner({ walletId });
+    // const balance = await beefyProtocol.getBalance(
+    //   vaultInfo,
+    //   await smartWallet.getAddress(),
+    //   chainId
+    // );
 
-    const balance = await beefyProtocol.getBalance(
-      vaultInfo,
-      await smartWallet.getAddress(),
-      chainId
-    );
+    const balance = await myceliumService.getEarnBalance(walletId);
 
     console.log("Balance on server >>>>> ", balance);
 
