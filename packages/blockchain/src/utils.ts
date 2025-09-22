@@ -2,11 +2,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-if (!process.env.RPC_URL) {
-  throw new Error("RPC_URL is not set");
+if (!process.env.FORK_RPC_URL) {
+  throw new Error("FORK_RPC_URL is not set");
 }
 
-const RPC_URL = process.env.RPC_URL;
+const RPC_URL = process.env.FORK_RPC_URL;
 
 export async function rpcCall(method: string, params = []) {
   const res = await fetch(RPC_URL, {

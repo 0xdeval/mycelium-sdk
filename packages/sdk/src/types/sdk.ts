@@ -1,5 +1,5 @@
-import type { PrivyClient } from "@privy-io/server-auth";
 import type { ChainConfig } from "@/types/chain";
+import type { ProtocolsRouterConfig } from "@/types/protocols/general";
 
 /**
  * Verbs SDK configuration
@@ -9,7 +9,9 @@ export interface MyceliumSDKConfig {
   /** Wallet configuration */
   walletsConfig: WalletConfig;
   /** Chains to use for the SDK */
-  chains?: ChainConfig[];
+  chain?: ChainConfig;
+  /** Protocols router configuration */
+  protocolsRouterConfig?: ProtocolsRouterConfig;
 }
 
 /**
@@ -72,6 +74,4 @@ export interface PrivyEmbeddedWalletProviderConfig {
     /** Privy party app secret */
     appSecret: string;
   };
-  // /** Privy client instance */
-  // privyClient: PrivyClient;
 }

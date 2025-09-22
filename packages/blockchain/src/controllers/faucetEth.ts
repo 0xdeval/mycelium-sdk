@@ -1,8 +1,9 @@
 import type { FaucetRequestBody, FaucetResponse } from "@/types/faucet";
 import type { Request, Response } from "express";
 import { rpcCall } from "@/utils";
+import { getEth } from "@/methods/getEth";
 
-export const localFaucet = async (
+export const faucetEth = async (
   req: Request<{}, {}, FaucetRequestBody>,
   res: Response<FaucetResponse | { error: string }>
 ) => {
@@ -10,11 +11,11 @@ export const localFaucet = async (
     const { to, amountEth = "0.1" } = req.body;
     if (!to) return res.status(400).json({ error: "`to` is required" });
 
-    // Use a more reasonable balance value that Anvil can handle
-    const wei = BigInt(Math.floor(parseFloat(amountEth) * 1e18));
-    const hex = "0x" + wei.toString(16);
+    const result = await getEth({ to, amountEth });
 
-    await rpcCall("anvil_setBalance", [to, hex] as any);
+    if (!result) {
+      return res.status(500).json({ error: "Failed to get ETH" });
+    }
 
     res.json({ ok: true, address: to, balance: amountEth + " ETH" });
   } catch (e) {

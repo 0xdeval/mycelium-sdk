@@ -1,7 +1,10 @@
 import MyceliumSDK from "@mycelium-sdk/core";
-import { sepolia } from "viem/chains";
 import type { WalletRecord } from "./WalletDatabase";
-import type { SmartWallet, TokenBalance } from "@mycelium-sdk/core";
+import type {
+  SmartWallet,
+  VaultBalance,
+  VaultTransactionResult,
+} from "@mycelium-sdk/core";
 
 export class MyceliumService {
   private static instance: MyceliumService;
@@ -18,6 +21,7 @@ export class MyceliumService {
   }
 
   async init(): Promise<void> {
+    console.log("=== MyceliumService.init() called ===");
     if (this.initialized) return;
 
     try {
@@ -38,13 +42,14 @@ export class MyceliumService {
             },
           },
         },
-        chains: [
-          {
-            chainId: sepolia.id,
-            rpcUrl: sepolia.rpcUrls.default.http[0],
-            bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
-          },
-        ],
+        chain: {
+          chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID!) as any,
+          rpcUrl: process.env.NEXT_PUBLIC_RPC_URL!,
+          bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
+        },
+        protocolsRouterConfig: {
+          riskLevel: "medium",
+        },
       });
 
       this.initialized = true;
@@ -97,6 +102,9 @@ export class MyceliumService {
     });
 
     const tokens = await wallet.getBalance();
+
+    console.log("all tokens info:", tokens);
+
     return tokens.map((token) => {
       return {
         symbol: token.symbol,
@@ -105,9 +113,38 @@ export class MyceliumService {
     });
   }
 
-  getSDK(): MyceliumSDK | null {
-    return this.sdk;
+  async earn(
+    walletId: string,
+    amount: string
+  ): Promise<VaultTransactionResult> {
+    if (!this.sdk) {
+      throw new Error("SDK not initialized");
+    }
+
+    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+      walletId,
+    });
+
+    const transactionResult = await wallet.earn(amount);
+    return transactionResult;
   }
+
+  async getEarnBalance(walletId: string): Promise<VaultBalance | null> {
+    if (!this.sdk) {
+      throw new Error("SDK not initialized");
+    }
+
+    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+      walletId,
+    });
+
+    const balance = await wallet.getEarnBalance();
+    return balance;
+  }
+
+  // getSDK(): MyceliumSDK | null {
+  //   return this.sdk;
+  // }
 }
 
 export const myceliumService = MyceliumService.getInstance();

@@ -23,6 +23,7 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
       [unichain.id]: "0x078d782b760474a361dda0af3839290b0ef57ad6",
       [baseSepolia.id]: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
       [sepolia.id]: "0xf08A50178dfcDe18524640EA6618a1f965821715",
+      [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     },
   },
 };

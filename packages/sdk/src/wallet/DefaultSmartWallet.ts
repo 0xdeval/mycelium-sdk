@@ -10,21 +10,19 @@ import type { SupportedChainId } from "@/constants/chains";
 import type { ChainManager } from "@/tools/ChainManager";
 import { fetchERC20Balance, fetchETHBalance } from "@/tools/TokenBalance";
 import { SUPPORTED_TOKENS } from "@/constants/tokens";
-// import type {
-//   LendOptions,
-//   LendProvider,
-//   LendTransaction,
-//   TransactionData,
-// } from "@/types/lend.js";
 import type { TokenBalance } from "@/types/token";
 import {
   type AssetIdentifier,
   parseAssetAmount,
-  parseLendParams,
   resolveAsset,
 } from "@/utils/assets";
 import { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
 import type { TransactionData } from "@/types/transaction";
+import type {
+  VaultBalance,
+  VaultTransactionResult,
+} from "@/types/protocols/beefy";
+import type { Protocol } from "@/types/protocols/general";
 
 /**
  * Smart Wallet Implementation
@@ -46,13 +44,16 @@ export class DefaultSmartWallet extends SmartWallet {
   private chainManager: ChainManager;
   /** Nonce used for deterministic address generation (defaults to 0) */
   private nonce?: bigint;
+  /** Protocol provider */
+  private protocolProvider: Protocol["instance"];
 
   /**
    * Create a Smart Wallet instance
    * @param owners - Array of wallet owners (addresses or WebAuthn accounts)
    * @param signer - Local account for signing transactions
    * @param chainManager - Network management service
-//    * @param lendProvider - Lending operations provider
+   * @param protocolProvider - Protocol provider
+   * @param protocolInfo - Protocol info
    * @param bundlerUrl - ERC-4337 bundler service URL
    * @param deploymentAddress - Known wallet address (if already deployed)
    * @param ownerIndex - Index of signer in owners array
@@ -63,6 +64,7 @@ export class DefaultSmartWallet extends SmartWallet {
     signer: LocalAccount,
     chainManager: ChainManager,
     // lendProvider: LendProvider,
+    protocolProvider: Protocol["instance"],
     deploymentAddress?: Address,
     signerOwnerIndex?: number,
     nonce?: bigint
@@ -75,6 +77,7 @@ export class DefaultSmartWallet extends SmartWallet {
     this.chainManager = chainManager;
     // this.lendProvider = lendProvider;
     this.nonce = nonce;
+    this.protocolProvider = protocolProvider;
   }
 
   /**
@@ -103,11 +106,11 @@ export class DefaultSmartWallet extends SmartWallet {
     });
 
     // Factory is the same accross all chains, so we can use the first chain to get the wallet address
-    const supportedChains = this.chainManager.getSupportedChains();
-    if (!supportedChains.length) {
+    const supportedChain = this.chainManager.getSupportedChain();
+    if (!supportedChain) {
       throw new Error("No supported chains configured");
     }
-    const publicClient = this.chainManager.getPublicClient(supportedChains[0]!);
+    const publicClient = this.chainManager.getPublicClient(supportedChain);
     const smartWalletAddress = await publicClient.readContract({
       abi: smartWalletFactoryAbi,
       address: smartWalletFactoryAddress,
@@ -148,9 +151,45 @@ export class DefaultSmartWallet extends SmartWallet {
         return fetchERC20Balance(this.chainManager, address, token);
       }
     );
+
     const ethBalancePromise = fetchETHBalance(this.chainManager, address);
 
     return Promise.all([ethBalancePromise, ...tokenBalancePromises]);
+  }
+
+  /**
+   * Make a deposit to a protocol vault that was selected before on the initialization step
+   */
+  async earn(
+    amount: string
+    // chainId: SupportedChainId
+  ): Promise<VaultTransactionResult> {
+    this.chainManager.getSupportedChain();
+    // const isChainSupportedByProtocol =
+    //   this.protocolInfo.supportedChains.includes(chainId);
+    // if (!isChainSupportedByProtocol) {
+    //   throw new Error(
+    //     `Chain ${chainId} is not supported by protocol ${this.protocolInfo.name}`
+    //   );
+    // }
+
+    const depositTransactionResult = this.protocolProvider.deposit(
+      amount,
+      this
+    );
+
+    return depositTransactionResult;
+  }
+
+  /**
+   *
+   */
+  async getEarnBalance(): Promise<VaultBalance | null> {
+    const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
+    if (!vaultInfo) {
+      return null;
+    }
+    return this.protocolProvider.getBalance(vaultInfo, await this.getAddress());
   }
 
   //   /**
@@ -213,12 +252,44 @@ export class DefaultSmartWallet extends SmartWallet {
         chainId,
         account
       );
-      const calls = [transactionData];
+
       const hash = await bundlerClient.sendUserOperation({
         account,
-        calls,
-        paymaster: true,
+        calls: [transactionData],
       });
+
+      // Wait for the transaction to be included in a block
+      await bundlerClient.waitForUserOperationReceipt({
+        hash,
+      });
+
+      return hash;
+    } catch (error) {
+      throw new Error(
+        `Failed to send transaction: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
+
+  async sendBatch(
+    transactionData: TransactionData[],
+    chainId: SupportedChainId
+  ): Promise<Hash> {
+    try {
+      const account = await this.getCoinbaseSmartAccount(chainId);
+      const bundlerClient = this.chainManager.getBundlerClient(
+        chainId,
+        account
+      );
+
+      // Wait for the transaction to be included in a block
+      const hash = await bundlerClient.sendUserOperation({
+        account,
+        calls: transactionData,
+      });
+
       await bundlerClient.waitForUserOperationReceipt({
         hash,
       });

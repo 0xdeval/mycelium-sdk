@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Box, Container, Heading, SimpleGrid } from "@chakra-ui/react";
 import WalletCreator from "@/components/WalletCreator";
 import WalletInfo from "@/components/WalletInfo";
+import VaultCard from "@/components/VaultCard";
+import VaultMonitor from "@/components/VaultMonitor";
 
 export default function Home() {
   const [walletId, setWalletId] = useState<string>("");
@@ -38,6 +40,17 @@ export default function Home() {
               walletAddress={walletAddress}
               error={error}
             />
+          </Box>
+          
+          <Box bg="white" p={6} borderRadius="lg" boxShadow="lg">
+            <VaultCard 
+              walletId={walletId}
+              walletAddress={walletAddress}
+            />
+          </Box>
+          
+          <Box bg="white" p={6} borderRadius="lg" boxShadow="lg">
+            <VaultMonitor />
           </Box>
         </SimpleGrid>
       </Container>

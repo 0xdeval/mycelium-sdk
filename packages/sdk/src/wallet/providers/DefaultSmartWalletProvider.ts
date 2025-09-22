@@ -5,9 +5,9 @@ import { type WebAuthnAccount } from "viem/account-abstraction";
 import { smartWalletFactoryAbi } from "@/abis/smartWalletFactory";
 import { smartWalletFactoryAddress } from "@/constants/addresses";
 import type { ChainManager } from "@/tools/ChainManager";
-// import type { LendProvider } from "@/types/lend.js";
 import { DefaultSmartWallet } from "@/wallet/DefaultSmartWallet";
 import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
+import type { Protocol, ProtocolInfo } from "@/types/protocols/general";
 
 /**
  * Smart Wallet Provider
@@ -20,16 +20,24 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
   /** Provider for lending market operations */
   //   private lendProvider: LendProvider;
 
+  /** Already initialized protocol provider */
+  private protocolProvider: Protocol["instance"];
+
+  /** Protocol info */
+  private protocolInfo: ProtocolInfo;
+
   /**
    * Initialize the Smart Wallet Provider
    * @param chainManager - Manages supported blockchain networks
    * @param paymasterAndBundlerUrl - URL for ERC-4337 bundler and paymaster services
    * @param lendProvider - Provider for lending market operations
    */
-  constructor(chainManager: ChainManager) {
+  constructor(chainManager: ChainManager, protocol: Protocol) {
     //  lendProvider: LendProvider) {
     super();
     this.chainManager = chainManager;
+    this.protocolProvider = protocol.instance;
+    this.protocolInfo = protocol.info;
     // this.lendProvider = lendProvider;
   }
 
@@ -53,6 +61,7 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       signer,
       this.chainManager,
       //   this.lendProvider,
+      this.protocolProvider,
       undefined,
       undefined,
       nonce
@@ -79,11 +88,11 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
     });
 
     // Factory is the same accross all chains, so we can use the first chain to get the wallet address
-    const supportedChains = this.chainManager.getSupportedChains();
-    if (!supportedChains.length) {
+    const supportedChain = this.chainManager.getSupportedChain();
+    if (!supportedChain) {
       throw new Error("No supported chains configured");
     }
-    const publicClient = this.chainManager.getPublicClient(supportedChains[0]!);
+    const publicClient = this.chainManager.getPublicClient(supportedChain);
     const smartWalletAddress = await publicClient.readContract({
       abi: smartWalletFactoryAbi,
       address: smartWalletFactoryAddress,
@@ -113,6 +122,7 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       signer,
       this.chainManager,
       //   this.lendProvider,
+      this.protocolProvider,
       walletAddress,
       ownerIndex
     );

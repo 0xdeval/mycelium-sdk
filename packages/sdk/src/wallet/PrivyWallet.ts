@@ -174,7 +174,7 @@ export class PrivyWallet extends EmbeddedWallet {
         account: privyWallet.address as Address,
         to: transactionData.to,
         data: transactionData.data as `0x${string}`,
-        value: BigInt(transactionData.value),
+        value: BigInt(transactionData.value || 0),
       });
 
       // Get current gas price and fee data

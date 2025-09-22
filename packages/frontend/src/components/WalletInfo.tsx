@@ -44,6 +44,43 @@ export default function WalletInfo({
     }
   };
 
+  const dropFunds = async () => {
+    if (!walletId) return;
+    setIsLoadingData(true);
+    setDataError(null);
+
+    try {
+      console.log("data for a facuet service", {
+        to: walletAddress,
+        amountUsdc: "1000",
+      });
+      const response = await fetch(`http://localhost:3001/drop-funds`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: walletAddress,
+          amountUsdc: "100",
+          amountEth: "0.1",
+        }),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log("data after drop funds: ", data);
+
+      await loadWalletData();
+    } catch (error) {
+      setDataError(
+        error instanceof Error ? error.message : "Failed to drop funds"
+      );
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
+
   useEffect(() => {
     if (walletId) {
       loadWalletData();
@@ -131,7 +168,7 @@ export default function WalletInfo({
                 >
                   <Text fontSize="lg" fontWeight="bold" color="blue.700">
                     {walletData &&
-                      walletData.balances
+                      walletData?.balances
                         .map(
                           (balance) =>
                             balance.formattedBalance + " " + balance.symbol
@@ -145,9 +182,17 @@ export default function WalletInfo({
                 onClick={loadWalletData}
                 size="sm"
                 colorScheme="blue"
-                variant="outline"
+                variant="solid"
               >
                 Refresh Data
+              </Button>
+              <Button
+                onClick={dropFunds}
+                size="sm"
+                colorScheme="grey"
+                variant="outline"
+              >
+                Get funds
               </Button>
             </VStack>
           ) : null}
