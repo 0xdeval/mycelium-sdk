@@ -1,28 +1,26 @@
-import type { Address, Hash, LocalAccount } from "viem";
-import { encodeFunctionData, erc20Abi, pad } from "viem";
-import type { WebAuthnAccount } from "viem/account-abstraction";
-import { toCoinbaseSmartAccount } from "viem/account-abstraction";
-import { unichain } from "viem/chains";
-
-import { smartWalletFactoryAbi } from "@/abis/smartWalletFactory";
-import { smartWalletFactoryAddress } from "@/constants/addresses";
-import type { SupportedChainId } from "@/constants/chains";
-import type { ChainManager } from "@/tools/ChainManager";
-import { fetchERC20Balance, fetchETHBalance } from "@/tools/TokenBalance";
-import { SUPPORTED_TOKENS } from "@/constants/tokens";
-import type { TokenBalance } from "@/types/token";
 import {
-  type AssetIdentifier,
-  parseAssetAmount,
-  resolveAsset,
-} from "@/utils/assets";
-import { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
-import type { TransactionData } from "@/types/transaction";
-import type {
-  VaultBalance,
-  VaultTransactionResult,
-} from "@/types/protocols/beefy";
-import type { Protocol } from "@/types/protocols/general";
+  type Address,
+  type Hash,
+  type LocalAccount,
+  encodeFunctionData,
+  erc20Abi,
+  pad,
+} from 'viem';
+import { type WebAuthnAccount, toCoinbaseSmartAccount } from 'viem/account-abstraction';
+import { unichain } from 'viem/chains';
+
+import { smartWalletFactoryAbi } from '@/abis/smartWalletFactory';
+import { smartWalletFactoryAddress } from '@/constants/addresses';
+import type { SupportedChainId } from '@/constants/chains';
+import type { ChainManager } from '@/tools/ChainManager';
+import { fetchERC20Balance, fetchETHBalance } from '@/tools/TokenBalance';
+import { SUPPORTED_TOKENS } from '@/constants/tokens';
+import type { TokenBalance } from '@/types/token';
+import { type AssetIdentifier, parseAssetAmount, resolveAsset } from '@/utils/assets';
+import { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
+import type { TransactionData } from '@/types/transaction';
+import type { VaultBalance, VaultTransactionResult } from '@/types/protocols/beefy';
+import type { Protocol } from '@/types/protocols/general';
 
 /**
  * Smart Wallet Implementation
@@ -45,7 +43,7 @@ export class DefaultSmartWallet extends SmartWallet {
   /** Nonce used for deterministic address generation (defaults to 0) */
   private nonce?: bigint;
   /** Protocol provider */
-  private protocolProvider: Protocol["instance"];
+  private protocolProvider: Protocol['instance'];
 
   /**
    * Create a Smart Wallet instance
@@ -64,10 +62,10 @@ export class DefaultSmartWallet extends SmartWallet {
     signer: LocalAccount,
     chainManager: ChainManager,
     // lendProvider: LendProvider,
-    protocolProvider: Protocol["instance"],
+    protocolProvider: Protocol['instance'],
     deploymentAddress?: Address,
     signerOwnerIndex?: number,
-    nonce?: bigint
+    nonce?: bigint,
   ) {
     super();
     this.owners = owners;
@@ -97,24 +95,30 @@ export class DefaultSmartWallet extends SmartWallet {
    * @returns Promise resolving to the wallet address
    */
   async getAddress() {
-    if (this.deploymentAddress) return this.deploymentAddress;
+    if (this.deploymentAddress) {
+      return this.deploymentAddress;
+    }
 
     const owners_bytes = this.owners.map((owner) => {
-      if (typeof owner === "string") return pad(owner);
-      if (owner.type === "webAuthn") return owner.publicKey;
-      throw new Error("invalid owner type");
+      if (typeof owner === 'string') {
+        return pad(owner);
+      }
+      if (owner.type === 'webAuthn') {
+        return owner.publicKey;
+      }
+      throw new Error('invalid owner type');
     });
 
-    // Factory is the same accross all chains, so we can use the first chain to get the wallet address
+    // Factory is the same across all chains, so we can use the first chain to get the wallet address
     const supportedChain = this.chainManager.getSupportedChain();
     if (!supportedChain) {
-      throw new Error("No supported chains configured");
+      throw new Error('No supported chains configured');
     }
     const publicClient = this.chainManager.getPublicClient(supportedChain);
     const smartWalletAddress = await publicClient.readContract({
       abi: smartWalletFactoryAbi,
       address: smartWalletFactoryAddress,
-      functionName: "getAddress",
+      functionName: 'getAddress',
       args: [owners_bytes, this.nonce || 0n],
     });
     return smartWalletAddress;
@@ -127,7 +131,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * @returns Coinbase Smart Account instance configured for the specified chain
    */
   async getCoinbaseSmartAccount(
-    chainId: SupportedChainId
+    chainId: SupportedChainId,
   ): ReturnType<typeof toCoinbaseSmartAccount> {
     return toCoinbaseSmartAccount({
       address: this.deploymentAddress,
@@ -135,7 +139,7 @@ export class DefaultSmartWallet extends SmartWallet {
       client: this.chainManager.getPublicClient(chainId),
       owners: [this.signer],
       nonce: this.nonce,
-      version: "1.1",
+      version: '1.1',
     });
   }
 
@@ -146,11 +150,9 @@ export class DefaultSmartWallet extends SmartWallet {
    */
   async getBalance(): Promise<TokenBalance[]> {
     const address = await this.getAddress();
-    const tokenBalancePromises = Object.values(SUPPORTED_TOKENS).map(
-      async (token) => {
-        return fetchERC20Balance(this.chainManager, address, token);
-      }
-    );
+    const tokenBalancePromises = Object.values(SUPPORTED_TOKENS).map(async (token) => {
+      return fetchERC20Balance(this.chainManager, address, token);
+    });
 
     const ethBalancePromise = fetchETHBalance(this.chainManager, address);
 
@@ -161,7 +163,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * Make a deposit to a protocol vault that was selected before on the initialization step
    */
   async earn(
-    amount: string
+    amount: string,
     // chainId: SupportedChainId
   ): Promise<VaultTransactionResult> {
     this.chainManager.getSupportedChain();
@@ -173,10 +175,7 @@ export class DefaultSmartWallet extends SmartWallet {
     //   );
     // }
 
-    const depositTransactionResult = this.protocolProvider.deposit(
-      amount,
-      this
-    );
+    const depositTransactionResult = this.protocolProvider.deposit(amount, this);
 
     return depositTransactionResult;
   }
@@ -242,16 +241,10 @@ export class DefaultSmartWallet extends SmartWallet {
    * @returns Promise resolving to UserOperation hash
    * @throws Error if transaction fails or validation errors occur
    */
-  async send(
-    transactionData: TransactionData,
-    chainId: SupportedChainId
-  ): Promise<Hash> {
+  async send(transactionData: TransactionData, chainId: SupportedChainId): Promise<Hash> {
     try {
       const account = await this.getCoinbaseSmartAccount(chainId);
-      const bundlerClient = this.chainManager.getBundlerClient(
-        chainId,
-        account
-      );
+      const bundlerClient = this.chainManager.getBundlerClient(chainId, account);
 
       const hash = await bundlerClient.sendUserOperation({
         account,
@@ -266,23 +259,15 @@ export class DefaultSmartWallet extends SmartWallet {
       return hash;
     } catch (error) {
       throw new Error(
-        `Failed to send transaction: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+        `Failed to send transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
 
-  async sendBatch(
-    transactionData: TransactionData[],
-    chainId: SupportedChainId
-  ): Promise<Hash> {
+  async sendBatch(transactionData: TransactionData[], chainId: SupportedChainId): Promise<Hash> {
     try {
       const account = await this.getCoinbaseSmartAccount(chainId);
-      const bundlerClient = this.chainManager.getBundlerClient(
-        chainId,
-        account
-      );
+      const bundlerClient = this.chainManager.getBundlerClient(chainId, account);
 
       // Wait for the transaction to be included in a block
       const hash = await bundlerClient.sendUserOperation({
@@ -297,9 +282,7 @@ export class DefaultSmartWallet extends SmartWallet {
       return hash;
     } catch (error) {
       throw new Error(
-        `Failed to send transaction: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+        `Failed to send transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
@@ -323,28 +306,28 @@ export class DefaultSmartWallet extends SmartWallet {
   async sendTokens(
     amount: number,
     asset: AssetIdentifier,
-    recipientAddress: Address
+    recipientAddress: Address,
   ): Promise<TransactionData> {
     if (!recipientAddress) {
-      throw new Error("Recipient address is required");
+      throw new Error('Recipient address is required');
     }
 
     // Validate amount
     if (amount <= 0) {
-      throw new Error("Amount must be greater than 0");
+      throw new Error('Amount must be greater than 0');
     }
 
     // TODO: Get actual chain ID from wallet context, for now using Unichain
     const chainId = unichain.id;
 
     // Handle ETH transfers
-    if (asset.toLowerCase() === "eth") {
+    if (asset.toLowerCase() === 'eth') {
       const parsedAmount = parseAssetAmount(amount, 18); // ETH has 18 decimals
 
       return {
         to: recipientAddress,
         value: parsedAmount,
-        data: "0x",
+        data: '0x',
       };
     }
 
@@ -355,7 +338,7 @@ export class DefaultSmartWallet extends SmartWallet {
     // Encode ERC20 transfer function call
     const transferData = encodeFunctionData({
       abi: erc20Abi,
-      functionName: "transfer",
+      functionName: 'transfer',
       args: [recipientAddress, parsedAmount],
     });
 

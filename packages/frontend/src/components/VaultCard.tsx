@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Box,
   Heading,
@@ -12,7 +12,7 @@ import {
   Badge,
   Spinner,
   Code,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
 interface VaultCardProps {
   walletId?: string;
@@ -22,13 +22,12 @@ interface VaultCardProps {
 export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   const [vaultInfo, setVaultInfo] = useState<any>(null);
   const [vaultBalance, setVaultBalance] = useState<any>(null);
-  const [depositAmount, setDepositAmount] = useState("");
-  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Инициализация протокола и тестового vault
   useEffect(() => {
     if (walletId && walletAddress) {
       initializeVault();
@@ -37,93 +36,54 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
   const initializeVault = async () => {
     try {
-      // const testVaultInfo = {
-      //   id: "morpho-steakhouse-usdc",
-      //   name: "USDC",
-      //   token: "USDC",
-      //   tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      //   tokenDecimals: 6,
-      //   earnContractAddress: "0xbBA4D1CEcc111BDC74bD2f95050Fb11aCB3b8A5E",
-      //   earnedToken: "mooMorpho-Steakhouse-USDC",
-      //   earnedTokenAddress: "0xbBA4D1CEcc111BDC74bD2f95050Fb11aCB3b8A5E",
-      //   earnedTokenDecimals: 6,
-      //   oracle: "tokens",
-      //   oracleId: "USDC",
-      //   status: "active",
-      //   createdAt: 1738747621,
-      //   platformId: "morpho",
-      //   assets: ["USDC"],
-      //   migrationIds: [],
-      //   risks: [
-      //     "COMPLEXITY_LOW",
-      //     "IL_NONE",
-      //     "MCAP_MEDIUM",
-      //     "AUDIT",
-      //     "CONTRACTS_VERIFIED"
-      //   ],
-      //   strategyTypeId: "single",
-      //   network: "ethereum",
-      //   zaps: [
-      //     {
-      //       strategyId: "single"
-      //     }
-      //   ],
-      //   isGovVault: false,
-      //   type: "standard",
-      //   chain: "ethereum",
-      //   strategy: "0xdCEe3AE4f82Bd085fF147B87a754517d8CAafF3b",
-      //   pricePerFullShare: "1028897364641329041",
-      //   lastHarvest: 1755347807
-      // };
-
       const testVaultInfo = {
-        id: "compound-base-usdc",
-        name: "USDC",
-        type: "standard",
-        token: "USDC",
-        tokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        id: 'compound-base-usdc',
+        name: 'USDC',
+        type: 'standard',
+        token: 'USDC',
+        tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
         tokenDecimals: 6,
-        earnedToken: "mooCompoundBaseUSDC",
-        earnedTokenAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-        earnContractAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-        oracle: "tokens",
-        oracleId: "USDC",
-        status: "active",
+        earnedToken: 'mooCompoundBaseUSDC',
+        earnedTokenAddress: '0xeF6ED674486E54507d0f711C0d388BD8a1552E6F',
+        earnContractAddress: '0xeF6ED674486E54507d0f711C0d388BD8a1552E6F',
+        oracle: 'tokens',
+        oracleId: 'USDC',
+        status: 'active',
         createdAt: 1711975000,
-        platformId: "compound",
-        assets: ["USDC"],
+        platformId: 'compound',
+        assets: ['USDC'],
         risks: [
-          "COMPLEXITY_LOW",
-          "BATTLE_TESTED",
-          "IL_NONE",
-          "MCAP_LARGE",
-          "PLATFORM_ESTABLISHED",
-          "AUDIT",
-          "CONTRACTS_VERIFIED",
+          'COMPLEXITY_LOW',
+          'BATTLE_TESTED',
+          'IL_NONE',
+          'MCAP_LARGE',
+          'PLATFORM_ESTABLISHED',
+          'AUDIT',
+          'CONTRACTS_VERIFIED',
         ],
-        strategyTypeId: "lendingNoBorrow",
+        strategyTypeId: 'lendingNoBorrow',
         buyTokenUrl:
-          "https://swap.defillama.com/?chain=base&from=0x0000000000000000000000000000000000000000&to=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-        network: "base",
+          'https://swap.defillama.com/?chain=base&from=0x0000000000000000000000000000000000000000&to=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+        network: 'base',
         zaps: [
           {
-            strategyId: "single",
+            strategyId: 'single',
           },
         ],
         lendingOracle: {
-          provider: "chainlink",
-          address: "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B",
+          provider: 'chainlink',
+          address: '0x7e860098F58bBFC8648a4311b374B1D669a2bc6B',
         },
         isGovVault: false,
-        chain: "base",
-        strategy: "0x2b4eF83aeE6bb3Dd5253dAa7d0756Ef5bD95f40f",
-        pricePerFullShare: "1101411076034236632",
+        chain: 'base',
+        strategy: '0x2b4eF83aeE6bb3Dd5253dAa7d0756Ef5bD95f40f',
+        pricePerFullShare: '1101411076034236632',
         lastHarvest: 1757617949,
       };
       setVaultInfo(testVaultInfo);
     } catch (err) {
       setError(
-        `Failed to initialize vault: ${err instanceof Error ? err.message : "Unknown error"}`
+        `Failed to initialize vault: ${err instanceof Error ? err.message : 'Unknown error'}`,
       );
     }
   };
@@ -135,39 +95,36 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   }, [vaultInfo, walletAddress]);
 
   const loadVaultBalance = async () => {
-    if (!vaultInfo || !walletAddress) return;
+    if (!vaultInfo || !walletAddress) {
+      return;
+    }
 
     try {
       const response = await fetch(`/api/sdk/vault-balance`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
-          walletAddress,
-          vaultInfo,
-          chainId: 8453,
         }),
       });
 
       const data = await response.json();
 
-      console.log("Balance data >>>>> ", data);
+      console.log('Balance data >>>>> ', data);
       if (data.success) {
         setVaultBalance(data.balance);
       } else {
         setError(data.error);
       }
     } catch (err) {
-      console.error("Failed to load vault balance:", err);
-      setError(
-        `Failed to load balance: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      console.error('Failed to load vault balance:', err);
+      setError(`Failed to load balance: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
   const handleDeposit = async () => {
     if (!vaultInfo || !walletId || !walletAddress || !depositAmount) {
-      setError("Missing required data for deposit");
+      setError('Missing required data for deposit');
       return;
     }
 
@@ -177,29 +134,24 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
     try {
       const response = await fetch(`/api/sdk/vault-deposit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
-          walletAddress,
-          vaultInfo,
           amount: depositAmount,
-          chainId: 8453,
         }),
       });
 
       const data = await response.json();
       if (data.success) {
         setSuccess(`Deposit successful! Transaction hash: ${data.hash}`);
-        setDepositAmount("");
+        setDepositAmount('');
         await loadVaultBalance();
       } else {
         setError(data.error);
       }
     } catch (err) {
-      setError(
-        `Deposit failed: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      setError(`Deposit failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -207,7 +159,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
   const handleWithdraw = async () => {
     if (!vaultInfo || !walletId || !walletAddress || !withdrawAmount) {
-      setError("Missing required data for withdraw");
+      setError('Missing required data for withdraw');
       return;
     }
 
@@ -217,8 +169,8 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
     try {
       const response = await fetch(`/api/sdk/vault-withdraw`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
           walletAddress,
@@ -231,15 +183,13 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
       const data = await response.json();
       if (data.success) {
         setSuccess(`Withdraw successful! Transaction hash: ${data.hash}`);
-        setWithdrawAmount("");
+        setWithdrawAmount('');
         await loadVaultBalance();
       } else {
         setError(data.error);
       }
     } catch (err) {
-      setError(
-        `Withdraw failed: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      setError(`Withdraw failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -247,7 +197,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
   const handleWithdrawAll = async () => {
     if (!vaultInfo || !walletId || !walletAddress) {
-      setError("Missing required data for withdraw all");
+      setError('Missing required data for withdraw all');
       return;
     }
 
@@ -257,13 +207,10 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
     try {
       const response = await fetch(`/api/sdk/vault-withdraw-all`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
-          walletAddress,
-          vaultInfo,
-          chainId: 8453,
         }),
       });
 
@@ -275,9 +222,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
         setError(data.error);
       }
     } catch (err) {
-      setError(
-        `Withdraw all failed: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      setError(`Withdraw all failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -294,7 +239,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
     );
   }
 
-  console.log("VaultBalance >>>>> ", vaultBalance);
+  console.log('VaultBalance >>>>> ', vaultBalance);
   return (
     <Box>
       <Heading size="lg" mb={4}>
@@ -302,27 +247,13 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
       </Heading>
 
       {error && (
-        <Box
-          p={4}
-          bg="red.50"
-          borderRadius="md"
-          border="1px"
-          borderColor="red.200"
-          mb={4}
-        >
+        <Box p={4} bg="red.50" borderRadius="md" border="1px" borderColor="red.200" mb={4}>
           <Text color="red.600">{error}</Text>
         </Box>
       )}
 
       {success && (
-        <Box
-          p={4}
-          bg="green.50"
-          borderRadius="md"
-          border="1px"
-          borderColor="green.200"
-          mb={4}
-        >
+        <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200" mb={4}>
           <Text color="green.600">{success}</Text>
         </Box>
       )}
@@ -330,13 +261,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
       {vaultInfo && (
         <VStack gap={4} align="stretch">
           {/* Vault Info */}
-          <Box
-            p={4}
-            bg="blue.50"
-            borderRadius="md"
-            border="1px"
-            borderColor="blue.200"
-          >
+          <Box p={4} bg="blue.50" borderRadius="md" border="1px" borderColor="blue.200">
             <HStack justify="space-between" mb={2}>
               <Text fontWeight="bold" color="blue.700">
                 {vaultInfo.name}
@@ -344,7 +269,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
               <Badge colorScheme="green">{vaultInfo.status}</Badge>
             </HStack>
             <Text fontSize="sm" color="blue.600" mb={1}>
-              Protocol: {vaultInfo.platformId?.toUpperCase() || "BEEFY"}
+              Protocol: {vaultInfo.platformId?.toUpperCase() || 'BEEFY'}
             </Text>
             <Text fontSize="sm" color="blue.600">
               Token: {vaultInfo.token} → {vaultInfo.earnedToken}
@@ -352,13 +277,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
           </Box>
 
           {/* Current Balance */}
-          <Box
-            p={4}
-            bg="green.50"
-            borderRadius="md"
-            border="1px"
-            borderColor="green.200"
-          >
+          <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200">
             <Text fontWeight="bold" color="green.700" mb={2}>
               Your Vault Balance
             </Text>
@@ -406,7 +325,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
                 disabled={isLoading || !depositAmount}
                 minW="100px"
               >
-                {isLoading ? <Spinner size="sm" /> : "Deposit"}
+                {isLoading ? <Spinner size="sm" /> : 'Deposit'}
               </Button>
             </HStack>
           </Box>
@@ -429,7 +348,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
                 disabled={isLoading || !withdrawAmount}
                 minW="100px"
               >
-                {isLoading ? <Spinner size="sm" /> : "Withdraw"}
+                {isLoading ? <Spinner size="sm" /> : 'Withdraw'}
               </Button>
             </HStack>
           </Box>
@@ -443,7 +362,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
               disabled={isLoading}
               width="100%"
             >
-              {isLoading ? <Spinner size="sm" /> : "Withdraw All"}
+              {isLoading ? <Spinner size="sm" /> : 'Withdraw All'}
             </Button>
           </Box>
 

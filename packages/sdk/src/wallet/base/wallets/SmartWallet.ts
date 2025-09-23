@@ -1,13 +1,10 @@
-import type { Address, Hash, LocalAccount } from "viem";
+import type { Address, Hash, LocalAccount } from 'viem';
 
-import type { SupportedChainId } from "@/constants/chains";
-import type { TokenBalance } from "@/types/token";
-import type { AssetIdentifier } from "@/utils/assets";
-import type { TransactionData } from "@/types/transaction";
-import type {
-  VaultBalance,
-  VaultTransactionResult,
-} from "@/types/protocols/beefy";
+import type { SupportedChainId } from '@/constants/chains';
+import type { TokenBalance } from '@/types/token';
+import type { AssetIdentifier } from '@/utils/assets';
+import type { TransactionData } from '@/types/transaction';
+import type { VaultBalance, VaultTransactionResult } from '@/types/protocols/beefy';
 
 /**
  * Base smart wallet class
@@ -43,10 +40,7 @@ export abstract class SmartWallet {
    * @param chainId - Target blockchain chain ID
    * @returns Promise resolving to the transaction hash
    */
-  abstract send(
-    transactionData: TransactionData,
-    chainId: SupportedChainId
-  ): Promise<Hash>;
+  abstract send(transactionData: TransactionData, chainId: SupportedChainId): Promise<Hash>;
 
   /**
    * Send a batch of transactions using this smart wallet. The order of the transactions is important
@@ -57,10 +51,7 @@ export abstract class SmartWallet {
    * @param chainId - Target blockchain chain ID
    * @returns Promise resolving to the transaction hash
    */
-  abstract sendBatch(
-    transactionData: TransactionData[],
-    chainId: SupportedChainId
-  ): Promise<Hash>;
+  abstract sendBatch(transactionData: TransactionData[], chainId: SupportedChainId): Promise<Hash>;
 
   /**
    * Send tokens to another address
@@ -74,7 +65,7 @@ export abstract class SmartWallet {
   abstract sendTokens(
     amount: number,
     asset: AssetIdentifier,
-    recipientAddress: Address
+    recipientAddress: Address,
   ): Promise<TransactionData>; // TODO: Add a correct type
 
   /**

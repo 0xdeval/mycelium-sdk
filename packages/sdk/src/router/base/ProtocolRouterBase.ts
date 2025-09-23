@@ -1,10 +1,7 @@
-import type { SupportedChainId } from "@/constants/chains";
-import type { ChainManager } from "@/tools/ChainManager";
-import { ApiKeysValidator } from "@/tools/ApiKeysValidator";
-import type {
-  Protocol,
-  ProtocolsRouterConfig,
-} from "@/types/protocols/general";
+import type { SupportedChainId } from '@/constants/chains';
+import type { ChainManager } from '@/tools/ChainManager';
+import { ApiKeysValidator } from '@/tools/ApiKeysValidator';
+import type { Protocol, ProtocolsRouterConfig } from '@/types/protocols/general';
 
 /**
  * Base protocol router class
@@ -13,10 +10,10 @@ import type {
  */
 export abstract class ProtocolRouterBase {
   /** The risk level the is required by an integrator */
-  public readonly riskLevel: ProtocolsRouterConfig["riskLevel"];
+  public readonly riskLevel: ProtocolsRouterConfig['riskLevel'];
 
   /** The minimum apy that is required by an integrator */
-  public readonly minApy?: ProtocolsRouterConfig["minApy"];
+  public readonly minApy?: ProtocolsRouterConfig['minApy'];
 
   /** The API key to access premium protocols with a higher APY*/
   public readonly apiKey?: string; // TODO: Add an API key validation
@@ -33,10 +30,10 @@ export abstract class ProtocolRouterBase {
    * @param minApy - The minimum apy that is required by an integrator
    */
   constructor(
-    riskLevel: ProtocolsRouterConfig["riskLevel"],
+    riskLevel: ProtocolsRouterConfig['riskLevel'],
     chainManager: ChainManager,
-    minApy?: ProtocolsRouterConfig["minApy"],
-    apiKey?: ProtocolsRouterConfig["apiKey"]
+    minApy?: ProtocolsRouterConfig['minApy'],
+    apiKey?: ProtocolsRouterConfig['apiKey'],
   ) {
     this.riskLevel = riskLevel;
     this.minApy = minApy;

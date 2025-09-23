@@ -1,10 +1,9 @@
-import MyceliumSDK from "@mycelium-sdk/core";
-import type { WalletRecord } from "./WalletDatabase";
-import type {
-  SmartWallet,
-  VaultBalance,
-  VaultTransactionResult,
-} from "@mycelium-sdk/core";
+import type { WalletRecord } from './WalletDatabase';
+import MyceliumSDK, {
+  type SmartWallet,
+  type VaultBalance,
+  type VaultTransactionResult,
+} from '@mycelium-sdk/core';
 
 export class MyceliumService {
   private static instance: MyceliumService;
@@ -21,15 +20,17 @@ export class MyceliumService {
   }
 
   async init(): Promise<void> {
-    console.log("=== MyceliumService.init() called ===");
-    if (this.initialized) return;
+    console.log('=== MyceliumService.init() called ===');
+    if (this.initialized) {
+      return;
+    }
 
     try {
       this.sdk = new MyceliumSDK({
         walletsConfig: {
           embeddedWalletConfig: {
             provider: {
-              type: "privy",
+              type: 'privy',
               providerConfig: {
                 appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
                 appSecret: process.env.NEXT_PUBLIC_PRIVY_APP_SECRET!,
@@ -38,7 +39,7 @@ export class MyceliumService {
           },
           smartWalletConfig: {
             provider: {
-              type: "default",
+              type: 'default',
             },
           },
         },
@@ -48,12 +49,12 @@ export class MyceliumService {
           bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
         },
         protocolsRouterConfig: {
-          riskLevel: "medium",
+          riskLevel: 'medium',
         },
       });
 
       this.initialized = true;
-      console.log("MyceliumService initialized");
+      console.log('MyceliumService initialized');
     } catch (error) {
       throw new Error(`Failed to initialize MyceliumService: ${error}`);
     }
@@ -61,11 +62,11 @@ export class MyceliumService {
 
   async createWallet() {
     if (!this.sdk) {
-      throw new Error("SDK not initialized");
+      throw new Error('SDK not initialized');
     }
     const embeddedWallet = await this.sdk.wallet.createEmbeddedWallet();
     const embeddedWalletId = embeddedWallet.walletId as string;
-    console.log("Embedded wallet ID: ", embeddedWalletId);
+    console.log('Embedded wallet ID: ', embeddedWalletId);
 
     const wallet = await this.sdk.wallet.createSmartWallet({
       owners: [embeddedWallet.address],
@@ -80,7 +81,7 @@ export class MyceliumService {
 
   async getWallet(existingWallet: WalletRecord): Promise<SmartWallet> {
     if (!this.sdk) {
-      throw new Error("SDK not initialized");
+      throw new Error('SDK not initialized');
     }
 
     const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
@@ -91,10 +92,10 @@ export class MyceliumService {
   }
 
   async getWalletBalance(
-    walletId: string
+    walletId: string,
   ): Promise<{ symbol: string; formattedBalance: string }[]> {
     if (!this.sdk) {
-      throw new Error("SDK not initialized");
+      throw new Error('SDK not initialized');
     }
 
     const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
@@ -103,7 +104,7 @@ export class MyceliumService {
 
     const tokens = await wallet.getBalance();
 
-    console.log("all tokens info:", tokens);
+    console.log('all tokens info:', tokens);
 
     return tokens.map((token) => {
       return {
@@ -113,12 +114,9 @@ export class MyceliumService {
     });
   }
 
-  async earn(
-    walletId: string,
-    amount: string
-  ): Promise<VaultTransactionResult> {
+  async earn(walletId: string, amount: string): Promise<VaultTransactionResult> {
     if (!this.sdk) {
-      throw new Error("SDK not initialized");
+      throw new Error('SDK not initialized');
     }
 
     const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
@@ -131,7 +129,7 @@ export class MyceliumService {
 
   async getEarnBalance(walletId: string): Promise<VaultBalance | null> {
     if (!this.sdk) {
-      throw new Error("SDK not initialized");
+      throw new Error('SDK not initialized');
     }
 
     const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({

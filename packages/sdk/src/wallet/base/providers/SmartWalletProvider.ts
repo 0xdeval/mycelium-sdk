@@ -1,9 +1,6 @@
-import type { Address, LocalAccount } from "viem";
-import type { WebAuthnAccount } from "viem/account-abstraction";
-
-import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet.js";
-import type { VaultTransactionResult } from "@/types/protocols/beefy";
-import type { SupportedChainId } from "@/constants/chains";
+import type { Address, LocalAccount } from 'viem';
+import type { WebAuthnAccount } from 'viem/account-abstraction';
+import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet.js';
 
 /**
  * Base smart wallet provider interface

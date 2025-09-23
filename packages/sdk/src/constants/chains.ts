@@ -1,11 +1,4 @@
-import {
-  base,
-  baseSepolia,
-  mainnet,
-  unichain,
-  sepolia,
-  type Chain,
-} from "viem/chains";
+import { base, baseSepolia, mainnet, unichain, sepolia, type Chain } from 'viem/chains';
 
 export const CHAINS_MAP: Record<string, Chain> = {
   mainnet,

@@ -1,11 +1,13 @@
-import { type Chain, createPublicClient, http, type PublicClient } from "viem";
-import type { BundlerClient, SmartAccount } from "viem/account-abstraction";
-import { createBundlerClient } from "viem/account-abstraction";
+import { type Chain, createPublicClient, http, type PublicClient } from 'viem';
+import {
+  type BundlerClient,
+  type SmartAccount,
+  createBundlerClient,
+} from 'viem/account-abstraction';
 
-import type { SUPPORTED_CHAIN_IDS, SupportedChainId } from "@/constants/chains";
-import { CHAINS_MAP } from "@/constants/chains";
-import type { ChainConfig } from "@/types/chain";
-import { chainById } from "@/utils/chains";
+import { type SUPPORTED_CHAIN_IDS, type SupportedChainId, CHAINS_MAP } from '@/constants/chains';
+import type { ChainConfig } from '@/types/chain';
+import { chainById } from '@/utils/chains';
 
 /**
  * Chain Manager Service
@@ -53,7 +55,7 @@ export class ChainManager {
    */
   getBundlerClient(
     chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
-    account: SmartAccount
+    account: SmartAccount,
   ): BundlerClient {
     const rpcUrl = this.getRpcUrl(chainId);
     const bundlerUrl = this.getBundlerUrl(chainId);
@@ -61,7 +63,7 @@ export class ChainManager {
       throw new Error(`No bundler URL configured for chain ID: ${chainId}`);
     }
 
-    console.log("Public client setup:", { bundlerUrl, chainId });
+    console.log('Public client setup:', { bundlerUrl, chainId });
     const client = createPublicClient({
       chain: this.getChain(chainId),
       transport: http(rpcUrl),
@@ -95,9 +97,7 @@ export class ChainManager {
    * @returns Bundler URL as a string or undefined if not configured
    * @throws Error if no chain config is found for the chain ID
    */
-  getBundlerUrl(
-    chainId: (typeof SUPPORTED_CHAIN_IDS)[number]
-  ): string | undefined {
+  getBundlerUrl(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): string | undefined {
     const chainConfig = this.chainConfigs;
     if (!chainConfig) {
       throw new Error(`No chain config found for chain ID: ${chainId}`);

@@ -1,13 +1,15 @@
-import type { ChainManager } from "@/tools/ChainManager";
-import type {
-  VaultInfo,
-  VaultTransactionResult,
-  VaultBalance,
-} from "@/types/protocols/beefy";
-import type { Address, LocalAccount } from "viem";
-import { erc20Abi, createWalletClient, http, parseGwei } from "viem";
-import type { SupportedChainId } from "@/constants/chains";
-import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
+import type { ChainManager } from '@/tools/ChainManager';
+import type { VaultInfo, VaultTransactionResult, VaultBalance } from '@/types/protocols/beefy';
+import {
+  type Address,
+  type LocalAccount,
+  erc20Abi,
+  createWalletClient,
+  http,
+  parseGwei,
+} from 'viem';
+import type { SupportedChainId } from '@/constants/chains';
+import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 
 export abstract class BaseProtocol {
   /** the chain manager instance */
@@ -23,9 +25,7 @@ export abstract class BaseProtocol {
    */
   protected ensureInitialized(): void {
     if (!this.chainManager) {
-      throw new Error(
-        "Protocol must be initialized before use. Call init() first."
-      );
+      throw new Error('Protocol must be initialized before use. Call init() first.');
     }
   }
 
@@ -42,17 +42,12 @@ export abstract class BaseProtocol {
   /**
    * Method defines and return a pool where a user could already have deposited funds previously
    */
-  abstract fetchDepositedVaults(
-    smartWallet: SmartWallet
-  ): Promise<VaultInfo | null>;
+  abstract fetchDepositedVaults(smartWallet: SmartWallet): Promise<VaultInfo | null>;
 
   /**
    * Deposit funds into a vault
    */
-  abstract deposit(
-    amount: string,
-    smartWallet: SmartWallet
-  ): Promise<VaultTransactionResult>;
+  abstract deposit(amount: string, smartWallet: SmartWallet): Promise<VaultTransactionResult>;
 
   /**
    * Withdraw funds from a vault
@@ -62,7 +57,7 @@ export abstract class BaseProtocol {
     vaultInfo: VaultInfo,
     walletAddress: Address,
     chainId: SupportedChainId,
-    smartWallet: SmartWallet
+    smartWallet: SmartWallet,
   ): Promise<VaultTransactionResult>;
 
   /**
@@ -72,7 +67,7 @@ export abstract class BaseProtocol {
     vaultInfo: VaultInfo,
     walletAddress: Address,
     chainId: SupportedChainId,
-    smartWallet: SmartWallet
+    smartWallet: SmartWallet,
   ): Promise<VaultTransactionResult>;
 
   /**
@@ -80,7 +75,7 @@ export abstract class BaseProtocol {
    */
   abstract getBalance(
     vaultInfo: VaultInfo,
-    walletAddress: Address // chainId: SupportedChainId
+    walletAddress: Address, // chainId: SupportedChainId
   ): Promise<VaultBalance>;
 
   /**
@@ -91,7 +86,7 @@ export abstract class BaseProtocol {
     spenderAddress: Address,
     amount: bigint,
     chainId: SupportedChainId,
-    account: LocalAccount
+    account: LocalAccount,
   ): Promise<string> {
     this.ensureInitialized();
 
@@ -104,11 +99,11 @@ export abstract class BaseProtocol {
     const hash = await walletClient.writeContract({
       address: tokenAddress,
       abi: erc20Abi,
-      functionName: "approve",
+      functionName: 'approve',
       args: [spenderAddress, amount],
       gas: 100000n,
-      maxFeePerGas: parseGwei("20"),
-      maxPriorityFeePerGas: parseGwei("2"),
+      maxFeePerGas: parseGwei('20'),
+      maxPriorityFeePerGas: parseGwei('2'),
     });
 
     return hash;
@@ -121,7 +116,7 @@ export abstract class BaseProtocol {
     tokenAddress: Address,
     spenderAddress: Address,
     walletAddress: Address,
-    chainId: SupportedChainId
+    chainId: SupportedChainId,
   ): Promise<bigint> {
     this.ensureInitialized();
 
@@ -130,7 +125,7 @@ export abstract class BaseProtocol {
     return await publicClient.readContract({
       address: tokenAddress,
       abi: erc20Abi,
-      functionName: "allowance",
+      functionName: 'allowance',
       args: [walletAddress, spenderAddress],
     });
   }

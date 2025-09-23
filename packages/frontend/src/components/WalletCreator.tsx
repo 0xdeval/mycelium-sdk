@@ -1,8 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Box, Heading, VStack, Text, Input, Button } from "@chakra-ui/react";
-import { CustomAlert } from "./ui/alert";
+import { useState } from 'react';
+import { Box, Heading, VStack, Text, Input, Button } from '@chakra-ui/react';
 
 interface Props {
   onWalletCreated: (id: string, address: string) => void;
@@ -17,41 +16,40 @@ export default function WalletCreator({
   isLoading,
   setIsLoading,
 }: Props) {
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState('');
 
   const handleCreateWallet = async () => {
     if (!userId.trim()) {
-      onError("Please enter a user ID");
+      onError('Please enter a user ID');
       return;
     }
 
     setIsLoading(true);
-    onError("");
+    onError('');
 
     try {
       const response = await fetch(`/api/sdk/get-wallet/${userId}`);
       const data = await response.json();
 
-      console.log("response after get wallet: ", data);
+      console.log('response after get wallet: ', data);
       if (data.found) {
         onWalletCreated(data.walletId, data.address);
-        setUserId("");
+        setUserId('');
         return;
       } else {
-        console.log("creating wallet for user: ", userId);
+        console.log('creating wallet for user: ', userId);
         const response = await fetch(`/api/sdk/create-wallet`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
         });
         const data = await response.json();
         onWalletCreated(data.walletId, data.walletAddress);
-        setUserId("");
+        setUserId('');
         return;
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An error occurred";
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       onError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -75,7 +73,7 @@ export default function WalletCreator({
             onChange={(e) => setUserId(e.target.value)}
             placeholder="Enter your user ID"
             disabled={isLoading}
-            bg={isLoading ? "gray.100" : "white"}
+            bg={isLoading ? 'gray.100' : 'white'}
           />
         </Box>
 
@@ -86,7 +84,7 @@ export default function WalletCreator({
           size="lg"
           width="100%"
         >
-          {isLoading ? "Creating Wallet..." : "Create Wallet"}
+          {isLoading ? 'Creating Wallet...' : 'Create Wallet'}
         </Button>
       </VStack>
 

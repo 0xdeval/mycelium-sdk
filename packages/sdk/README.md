@@ -35,7 +35,7 @@ When an SDK is built, then it could be used in package/frontend
 
 ## Chain management
 
-The chains config that is provided on the SDK initialitzation is used to define where the onchain activity will take place. For now, only one chain should be provided as only one chain can be used for `earn` functionality (more chains support is coming soon). For example on the following init we defined a chain id => 8453:
+The chains config that is provided on the SDK init is used to define where the onchain activity will take place. For now, only one chain should be provided as only one chain can be used for `earn` functionality (more chains support is coming soon). For example on the following init we defined a chain id => 8453:
 
 ```javascript
 this.sdk = new MyceliumSDK({

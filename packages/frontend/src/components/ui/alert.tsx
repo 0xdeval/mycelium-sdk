@@ -1,12 +1,6 @@
-import { Alert } from "@chakra-ui/react";
+import { Alert } from '@chakra-ui/react';
 
-export const CustomAlert = ({
-  title,
-  body,
-}: {
-  title: string;
-  body?: string;
-}) => {
+export const CustomAlert = ({ title, body }: { title: string; body?: string }) => {
   return (
     <Alert.Root>
       <Alert.Indicator />

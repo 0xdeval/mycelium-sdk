@@ -1,5 +1,5 @@
-import type { ChainConfig } from "@/types/chain";
-import type { ProtocolsRouterConfig } from "@/types/protocols/general";
+import type { ChainConfig } from '@/types/chain';
+import type { ProtocolsRouterConfig } from '@/types/protocols/general';
 
 /**
  * Verbs SDK configuration
@@ -54,7 +54,7 @@ export type SmartWalletProvider = DefaultSmartWalletProvider;
  * @description Built-in provider smart wallet provider.
  */
 export interface DefaultSmartWalletProvider {
-  type: "default";
+  type: 'default';
 }
 
 /**
@@ -66,7 +66,7 @@ export type EmbeddedWalletProviderConfig = PrivyEmbeddedWalletProviderConfig;
 /** Privy embedded wallet provider configuration */
 export interface PrivyEmbeddedWalletProviderConfig {
   /** Embedded wallet provider type */
-  type: "privy";
+  type: 'privy';
   /** Privy client provider config */
   providerConfig: {
     /** Privy params */
