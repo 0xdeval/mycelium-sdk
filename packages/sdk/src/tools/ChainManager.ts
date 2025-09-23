@@ -143,11 +143,38 @@ export class ChainManager {
     return client;
   }
 
+  /**
+   * Get chain ID by name
+   * @param name - Chain name to get the ID for
+   * @returns Chain ID
+   */
   getChainIdByName(name: string): SupportedChainId {
+    // TODO: strange case
+    if (name === 'ethereum') {
+      // @ts-ignore
+      return this.chainNames['mainnet'].id;
+    }
     const chain = this.chainNames[name];
     if (!chain) {
       throw new Error(`Chain not found for name: ${name}`);
     }
     return chain.id;
+  }
+
+    /**
+   * Get all supported chain names
+   * @returns Array of supported chain names
+   */
+  getSupportedChainNames(): string[] {
+    return Object.keys(this.chainNames);
+  }
+
+  /**
+   * Check if chain is supported
+   * @param chainName - Chain name to check
+   * @returns True if chain is supported
+   */
+  isChainSupported(chainName: string): boolean {
+    return chainName in this.chainNames;
   }
 }

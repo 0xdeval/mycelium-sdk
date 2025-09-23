@@ -7,12 +7,12 @@ export async function POST(request: NextRequest) {
     const { walletId, walletAddress, vaultInfo, chainId } =
       await request.json();
 
-    console.log("API Request data:", {
-      walletId,
-      walletAddress,
-      vaultInfo,
-      chainId,
-    });
+    // console.log("API Request data:", {
+    //   walletId,
+    //   walletAddress,
+    //   vaultInfo,
+    //   chainId,
+    // });
 
     const myceliumService = MyceliumService.getInstance();
     await myceliumService.init();

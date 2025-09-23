@@ -31,102 +31,86 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   // Инициализация протокола и тестового vault
   useEffect(() => {
     if (walletId && walletAddress) {
-      initializeVault();
+      initializeVault(); 
     }
   }, [walletId, walletAddress]);
 
-  const initializeVault = async () => {
-    try {
-      // const testVaultInfo = {
-      //   id: "morpho-steakhouse-usdc",
-      //   name: "USDC",
-      //   token: "USDC",
-      //   tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      //   tokenDecimals: 6,
-      //   earnContractAddress: "0xbBA4D1CEcc111BDC74bD2f95050Fb11aCB3b8A5E",
-      //   earnedToken: "mooMorpho-Steakhouse-USDC",
-      //   earnedTokenAddress: "0xbBA4D1CEcc111BDC74bD2f95050Fb11aCB3b8A5E",
-      //   earnedTokenDecimals: 6,
-      //   oracle: "tokens",
-      //   oracleId: "USDC",
-      //   status: "active",
-      //   createdAt: 1738747621,
-      //   platformId: "morpho",
-      //   assets: ["USDC"],
-      //   migrationIds: [],
-      //   risks: [
-      //     "COMPLEXITY_LOW",
-      //     "IL_NONE",
-      //     "MCAP_MEDIUM",
-      //     "AUDIT",
-      //     "CONTRACTS_VERIFIED"
-      //   ],
-      //   strategyTypeId: "single",
-      //   network: "ethereum",
-      //   zaps: [
-      //     {
-      //       strategyId: "single"
-      //     }
-      //   ],
-      //   isGovVault: false,
-      //   type: "standard",
-      //   chain: "ethereum",
-      //   strategy: "0xdCEe3AE4f82Bd085fF147B87a754517d8CAafF3b",
-      //   pricePerFullShare: "1028897364641329041",
-      //   lastHarvest: 1755347807
-      // };
+  // const initializeVault = async () => {
+  //   try {
+  //     const testVaultInfo = {
+  //       id: "compound-base-usdc",
+  //       name: "USDC",
+  //       type: "standard",
+  //       token: "USDC",
+  //       tokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  //       tokenDecimals: 6,
+  //       earnedToken: "mooCompoundBaseUSDC",
+  //       earnedTokenAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
+  //       earnContractAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
+  //       oracle: "tokens",
+  //       oracleId: "USDC",
+  //       status: "active",
+  //       createdAt: 1711975000,
+  //       platformId: "compound",
+  //       assets: ["USDC"],
+  //       risks: [
+  //         "COMPLEXITY_LOW",
+  //         "BATTLE_TESTED",
+  //         "IL_NONE",
+  //         "MCAP_LARGE",
+  //         "PLATFORM_ESTABLISHED",
+  //         "AUDIT",
+  //         "CONTRACTS_VERIFIED",
+  //       ],
+  //       strategyTypeId: "lendingNoBorrow",
+  //       buyTokenUrl:
+  //         "https://swap.defillama.com/?chain=base&from=0x0000000000000000000000000000000000000000&to=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  //       network: "base",
+  //       zaps: [
+  //         {
+  //           strategyId: "single",
+  //         },
+  //       ],
+  //       lendingOracle: {
+  //         provider: "chainlink",
+  //         address: "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B",
+  //       },
+  //       isGovVault: false,
+  //       chain: "base",
+  //       strategy: "0x2b4eF83aeE6bb3Dd5253dAa7d0756Ef5bD95f40f",
+  //       pricePerFullShare: "1101411076034236632",
+  //       lastHarvest: 1757617949,
+  //     };
+  //     setVaultInfo(testVaultInfo);
+  //   } catch (err) {
+  //     setError(
+  //       `Failed to initialize vault: ${err instanceof Error ? err.message : "Unknown error"}`
+  //     );
+  //   }
+  // };
 
-      const testVaultInfo = {
-        id: "compound-base-usdc",
-        name: "USDC",
-        type: "standard",
-        token: "USDC",
-        tokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-        tokenDecimals: 6,
-        earnedToken: "mooCompoundBaseUSDC",
-        earnedTokenAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-        earnContractAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-        oracle: "tokens",
-        oracleId: "USDC",
-        status: "active",
-        createdAt: 1711975000,
-        platformId: "compound",
-        assets: ["USDC"],
-        risks: [
-          "COMPLEXITY_LOW",
-          "BATTLE_TESTED",
-          "IL_NONE",
-          "MCAP_LARGE",
-          "PLATFORM_ESTABLISHED",
-          "AUDIT",
-          "CONTRACTS_VERIFIED",
-        ],
-        strategyTypeId: "lendingNoBorrow",
-        buyTokenUrl:
-          "https://swap.defillama.com/?chain=base&from=0x0000000000000000000000000000000000000000&to=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-        network: "base",
-        zaps: [
-          {
-            strategyId: "single",
-          },
-        ],
-        lendingOracle: {
-          provider: "chainlink",
-          address: "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B",
-        },
-        isGovVault: false,
-        chain: "base",
-        strategy: "0x2b4eF83aeE6bb3Dd5253dAa7d0756Ef5bD95f40f",
-        pricePerFullShare: "1101411076034236632",
-        lastHarvest: 1757617949,
-      };
-      setVaultInfo(testVaultInfo);
-    } catch (err) {
-      setError(
-        `Failed to initialize vault: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+  const initializeVault = async () => {
+  try {
+    const response = await fetch(`/api/sdk/vault-info`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ walletId }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setVaultInfo(data.vaultInfo);
+      console.log("Vault initialized:", data.vaultInfo?.name);
+    } else {
+      setError(`Failed to get vault: ${data.error}`);
     }
-  };
+  } catch (err) {
+    setError(
+      `Failed to initialize vault: ${err instanceof Error ? err.message : "Unknown error"}`
+    );
+  }
+};
 
   useEffect(() => {
     if (vaultInfo && walletAddress) {
@@ -153,7 +137,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
       console.log("Balance data >>>>> ", data);
       if (data.success) {
-        setVaultBalance(data.balance);
+        setVaultBalance(data.balance || { shares: "0", depositedAmount: "0", ppfs: "0" });
       } else {
         setError(data.error);
       }

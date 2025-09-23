@@ -21,10 +21,10 @@ export async function GET(
     console.log("=== init() completed ===");
 
     try {
-      const balances = await myceliumService.getWalletBalance(walletId);
+      const balance = await myceliumService.getWalletBalance(walletId);
       return NextResponse.json({
         success: true,
-        balances,
+        balance: balance || { shares: "0", depositedAmount: "0", ppfs: "0" },
       });
     } catch (error) {
       return NextResponse.json({

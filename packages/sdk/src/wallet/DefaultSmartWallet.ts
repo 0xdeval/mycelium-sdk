@@ -192,6 +192,48 @@ export class DefaultSmartWallet extends SmartWallet {
     return this.protocolProvider.getBalance(vaultInfo, await this.getAddress());
   }
 
+  /**
+   * Withdraw specific amount from the protocol vault
+   */
+  async withdraw(amount: string): Promise<VaultTransactionResult> {
+    const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
+    if (!vaultInfo) {
+      throw new Error("No vault found to withdraw from");
+    }
+
+    const chainId = this.chainManager.getSupportedChain();
+    const walletAddress = await this.getAddress();
+
+    const withdrawTransactionResult = await this.protocolProvider.withdraw(
+      amount,
+      vaultInfo,
+      walletAddress,
+      chainId,
+      this
+    );
+
+    return withdrawTransactionResult;
+  }
+
+  async withdrawAll(): Promise<VaultTransactionResult> {
+    const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
+    if (!vaultInfo) {
+      throw new Error("No vault found to withdraw from");
+    }
+
+    const chainId = this.chainManager.getSupportedChain();
+    const walletAddress = await this.getAddress();
+
+    const withdrawTransactionResult = await this.protocolProvider.withdrawAll(
+      vaultInfo,
+      walletAddress,
+      chainId,
+      this
+    );
+
+    return withdrawTransactionResult;
+  }
+
   //   /**
   //    * Lend assets to a lending market
   //    * @description Lends assets using the configured lending provider with human-readable amounts
@@ -364,5 +406,8 @@ export class DefaultSmartWallet extends SmartWallet {
       value: 0n,
       data: transferData,
     };
+  }
+  async getVault(): Promise<VaultInfo | undefined> {
+    return await this.protocolProvider.getVault(this);
   }
 }
