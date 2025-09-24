@@ -1,27 +1,24 @@
-export type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
-export type { EmbeddedWallet } from "@/wallet/base/wallets/EmbeddedWallet";
-export type { WalletNamespace } from "@/wallet/WalletNamespace";
-export type { ChainManager } from "@/tools/ChainManager";
-export type { TokenBalance } from "@/types/token";
-export type {
-  VaultTransactionResult,
-  VaultBalance,
-} from "@/types/protocols/beefy";
+export type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
+export type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
+export type { WalletNamespace } from '@/wallet/WalletNamespace';
+export type { ChainManager } from '@/tools/ChainManager';
+export type { TokenBalance } from '@/types/token';
+export type { VaultTransactionResult, VaultBalance } from '@/types/protocols/beefy';
 
-import { ChainManager } from "@/tools/ChainManager";
-import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
-import { WalletNamespace } from "@/wallet/WalletNamespace";
-import { type MyceliumSDKConfig } from "@/types/sdk";
-import { base } from "viem/chains";
-import { DefaultSmartWalletProvider } from "@/wallet/providers/DefaultSmartWalletProvider";
-import { WalletProvider } from "@/wallet/WalletProvider";
-import type { EmbeddedWalletProvider } from "@/wallet/base/providers/EmbeddedWalletProvider";
-import { PrivyEmbeddedWalletProvider } from "./wallet/providers/PrivyEmbeddedWalletProvider";
-import { PrivyClient } from "@privy-io/server-auth";
-import { ProtocolRouter } from "./router/ProtocolRouter";
-import type { Protocol } from "./types/protocols/general";
+import { ChainManager } from '@/tools/ChainManager';
+import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
+import { WalletNamespace } from '@/wallet/WalletNamespace';
+import { type MyceliumSDKConfig } from '@/types/sdk';
+import { base } from 'viem/chains';
+import { DefaultSmartWalletProvider } from '@/wallet/providers/DefaultSmartWalletProvider';
+import { WalletProvider } from '@/wallet/WalletProvider';
+import type { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWalletProvider';
+import { PrivyEmbeddedWalletProvider } from './wallet/providers/PrivyEmbeddedWalletProvider';
+import { PrivyClient } from '@privy-io/server-auth';
+import { ProtocolRouter } from './router/ProtocolRouter';
+import type { Protocol } from './types/protocols/general';
 
-export { BeefyProtocol } from "./protocols/implementations/BeefyProtocol";
+export { BeefyProtocol } from './protocols/implementations/BeefyProtocol';
 
 export class MyceliumSDK {
   public readonly wallet: WalletNamespace;
@@ -36,11 +33,11 @@ export class MyceliumSDK {
       config.chain || {
         chainId: base.id,
         rpcUrl: base.rpcUrls.default.http[0],
-      }
+      },
     );
 
     const protocolsRouterConfig = config.protocolsRouterConfig || {
-      riskLevel: "medium",
+      riskLevel: 'medium',
     };
 
     // protocolsRouterConfig is the abstract settings that are clear for a dev, e.g. risk level, basic apy, etc
@@ -61,9 +58,7 @@ export class MyceliumSDK {
    *
    * @param config Return a protocol provider instance that was recommended by the smart router based on the given config
    */
-  private findProtocol(
-    config: MyceliumSDKConfig["protocolsRouterConfig"]
-  ): Protocol {
+  private findProtocol(config: MyceliumSDKConfig['protocolsRouterConfig']): Protocol {
     // 1. Create a smart router with the given config
     // 2. Smart router will fetch available protocols
     // 3. Smart router will find the best protocol based on the given config
@@ -87,43 +82,40 @@ export class MyceliumSDK {
    * @param config - Wallet configuration
    * @returns WalletProvider instance
    */
-  private createWalletProvider(config: MyceliumSDKConfig["walletsConfig"]) {
-    if (config.embeddedWalletConfig.provider.type === "privy") {
+  private createWalletProvider(config: MyceliumSDKConfig['walletsConfig']) {
+    if (config.embeddedWalletConfig.provider.type === 'privy') {
       const privyClient = new PrivyClient(
         config.embeddedWalletConfig.provider.providerConfig.appId,
-        config.embeddedWalletConfig.provider.providerConfig.appSecret
+        config.embeddedWalletConfig.provider.providerConfig.appSecret,
       );
 
       this.embeddedWalletProvider = new PrivyEmbeddedWalletProvider(
         // config.embeddedWalletConfig.provider.privyClient,
         privyClient,
-        this._chainManager
+        this._chainManager,
         // this.lendProvider!
       );
     } else {
       throw new Error(
-        `Unsupported embedded wallet provider: ${config.embeddedWalletConfig.provider.type}`
+        `Unsupported embedded wallet provider: ${config.embeddedWalletConfig.provider.type}`,
       );
     }
 
-    if (
-      !config.smartWalletConfig ||
-      config.smartWalletConfig.provider.type === "default"
-    ) {
+    if (!config.smartWalletConfig || config.smartWalletConfig.provider.type === 'default') {
       this.smartWalletProvider = new DefaultSmartWalletProvider(
         this.chainManager,
-        this.protocol
+        this.protocol,
         // this.lend
       );
     } else {
       throw new Error(
-        `Unsupported smart wallet provider: ${config.smartWalletConfig.provider.type}`
+        `Unsupported smart wallet provider: ${config.smartWalletConfig.provider.type}`,
       );
     }
 
     const walletProvider = new WalletProvider(
       this.embeddedWalletProvider,
-      this.smartWalletProvider
+      this.smartWalletProvider,
     );
 
     return walletProvider;
@@ -134,7 +126,7 @@ export class MyceliumSDK {
    * @param config - Wallet configuration
    * @returns WalletNamespace instance
    */
-  private createWalletNamespace(config: MyceliumSDKConfig["walletsConfig"]) {
+  private createWalletNamespace(config: MyceliumSDKConfig['walletsConfig']) {
     const walletProvider = this.createWalletProvider(config);
     return new WalletNamespace(walletProvider);
   }

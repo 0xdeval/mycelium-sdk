@@ -1,11 +1,8 @@
-import type { SupportedChainId } from "@/constants/chains";
-import { availableProtocols } from "@/constants/protocols";
-import { ProtocolRouterBase } from "@/router/base/ProtocolRouterBase";
-import type { ChainManager } from "@/tools/ChainManager";
-import type {
-  Protocol,
-  ProtocolsRouterConfig,
-} from "@/types/protocols/general";
+import type { SupportedChainId } from '@/constants/chains';
+import { availableProtocols } from '@/constants/protocols';
+import { ProtocolRouterBase } from '@/router/base/ProtocolRouterBase';
+import type { ChainManager } from '@/tools/ChainManager';
+import type { Protocol, ProtocolsRouterConfig } from '@/types/protocols/general';
 
 export class ProtocolRouter extends ProtocolRouterBase {
   constructor(config: ProtocolsRouterConfig, chainManager: ChainManager) {
@@ -32,9 +29,7 @@ export class ProtocolRouter extends ProtocolRouterBase {
   }
 
   isProtocolSupportedChain(chainIds: SupportedChainId[]): boolean {
-    return chainIds.some(
-      (chainId) => this.chainManager.getSupportedChain() === chainId
-    );
+    return chainIds.some((chainId) => this.chainManager.getSupportedChain() === chainId);
   }
 
   recommend(): Protocol {
@@ -46,17 +41,13 @@ export class ProtocolRouter extends ProtocolRouterBase {
       // Check if protocol matches risk level
       const riskMatches = protocol.info.riskLevel === this.riskLevel;
 
-      const isSupportedChain = this.isProtocolSupportedChain(
-        protocol.info.supportedChains
-      );
+      const isSupportedChain = this.isProtocolSupportedChain(protocol.info.supportedChains);
 
       return riskMatches && isSupportedChain;
     });
 
     if (eligibleProtocols.length === 0) {
-      throw new Error(
-        `No protocols available for risk level: ${this.riskLevel}`
-      );
+      throw new Error(`No protocols available for risk level: ${this.riskLevel}`);
     }
 
     // TODO: Add a smarter sorting of protocols here and then return the best one

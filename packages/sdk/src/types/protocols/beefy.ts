@@ -1,5 +1,5 @@
-import type { SupportedChainId } from "@/constants/chains";
-import type { Address } from "viem";
+import type { SupportedChainId } from '@/constants/chains';
+import type { Address } from 'viem';
 
 export interface VaultInfo {
   id: string;
@@ -12,7 +12,7 @@ export interface VaultInfo {
   earnedTokenAddress: Address;
   oracle: string;
   oracleId: string;
-  status: "active" | "paused" | "deprecated";
+  status: 'active' | 'paused' | 'deprecated';
   createdAt: number;
   platformId: string;
   assets: string[];

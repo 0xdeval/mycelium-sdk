@@ -1,6 +1,6 @@
-import type { Address } from "viem";
-import type { SupportedChainId } from "@/constants/chains";
-import { SUPPORTED_TOKENS } from "@/constants/tokens";
+import type { Address } from 'viem';
+import type { SupportedChainId } from '@/constants/chains';
+import { SUPPORTED_TOKENS } from '@/constants/tokens';
 
 export interface TokenInfo {
   symbol: string;
@@ -15,10 +15,7 @@ export interface TokenInfo {
  * @param chainId Chain ID
  * @returns Token symbol or null if not found
  */
-export function findTokenByAddress(
-  address: Address,
-  chainId: SupportedChainId
-): string | null {
+export function findTokenByAddress(address: Address, chainId: SupportedChainId): string | null {
   const normalizedAddress = address.toLowerCase();
 
   for (const [symbol, token] of Object.entries(SUPPORTED_TOKENS)) {
@@ -37,10 +34,7 @@ export function findTokenByAddress(
  * @param chainId Chain ID
  * @returns Token address or null if not supported on that chain
  */
-export function getTokenAddress(
-  symbol: string,
-  chainId: SupportedChainId
-): Address | null {
+export function getTokenAddress(symbol: string, chainId: SupportedChainId): Address | null {
   const token = SUPPORTED_TOKENS[symbol];
   return token?.addresses[chainId] || null;
 }

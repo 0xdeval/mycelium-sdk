@@ -1,4 +1,4 @@
-import type { BaseProtocol } from "@/protocols/base/BaseProtocol";
+import type { BaseProtocol } from '@/protocols/base/BaseProtocol';
 
 /**
  * Base information that can be used to identify a protocol
@@ -9,7 +9,7 @@ export interface ProtocolInfo {
   website: string;
   logo: string;
   supportedChains: number[];
-  riskLevel: "low" | "medium" | "high";
+  riskLevel: 'low' | 'medium' | 'high';
   isPremium: boolean;
 }
 
@@ -22,7 +22,7 @@ export interface Protocol {
  * The protocols router config that defines which protocols should be used for an integrator
  */
 export interface ProtocolsRouterConfig {
-  riskLevel: "low" | "medium" | "high";
+  riskLevel: 'low' | 'medium' | 'high';
   minApy?: number;
   apiKey?: string;
 }

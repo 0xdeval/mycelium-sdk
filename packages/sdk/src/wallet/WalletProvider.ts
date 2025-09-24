@@ -1,5 +1,5 @@
-import type { Address } from "viem";
-import type { WebAuthnAccount } from "viem/account-abstraction";
+import type { Address } from 'viem';
+import type { WebAuthnAccount } from 'viem/account-abstraction';
 
 import type {
   CreateSmartWalletOptions,
@@ -7,11 +7,11 @@ import type {
   GetEmbeddedWalletOptions,
   GetSmartWalletOptions,
   GetSmartWalletWithEmbeddedSignerOptions,
-} from "@/types/wallet";
-import type { EmbeddedWallet } from "@/wallet/base/wallets/EmbeddedWallet";
-import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
-import type { EmbeddedWalletProvider } from "@/wallet/base/providers/EmbeddedWalletProvider";
-import type { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
+} from '@/types/wallet';
+import type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
+import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
+import type { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWalletProvider';
+import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
 
 // WHAT IS THIS CLASS?
 // This is a provider class that is used to manage smart and embedded wallets
@@ -29,7 +29,7 @@ export class WalletProvider {
 
   constructor(
     embeddedWalletProvider: EmbeddedWalletProvider,
-    smartWalletProvider: SmartWalletProvider
+    smartWalletProvider: SmartWalletProvider,
   ) {
     this.embeddedWalletProvider = embeddedWalletProvider;
     this.smartWalletProvider = smartWalletProvider;
@@ -55,9 +55,7 @@ export class WalletProvider {
    * @param params.nonce - Optional nonce for smart wallet address generation (defaults to 0)
    * @returns Promise resolving to the created smart wallet instance
    */
-  async createSmartWallet(
-    params: CreateSmartWalletOptions
-  ): Promise<SmartWallet> {
+  async createSmartWallet(params: CreateSmartWalletOptions): Promise<SmartWallet> {
     const { owners, signer, nonce } = params;
 
     return this.smartWalletProvider.createWallet({
@@ -78,7 +76,7 @@ export class WalletProvider {
    * @returns Promise resolving to the created smart wallet instance
    */
   async createWalletWithEmbeddedSigner(
-    params?: CreateWalletWithEmbeddedSignerOptions
+    params?: CreateWalletWithEmbeddedSignerOptions,
   ): Promise<SmartWallet> {
     const { owners: ownersParam, embeddedWalletIndex, nonce } = params || {};
     const embeddedWallet = await this.embeddedWalletProvider.createWallet();
@@ -116,22 +114,19 @@ export class WalletProvider {
    * @returns Promise resolving to the smart wallet instance with embedded wallet as signer
    * @throws Error if embedded wallet is not found
    */
-  async getSmartWalletWithEmbeddedSigner(
-    params: GetSmartWalletWithEmbeddedSignerOptions
-  ) {
+  async getSmartWalletWithEmbeddedSigner(params: GetSmartWalletWithEmbeddedSignerOptions) {
     const { walletId, deploymentOwners, walletAddress } = params;
     const embeddedWallet = await this.embeddedWalletProvider.getWallet({
       walletId,
     });
     if (!embeddedWallet) {
-      throw new Error("Embedded wallet not found");
+      throw new Error('Embedded wallet not found');
     }
     const account = await embeddedWallet.account();
 
     // If neither walletAddress nor deploymentOwners provided, default to embedded wallet as single owner
     const finalDeploymentOwners =
-      deploymentOwners ||
-      (walletAddress ? undefined : [embeddedWallet.address]);
+      deploymentOwners || (walletAddress ? undefined : [embeddedWallet.address]);
 
     return this.getSmartWallet({
       signer: account,
@@ -182,12 +177,12 @@ export class WalletProvider {
     if (!walletAddressParam && !deploymentOwners) {
       try {
         throw new Error(
-          "Either walletAddress or deploymentOwners array must be provided to locate the smart wallet"
+          'Either walletAddress or deploymentOwners array must be provided to locate the smart wallet',
         );
       } catch (error) {
         console.error(error);
         throw new Error(
-          "Either walletAddress or deploymentOwners array must be provided to locate the smart wallet"
+          'Either walletAddress or deploymentOwners array must be provided to locate the smart wallet',
         );
       }
     }

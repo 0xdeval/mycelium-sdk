@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "ignorePaths": [
+    "node_modules",
+    "./cspell-words.txt",
+    "./.next",
+    "./.husky",
+    "./.vscode",
+    "./.git",
+    "./.env",
+    "./vercel",
+    "build/**",
+    "dist/**",
+    "*.lock",
+    "*.log",
+    "*.lockb",
+    "src/abi/"
+  ],
+  "caseSensitive": false,
+  "words": [
+    "monorepo",
+    "TypeDoc",
+    "tsup",
+    "pnpm",
+    "SDK",
+    "wagmi",
+    "Reown",
+    "viem",
+    "chakra",
+    "unichain",
+    "MCAP",
+    "chainlink",
+    "ppfs",
+    "REPLAYABLE",
+    "proxiable",
+    "undeployed",
+    "accross"
+  ],
+  "enableFiletypes": ["!binary"],
+  "overrides": [
+    {
+      "filename": "**/*.{ts,tsx,js,jsx,md,json,yml,yaml}",
+      "language": "en"
+    }
+  ]
+}

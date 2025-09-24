@@ -1,4 +1,4 @@
-import type { EmbeddedWallet } from "@/wallet/base/wallets/EmbeddedWallet";
+import type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
 
 /**
  * Base embedded wallet provider class

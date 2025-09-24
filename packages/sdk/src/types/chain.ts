@@ -1,4 +1,4 @@
-import type { SUPPORTED_CHAIN_IDS } from "@/constants/chains";
+import type { SUPPORTED_CHAIN_IDS } from '@/constants/chains';
 
 /**
  * Chain configuration
