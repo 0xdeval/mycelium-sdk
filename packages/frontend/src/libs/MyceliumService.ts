@@ -50,10 +50,10 @@ export class MyceliumService {
           riskLevel: "medium",
         },
       });
-      const protocol = (this.sdk as any).protocol;
-      if (protocol && protocol.instance) {
-        await protocol.instance.init((this.sdk as any).chainManager);
-      }
+      // const protocol = (this.sdk as any).protocol;
+      // if (protocol && protocol.instance) {
+      //   await protocol.instance.init((this.sdk as any).chainManager);
+      // }
       this.initialized = true;
       console.log("MyceliumService initialized");
     } catch (error) {

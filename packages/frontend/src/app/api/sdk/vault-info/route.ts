@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MyceliumService } from "@/libs/MyceliumService";
-import { BeefyProtocol } from "@mycelium-sdk/core";
 
 export async function POST(request: NextRequest) {
   try {
