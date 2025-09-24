@@ -24,7 +24,7 @@ export async function GET(
       const balance = await myceliumService.getWalletBalance(walletId);
       return NextResponse.json({
         success: true,
-        balance: balance || { shares: "0", depositedAmount: "0", ppfs: "0" },
+        balance,
       });
     } catch (error) {
       return NextResponse.json({

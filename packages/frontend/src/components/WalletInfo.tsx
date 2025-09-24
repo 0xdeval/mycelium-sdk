@@ -31,10 +31,10 @@ export default function WalletInfo({
 
     try {
       const response = await fetch(`/api/sdk/get-balance/${walletId}`);
-      const { balances } = await response.json();
+      const { balance } = await response.json();
 
-      console.log("tokensBalances in WalletInfo: ", balances);
-      setWalletData({ balances });
+      console.log("tokensBalances in WalletInfo: ", balance);
+      setWalletData({ balance });
     } catch (error) {
       setDataError(
         error instanceof Error ? error.message : "Failed to load wallet data"
@@ -168,7 +168,7 @@ export default function WalletInfo({
                 >
                   <Text fontSize="lg" fontWeight="bold" color="blue.700">
                     {walletData &&
-                      walletData?.balances
+                      walletData?.balance
                         .map(
                           (balance) =>
                             balance.formattedBalance + " " + balance.symbol
