@@ -5,7 +5,6 @@ import { Box, Container, Heading, SimpleGrid } from "@chakra-ui/react";
 import WalletCreator from "@/components/WalletCreator";
 import WalletInfo from "@/components/WalletInfo";
 import VaultCard from "@/components/VaultCard";
-import VaultMonitor from "@/components/VaultMonitor";
 
 export default function Home() {
   const [walletId, setWalletId] = useState<string>("");
@@ -20,8 +19,8 @@ export default function Home() {
           Mycelium Wallet Creator
         </Heading>
 
-        <SimpleGrid columns={{ base: 1, md: 2 }} gap={8}>
-          <Box bg="white" p={6} borderRadius="lg" boxShadow="lg">
+        <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
+          <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
             <WalletCreator
               onWalletCreated={(id, address) => {
                 setWalletId(id);
@@ -34,7 +33,7 @@ export default function Home() {
             />
           </Box>
 
-          <Box bg="white" p={6} borderRadius="lg" boxShadow="lg">
+          <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
             <WalletInfo
               walletId={walletId}
               walletAddress={walletAddress}
@@ -42,15 +41,11 @@ export default function Home() {
             />
           </Box>
           
-          <Box bg="white" p={6} borderRadius="lg" boxShadow="lg">
+          <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
             <VaultCard 
               walletId={walletId}
               walletAddress={walletAddress}
             />
-          </Box>
-          
-          <Box bg="white" p={6} borderRadius="lg" boxShadow="lg">
-            <VaultMonitor />
           </Box>
         </SimpleGrid>
       </Container>

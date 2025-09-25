@@ -101,12 +101,4 @@ export abstract class SmartWallet {
    */
   abstract withdraw(amount: string): Promise<VaultTransactionResult>;
 
-  /**
-   * Withdraw all funds from the protocol vault
-   * @description Withdraws all deposited funds from the protocol vault
-   * @returns Promise resolving to transaction result
-   */
-  abstract withdrawAll(): Promise<VaultTransactionResult>;
-
-  abstract getVault(): Promise<VaultInfo | undefined>;
 }

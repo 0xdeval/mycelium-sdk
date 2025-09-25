@@ -12,7 +12,6 @@ import type { PublicClient } from "viem";
 import { encodeFunctionData } from "viem";
 import { erc20Abi } from "viem";
 import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
-import { MOCK_BEEFY_VAULTS } from "@/constants/mocks";
 
 export class BeefyProtocol extends BaseProtocol {
   private vaultInfo: VaultInfo | undefined;
@@ -30,6 +29,7 @@ export class BeefyProtocol extends BaseProtocol {
     // TODO: Remove multiple chains support for now. Leave only one chain for SDK overall
     this.selectedChainId = chainManager.getSupportedChain();
     this.allVaults = await this.getVaults();
+    console.log('===allVaults===', this.allVaults.length);
   }
 
   /**
@@ -54,14 +54,18 @@ export class BeefyProtocol extends BaseProtocol {
       
       const enrichedVaults = vaults
         .filter((vault: any) => {
-          // const supportedChains = this.chainManager!.getSupportedChainNames();
-          // const isSupportedChain = supportedChains.includes(vault.chain);
-    
-          // TODO: custom case for MVP. Leave only base chain for now.
-          const isBaseChain = vault.chain === 'base';
-          const hasUSDC = vault.assets && vault.assets.includes('USDC');
+          const isSupportedChain = this.chainManager!.isChainSupported(vault.chain);
+          if (!isSupportedChain) {
+            return false;
+          }
           
-          return isBaseChain && hasUSDC;
+          // TODO: custom case for MVP. Leave only USDC asset for now.
+          const hasUSDC = vault.assets && vault.assets.includes('USDC');
+              
+          const vaultChainId = this.chainManager!.getChainIdByName(vault.chain);
+          const isCorrectChain = vaultChainId === this.selectedChainId;
+
+          return isCorrectChain && hasUSDC;
         })
         .map((vault: any) => {
           const vaultId = vault.id;
@@ -95,7 +99,7 @@ export class BeefyProtocol extends BaseProtocol {
     // TODO: Also implement logic of getting the best vault among all supported by the protocol chains
     // TODO: Check and take into account that a user could already have deposit to a vault
 
-
+    console.log('===getBestVault===', this.allVaults.length);
     if (this.allVaults.length === 0) {
       throw new Error("No vaults found");
     }
@@ -131,20 +135,9 @@ export class BeefyProtocol extends BaseProtocol {
         depositedVaults = vault;
       }
     }
+    console.log('depositedVaults', depositedVaults);
 
     return depositedVaults || null;
-  }
-
-  async getVault(smartWallet: SmartWallet): Promise<VaultInfo | undefined> {
-    const depositedVault = await this.fetchDepositedVaults(smartWallet);
-    if (depositedVault) {
-      this.vaultInfo = depositedVault;
-    } else {
-      // Find the best pool to deposit for a protocol
-      this.vaultInfo = await this.getBestVault();
-      console.log('Best vault to deposit', this.vaultInfo);
-    }
-    return this.vaultInfo;
   }
 
   /**
@@ -158,10 +151,13 @@ export class BeefyProtocol extends BaseProtocol {
     smartWallet: SmartWallet
   ): Promise<VaultTransactionResult> {
     // Check if a user deposited previously to any vault of the protocol
-    this.vaultInfo = await this.getVault(smartWallet);
-
-    console.log("VaultInfo:", this.vaultInfo);
-    console.log("TokenDecimals:", this.vaultInfo!.tokenDecimals);
+    const depositedVault = await this.fetchDepositedVaults(smartWallet);
+    if (depositedVault) {
+      this.vaultInfo = depositedVault;
+    } else {
+      // Find the best pool to deposit for a protocol
+      this.vaultInfo = await this.getBestVault();
+    }
 
     if (!this.vaultInfo!.tokenDecimals) {
       throw new Error("TokenDecimals is undefined");
@@ -217,26 +213,38 @@ export class BeefyProtocol extends BaseProtocol {
    * @description Partially withdraw funds from a vault
    */
   async withdraw(
-    shares: string,
+    shares: string | undefined,
     vaultInfo: VaultInfo,
     walletAddress: Address,
     chainId: SupportedChainId,
     smartWallet: SmartWallet
   ): Promise<VaultTransactionResult> {
-    console.log("Withdrawing shares:", shares, "from vault:", vaultInfo.name);
-
     let operationsCallData = [];
 
-    const rawSharesAmount = parseUnits(shares, 18);
-
-    const withdrawData = {
-      to: vaultInfo.earnContractAddress,
-      data: encodeFunctionData({
-        abi: beefyVaultAbi,
-        functionName: "withdraw",
-        args: [rawSharesAmount],
-      }),
-    };
+    let withdrawData;
+    
+    if (shares) {
+      console.log("Withdrawing shares:", shares, "from vault:", vaultInfo.name);
+      const rawSharesAmount = parseUnits(shares, 18);
+      withdrawData = {
+        to: vaultInfo.earnContractAddress,
+        data: encodeFunctionData({
+          abi: beefyVaultAbi,
+          functionName: "withdraw",
+          args: [rawSharesAmount],
+        }),
+      };
+    } else {
+      console.log("Withdrawing all funds from vault:", vaultInfo.name);
+      withdrawData = {
+        to: vaultInfo.earnContractAddress,
+        data: encodeFunctionData({
+          abi: beefyVaultAbi,
+          functionName: "withdrawAll",
+          args: [],
+        }),
+      };
+    }
 
     operationsCallData.push(withdrawData);
 
@@ -247,43 +255,6 @@ export class BeefyProtocol extends BaseProtocol {
 
     return { hash, success: true };
   }
-
-  async withdrawAll(
-    vaultInfo: VaultInfo,
-    walletAddress: Address,
-    chainId: SupportedChainId,
-    smartWallet: SmartWallet
-  ): Promise<VaultTransactionResult> {
-    console.log("Withdrawing all funds from vault:", vaultInfo.name);
-
-    // const currentAddress = await smartWallet.getAddress();
-    let operationsCallData = [];
-
-    const withdrawAllData = {
-      to: vaultInfo.earnContractAddress,
-      data: encodeFunctionData({
-        abi: beefyVaultAbi,
-        functionName: "withdrawAll",
-        args: [],
-      }),
-    };
-
-    operationsCallData.push(withdrawAllData);
-
-    const hash = await smartWallet.sendBatch(
-      operationsCallData,
-      chainId
-    );
-
-    return { hash, success: true };
-  }
-
-  // /**
-  //  * @description Withdraw all funds from a vault
-  //  */
-  // async withdrawAll(): Promise<VaultTransactionResult> {
-  //   throw new Error("'withdrawAll' is not yet implemented");
-  // }
 
   /**
    * @description Read the price per full share from the vault

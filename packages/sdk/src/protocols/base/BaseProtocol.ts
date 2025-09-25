@@ -66,16 +66,6 @@ export abstract class BaseProtocol {
   ): Promise<VaultTransactionResult>;
 
   /**
-   * Withdraw all funds from a vault
-   */
-  abstract withdrawAll(
-    vaultInfo: VaultInfo,
-    walletAddress: Address,
-    chainId: SupportedChainId,
-    smartWallet: SmartWallet
-  ): Promise<VaultTransactionResult>;
-
-  /**
    * Get the balance of deposited funds to a vault
    */
   abstract getBalance(

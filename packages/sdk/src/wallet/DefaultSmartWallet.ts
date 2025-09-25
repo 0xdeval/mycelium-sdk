@@ -182,7 +182,7 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   *
+   * Get the balance of the protocol vault
    */
   async getEarnBalance(): Promise<VaultBalance | null> {
     const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
@@ -206,25 +206,6 @@ export class DefaultSmartWallet extends SmartWallet {
 
     const withdrawTransactionResult = await this.protocolProvider.withdraw(
       amount,
-      vaultInfo,
-      walletAddress,
-      chainId,
-      this
-    );
-
-    return withdrawTransactionResult;
-  }
-
-  async withdrawAll(): Promise<VaultTransactionResult> {
-    const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
-    if (!vaultInfo) {
-      throw new Error("No vault found to withdraw from");
-    }
-
-    const chainId = this.chainManager.getSupportedChain();
-    const walletAddress = await this.getAddress();
-
-    const withdrawTransactionResult = await this.protocolProvider.withdrawAll(
       vaultInfo,
       walletAddress,
       chainId,
@@ -406,8 +387,5 @@ export class DefaultSmartWallet extends SmartWallet {
       value: 0n,
       data: transferData,
     };
-  }
-  async getVault(): Promise<VaultInfo | undefined> {
-    return await this.protocolProvider.getVault(this);
   }
 }

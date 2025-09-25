@@ -156,37 +156,6 @@ export class MyceliumService {
     const transactionResult = await wallet.withdraw(amount);
     return transactionResult;
   }
-
-  async withdrawAll(walletId: string): Promise<VaultTransactionResult> {
-    if (!this.sdk) {
-      throw new Error("SDK not initialized");
-    }
-
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
-      walletId,
-    });
-
-    const transactionResult = await wallet.withdrawAll();
-    return transactionResult;
-  }
-
-  async getVault(walletId: string): Promise<any> {
-  if (!this.sdk) {
-    throw new Error("SDK not initialized");
-  }
-
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
-      walletId,
-    });
-
-  const vaultInfo = await wallet.getVault();
-  
-  return vaultInfo;
-}
-
-  // getSDK(): MyceliumSDK | null {
-  //   return this.sdk;
-  // }
 }
 
 export const myceliumService = MyceliumService.getInstance();

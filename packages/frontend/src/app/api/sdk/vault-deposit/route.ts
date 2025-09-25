@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MyceliumService } from "@/libs/MyceliumService";
-import { BeefyProtocol } from "@mycelium-sdk/core";
-// import type { SmartWallet } from "@mycelium-sdk/core";
-
-console.log("=== vault-deposit route.ts loaded ===");
 
 export async function POST(request: NextRequest) {
-  console.log("API Request received!!!!");
   try {
     const body = await request.json();
-    // console.log('Raw request body:', body);
 
     const { walletId, walletAddress, vaultInfo, amount, chainId } = body;
 

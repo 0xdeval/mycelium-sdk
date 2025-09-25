@@ -31,95 +31,14 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   // Инициализация протокола и тестового vault
   useEffect(() => {
     if (walletId && walletAddress) {
-      initializeVault(); 
+      loadVaultBalance();
     }
   }, [walletId, walletAddress]);
 
-  // const initializeVault = async () => {
-  //   try {
-  //     const testVaultInfo = {
-  //       id: "compound-base-usdc",
-  //       name: "USDC",
-  //       type: "standard",
-  //       token: "USDC",
-  //       tokenAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  //       tokenDecimals: 6,
-  //       earnedToken: "mooCompoundBaseUSDC",
-  //       earnedTokenAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-  //       earnContractAddress: "0xeF6ED674486E54507d0f711C0d388BD8a1552E6F",
-  //       oracle: "tokens",
-  //       oracleId: "USDC",
-  //       status: "active",
-  //       createdAt: 1711975000,
-  //       platformId: "compound",
-  //       assets: ["USDC"],
-  //       risks: [
-  //         "COMPLEXITY_LOW",
-  //         "BATTLE_TESTED",
-  //         "IL_NONE",
-  //         "MCAP_LARGE",
-  //         "PLATFORM_ESTABLISHED",
-  //         "AUDIT",
-  //         "CONTRACTS_VERIFIED",
-  //       ],
-  //       strategyTypeId: "lendingNoBorrow",
-  //       buyTokenUrl:
-  //         "https://swap.defillama.com/?chain=base&from=0x0000000000000000000000000000000000000000&to=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  //       network: "base",
-  //       zaps: [
-  //         {
-  //           strategyId: "single",
-  //         },
-  //       ],
-  //       lendingOracle: {
-  //         provider: "chainlink",
-  //         address: "0x7e860098F58bBFC8648a4311b374B1D669a2bc6B",
-  //       },
-  //       isGovVault: false,
-  //       chain: "base",
-  //       strategy: "0x2b4eF83aeE6bb3Dd5253dAa7d0756Ef5bD95f40f",
-  //       pricePerFullShare: "1101411076034236632",
-  //       lastHarvest: 1757617949,
-  //     };
-  //     setVaultInfo(testVaultInfo);
-  //   } catch (err) {
-  //     setError(
-  //       `Failed to initialize vault: ${err instanceof Error ? err.message : "Unknown error"}`
-  //     );
-  //   }
-  // };
-
-  const initializeVault = async () => {
-  try {
-    const response = await fetch(`/api/sdk/vault-info`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ walletId }),
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      setVaultInfo(data.vaultInfo);
-      console.log("Vault initialized:", data.vaultInfo?.name);
-    } else {
-      setError(`Failed to get vault: ${data.error}`);
-    }
-  } catch (err) {
-    setError(
-      `Failed to initialize vault: ${err instanceof Error ? err.message : "Unknown error"}`
-    );
-  }
-};
-
-  useEffect(() => {
-    if (vaultInfo && walletAddress) {
-      loadVaultBalance();
-    }
-  }, [vaultInfo, walletAddress]);
-
   const loadVaultBalance = async () => {
-    if (!vaultInfo || !walletAddress) return;
+
+    if (!walletAddress) return;
+    console.log('===loadVaultBalance===', walletId, walletAddress);
 
     try {
       const response = await fetch(`/api/sdk/vault-balance`, {
@@ -150,7 +69,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   };
 
   const handleDeposit = async () => {
-    if (!vaultInfo || !walletId || !walletAddress || !depositAmount) {
+    if (!walletId || !walletAddress || !depositAmount) {
       setError("Missing required data for deposit");
       return;
     }
@@ -230,7 +149,8 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   };
 
   const handleWithdrawAll = async () => {
-    if (!vaultInfo || !walletId || !walletAddress) {
+    console.log('===handleWithdrawAll===', walletId, walletAddress, vaultInfo);
+    if (!walletId || !walletAddress) {
       setError("Missing required data for withdraw all");
       return;
     }
@@ -240,13 +160,14 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
     setSuccess(null);
 
     try {
-      const response = await fetch(`/api/sdk/vault-withdraw-all`, {
+      const response = await fetch(`/api/sdk/vault-withdraw`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletId,
           walletAddress,
           vaultInfo,
+          amount: undefined,
           chainId: 8453,
         }),
       });
@@ -311,9 +232,9 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
         </Box>
       )}
 
-      {vaultInfo && (
-        <VStack gap={4} align="stretch">
-          {/* Vault Info */}
+      <VStack gap={4} align="stretch">
+        {/* Vault Info */}
+        {vaultInfo && (
           <Box
             p={4}
             bg="blue.50"
@@ -334,118 +255,122 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
               Token: {vaultInfo.token} → {vaultInfo.earnedToken}
             </Text>
           </Box>
+        )}
 
-          {/* Current Balance */}
-          <Box
-            p={4}
-            bg="green.50"
-            borderRadius="md"
-            border="1px"
-            borderColor="green.200"
+        {/* Current Balance */}
+        <Box
+          p={4}
+          bg="green.50"
+          borderRadius="md"
+          border="1px"
+          borderColor="green.200"
+        >
+          <Text fontWeight="bold" color="green.700" mb={2}>
+            Your Vault Balance
+          </Text>
+          {vaultBalance ? (
+            <VStack gap={1} align="stretch">
+              <Text fontSize="lg" fontWeight="bold">
+                {vaultBalance.shares} {vaultInfo?.earnedToken || "Shares"}
+              </Text>
+              <Text fontSize="sm" color="green.600">
+                Shares: {vaultBalance.ppfs}
+              </Text>
+              <Text fontSize="sm" color="green.600">
+                Value: {vaultBalance.depositedAmount} {vaultInfo?.token || "USDC"}
+              </Text>
+            </VStack>
+          ) : (
+            <Text color="green.600">Loading balance...</Text>
+          )}
+          <Button
+            size="sm"
+            colorScheme="green"
+            variant="outline"
+            mt={2}
+            onClick={loadVaultBalance}
           >
-            <Text fontWeight="bold" color="green.700" mb={2}>
-              Your Vault Balance
-            </Text>
-            {vaultBalance ? (
-              <VStack gap={1} align="stretch">
-                <Text fontSize="lg" fontWeight="bold">
-                  {vaultBalance.shares} {vaultInfo.earnedToken}
-                </Text>
-                <Text fontSize="sm" color="green.600">
-                  Shares: {vaultBalance.ppfs}
-                </Text>
-                <Text fontSize="sm" color="green.600">
-                  Value: {vaultBalance.depositedAmount} {vaultInfo.token}
-                </Text>
-              </VStack>
-            ) : (
-              <Text color="green.600">Loading balance...</Text>
-            )}
-            <Button
-              size="sm"
-              colorScheme="green"
-              variant="outline"
-              mt={2}
-              onClick={loadVaultBalance}
-            >
-              Refresh Balance
-            </Button>
-          </Box>
+            Refresh Balance
+          </Button>
+        </Box>
 
-          {/* Deposit Section */}
-          <Box>
-            <Text fontWeight="bold" mb={2}>
-              Deposit {vaultInfo.token}
-            </Text>
-            <HStack gap={2}>
-              <Input
-                placeholder="Amount to deposit"
-                value={depositAmount}
-                onChange={(e) => setDepositAmount(e.target.value)}
-                disabled={isLoading}
-              />
-              <Button
-                colorScheme="blue"
-                onClick={handleDeposit}
-                disabled={isLoading || !depositAmount}
-                minW="100px"
-              >
-                {isLoading ? <Spinner size="sm" /> : "Deposit"}
-              </Button>
-            </HStack>
-          </Box>
-
-          {/* Withdraw Section */}
-          <Box>
-            <Text fontWeight="bold" mb={2}>
-              Withdraw {vaultInfo.earnedToken}
-            </Text>
-            <HStack gap={2}>
-              <Input
-                placeholder="Amount to withdraw"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                disabled={isLoading}
-              />
-              <Button
-                colorScheme="orange"
-                onClick={handleWithdraw}
-                disabled={isLoading || !withdrawAmount}
-                minW="100px"
-              >
-                {isLoading ? <Spinner size="sm" /> : "Withdraw"}
-              </Button>
-            </HStack>
-          </Box>
-
-          {/* Withdraw All */}
-          <Box>
-            <Button
-              colorScheme="red"
-              variant="outline"
-              onClick={handleWithdrawAll}
+        {/* Deposit Section */}
+        <Box>
+          <Text fontWeight="bold" mb={2}>
+            Deposit {vaultInfo?.token || "USDC"}
+          </Text>
+          <HStack gap={2}>
+            <Input
+              placeholder="Amount to deposit"
+              value={depositAmount}
+              onChange={(e) => setDepositAmount(e.target.value)}
               disabled={isLoading}
-              width="100%"
+            />
+            <Button
+              colorScheme="blue"
+              onClick={handleDeposit}
+              disabled={isLoading || !depositAmount}
+              minW="100px"
             >
-              {isLoading ? <Spinner size="sm" /> : "Withdraw All"}
+              {isLoading ? <Spinner size="sm" /> : "Deposit"}
             </Button>
-          </Box>
+          </HStack>
+        </Box>
 
-          {/* Debug Info */}
-          <Box p={3} bg="gray.50" borderRadius="md">
-            <Text fontSize="xs" fontWeight="bold" mb={1} color="gray.600">
-              Debug Info:
-            </Text>
-            <Code fontSize="xs" wordBreak="break-all">
-              Wallet: {walletAddress}
-            </Code>
-            <br />
-            <Code fontSize="xs" wordBreak="break-all">
-              Vault: {vaultInfo.earnContractAddress}
-            </Code>
-          </Box>
-        </VStack>
-      )}
+        {/* Withdraw Section */}
+        {vaultBalance && parseFloat(vaultBalance.shares) > 0 && (
+          <>
+            <Box>
+              <Text fontWeight="bold" mb={2}>
+                Withdraw {vaultInfo?.earnedToken || "Shares"}
+              </Text>
+              <HStack gap={2}>
+                <Input
+                  placeholder="Amount to withdraw"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  disabled={isLoading}
+                />
+                <Button
+                  colorScheme="orange"
+                  onClick={handleWithdraw}
+                  disabled={isLoading || !withdrawAmount}
+                  minW="100px"
+                >
+                  {isLoading ? <Spinner size="sm" /> : "Withdraw"}
+                </Button>
+              </HStack>
+            </Box>
+
+            {/* Withdraw All */}
+            <Box>
+              <Button
+                colorScheme="red"
+                variant="outline"
+                onClick={handleWithdrawAll}
+                disabled={isLoading}
+                width="100%"
+              >
+                {isLoading ? <Spinner size="sm" /> : "Withdraw All"}
+              </Button>
+            </Box>
+          </>
+        )}
+
+        {/* Debug Info */}
+        <Box p={3} bg="gray.50" borderRadius="md">
+          <Text fontSize="xs" fontWeight="bold" mb={1} color="gray.600">
+            Debug Info:
+          </Text>
+          <Code fontSize="xs" wordBreak="break-all">
+            Wallet: {walletAddress}
+          </Code>
+          <br />
+          <Code fontSize="xs" wordBreak="break-all">
+            Vault: {vaultInfo?.earnContractAddress || "Not loaded"}
+          </Code>
+        </Box>
+      </VStack>
     </Box>
   );
 }
