@@ -1,21 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { MyceliumService } from "@/libs/MyceliumService";
-import { WalletDatabase } from "@/libs/WalletDatabase";
+import { type NextRequest, NextResponse } from 'next/server';
+import { MyceliumService } from '@/libs/MyceliumService';
+import { WalletDatabase } from '@/libs/WalletDatabase';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { userId: string } }) {
   try {
     const { userId } = await params;
 
-    console.log("userId in API: ", userId);
+    console.log('userId in API: ', userId);
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Wallet ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Wallet ID is required' }, { status: 400 });
     }
 
     const walletDb = WalletDatabase.getInstance();
@@ -25,11 +19,6 @@ export async function GET(
     await myceliumService.init();
 
     const walletRecord = await walletDb.getWallet(userId);
-
-    console.log(
-      `walletRecord in API basedon userID (${userId}): `,
-      walletRecord
-    );
 
     if (!walletRecord) {
       return NextResponse.json({ found: false }, { status: 404 });
@@ -48,7 +37,7 @@ export async function GET(
   } catch (error) {
     return NextResponse.json(
       { error: `Failed to get wallet: ${error}`, found: false },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

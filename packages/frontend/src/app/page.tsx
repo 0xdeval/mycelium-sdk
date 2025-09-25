@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { Box, Container, Heading, SimpleGrid } from "@chakra-ui/react";
@@ -7,10 +7,10 @@ import WalletInfo from "@/components/WalletInfo";
 import VaultCard from "@/components/VaultCard";
 
 export default function Home() {
-  const [walletId, setWalletId] = useState<string>("");
-  const [walletAddress, setWalletAddress] = useState<string>("");
+  const [walletId, setWalletId] = useState<string>('');
+  const [walletAddress, setWalletAddress] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
 
   return (
     <Box minH="100vh" p={8} bg="gray.50">
@@ -25,7 +25,7 @@ export default function Home() {
               onWalletCreated={(id, address) => {
                 setWalletId(id);
                 setWalletAddress(address);
-                setError("");
+                setError('');
               }}
               onError={(err) => setError(err)}
               isLoading={isLoading}

@@ -1,5 +1,5 @@
-import type { Address, LocalAccount } from "viem";
-import type { WebAuthnAccount } from "viem/account-abstraction";
+import type { Address, LocalAccount } from 'viem';
+import type { WebAuthnAccount } from 'viem/account-abstraction';
 
 /**
  * Options for creating a smart wallet
@@ -46,8 +46,5 @@ export type GetEmbeddedWalletOptions = {
  * @description Parameters for getting an existing smart wallet using an embedded wallet as signer.
  * If neither walletAddress nor deploymentOwners is provided, defaults to using the embedded wallet as single owner.
  */
-export type GetSmartWalletWithEmbeddedSignerOptions = Omit<
-  GetSmartWalletOptions,
-  "signer"
-> &
+export type GetSmartWalletWithEmbeddedSignerOptions = Omit<GetSmartWalletOptions, 'signer'> &
   GetEmbeddedWalletOptions;

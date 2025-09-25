@@ -1,17 +1,18 @@
-import { BaseProtocol } from "@/protocols/base/BaseProtocol";
-import { beefyVaultAbi } from "@/abis/protocols/beefyVault";
-import { parseUnits, type Address, formatUnits } from "viem";
-import type {
-  VaultInfo,
-  VaultTransactionResult,
-  VaultBalance,
-} from "@/types/protocols/beefy";
-import type { ChainManager } from "@/tools/ChainManager";
-import type { SupportedChainId } from "@/constants/chains";
-import type { PublicClient } from "viem";
-import { encodeFunctionData } from "viem";
-import { erc20Abi } from "viem";
-import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
+import { BaseProtocol } from '@/protocols/base/BaseProtocol';
+import { beefyVaultAbi } from '@/abis/protocols/beefyVault';
+import type { VaultInfo, VaultTransactionResult, VaultBalance } from '@/types/protocols/beefy';
+import type { ChainManager } from '@/tools/ChainManager';
+import type { SupportedChainId } from '@/constants/chains';
+
+import {
+  type PublicClient,
+  encodeFunctionData,
+  erc20Abi,
+  parseUnits,
+  type Address,
+  formatUnits,
+} from 'viem';
+import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 
 export class BeefyProtocol extends BaseProtocol {
   private vaultInfo: VaultInfo | undefined;
@@ -101,7 +102,7 @@ export class BeefyProtocol extends BaseProtocol {
 
     console.log('===getBestVault===', this.allVaults.length);
     if (this.allVaults.length === 0) {
-      throw new Error("No vaults found");
+      throw new Error('No vaults found');
     }
     const sortedVaults = this.allVaults.sort((a, b) => {
       const apyA = (a as any).apy || 0;
@@ -119,9 +120,7 @@ export class BeefyProtocol extends BaseProtocol {
    * @param smartWallet
    * @returns
    */
-  async fetchDepositedVaults(
-    smartWallet: SmartWallet
-  ): Promise<VaultInfo | null> {
+  async fetchDepositedVaults(smartWallet: SmartWallet): Promise<VaultInfo | null> {
     // TODO: Support logic for fetching info about vaults where a user already deposited funds previously:
     // 1. Fetch all vaults
     // 2. Check balance of each vault token for a provided wallet address
@@ -146,10 +145,7 @@ export class BeefyProtocol extends BaseProtocol {
    * @param smartWallet
    * @returns
    */
-  async deposit(
-    amount: string,
-    smartWallet: SmartWallet
-  ): Promise<VaultTransactionResult> {
+  async deposit(amount: string, smartWallet: SmartWallet): Promise<VaultTransactionResult> {
     // Check if a user deposited previously to any vault of the protocol
     const depositedVault = await this.fetchDepositedVaults(smartWallet);
     if (depositedVault) {
@@ -160,13 +156,13 @@ export class BeefyProtocol extends BaseProtocol {
     }
 
     if (!this.vaultInfo!.tokenDecimals) {
-      throw new Error("TokenDecimals is undefined");
+      throw new Error('TokenDecimals is undefined');
     }
 
     // const chainId = this.vaultInfo!.chainId!;
     const currentAddress = await smartWallet.getAddress();
 
-    let operationsCallData = [];
+    const operationsCallData = [];
 
     const rawDepositAmount = parseUnits(amount, this.vaultInfo!.tokenDecimals);
 
@@ -174,7 +170,7 @@ export class BeefyProtocol extends BaseProtocol {
       this.vaultInfo!.tokenAddress,
       this.vaultInfo!.earnContractAddress,
       currentAddress,
-      this.selectedChainId!
+      this.selectedChainId!,
     );
 
     if (allowance < rawDepositAmount) {
@@ -182,7 +178,7 @@ export class BeefyProtocol extends BaseProtocol {
         to: this.vaultInfo!.tokenAddress,
         data: encodeFunctionData({
           abi: erc20Abi,
-          functionName: "approve",
+          functionName: 'approve',
           args: [this.vaultInfo!.earnContractAddress, rawDepositAmount],
         }),
       };
@@ -194,17 +190,14 @@ export class BeefyProtocol extends BaseProtocol {
       to: this.vaultInfo!.earnContractAddress,
       data: encodeFunctionData({
         abi: beefyVaultAbi,
-        functionName: "deposit",
+        functionName: 'deposit',
         args: [rawDepositAmount],
       }),
     };
 
     operationsCallData.push(depositData);
 
-    const hash = await smartWallet.sendBatch(
-      operationsCallData,
-      this.selectedChainId!
-    );
+    const hash = await smartWallet.sendBatch(operationsCallData, this.selectedChainId!);
 
     return { hash, success: true };
   }
@@ -269,16 +262,14 @@ export class BeefyProtocol extends BaseProtocol {
       ppfs = await publicClient.readContract({
         address: vaultAddress,
         abi: beefyVaultAbi,
-        functionName: "getPricePerFullShare",
+        functionName: 'getPricePerFullShare',
       });
     } catch {
-      console.log(
-        "Couldn't get data from getPricePerFullShare, using pricePerShare..."
-      );
+      console.log("Couldn't get data from getPricePerFullShare, using pricePerShare...");
       ppfs = await publicClient.readContract({
         address: vaultAddress,
         abi: beefyVaultAbi,
-        functionName: "pricePerShare",
+        functionName: 'pricePerShare',
       });
     }
 
@@ -292,36 +283,28 @@ export class BeefyProtocol extends BaseProtocol {
    * @param walletAddress
    * @returns
    */
-  async getBalance(
-    vaultInfo: VaultInfo,
-    walletAddress: Address
-  ): Promise<VaultBalance> {
+  async getBalance(vaultInfo: VaultInfo, walletAddress: Address): Promise<VaultBalance> {
     // const chainId = vaultInfo.chainId!;
 
-    const publicClient = this.chainManager!.getPublicClient(
-      this.selectedChainId!
-    );
+    const publicClient = this.chainManager!.getPublicClient(this.selectedChainId!);
 
     // 'share' is a share of moo tokens that a user received after a deposit
     const shares = await publicClient.readContract({
       address: vaultInfo.earnContractAddress,
       abi: beefyVaultAbi,
-      functionName: "balanceOf",
+      functionName: 'balanceOf',
       args: [walletAddress],
     });
 
     if (shares === 0n) {
       return {
-        shares: "0",
-        depositedAmount: "0",
+        shares: '0',
+        depositedAmount: '0',
       };
     }
 
     // 'ppfs' is a Price Per Full Share per one base token. For example, 1.0 share == 1 USDC
-    const ppfs = await this.readPpfs(
-      publicClient,
-      vaultInfo.earnContractAddress
-    );
+    const ppfs = await this.readPpfs(publicClient, vaultInfo.earnContractAddress);
 
     const ONE_E18 = 10n ** 18n;
 

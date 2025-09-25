@@ -1,5 +1,5 @@
-import sqlite3 from "sqlite3";
-import { open, Database } from "sqlite";
+import sqlite3 from 'sqlite3';
+import { open, type Database } from 'sqlite';
 
 export interface WalletRecord {
   user_id: string;
@@ -23,24 +23,28 @@ export class WalletDatabase {
   }
 
   async init(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {
+      return;
+    }
 
     try {
       this.db = await open({
-        filename: "./wallets.db",
+        filename: './wallets.db',
         driver: sqlite3.Database,
       });
 
       await this.createTables();
       this.initialized = true;
-      console.log("WalletDatabase initialized successfully");
+      console.log('WalletDatabase initialized successfully');
     } catch (error) {
       throw new Error(`Failed to initialize database: ${error}`);
     }
   }
 
   private async createTables(): Promise<void> {
-    if (!this.db) throw new Error("Database not available");
+    if (!this.db) {
+      throw new Error('Database not available');
+    }
 
     await this.db.exec(`
       CREATE TABLE IF NOT EXISTS wallets (
@@ -53,32 +57,31 @@ export class WalletDatabase {
   }
 
   async getWallet(userId: string): Promise<WalletRecord | null> {
-    if (!this.db) throw new Error("Database not initialized");
+    if (!this.db) {
+      throw new Error('Database not initialized');
+    }
 
-    const wallet = await this.db.get(
-      "SELECT * FROM wallets WHERE user_id = ?",
-      [userId]
-    );
+    const wallet = await this.db.get('SELECT * FROM wallets WHERE user_id = ?', [userId]);
     return wallet || null;
   }
 
-  async saveWallet(
-    userId: string,
-    walletId: string,
-    walletAddress: string
-  ): Promise<void> {
-    if (!this.db) throw new Error("Database not initialized");
+  async saveWallet(userId: string, walletId: string, walletAddress: string): Promise<void> {
+    if (!this.db) {
+      throw new Error('Database not initialized');
+    }
 
     await this.db.run(
-      "INSERT OR REPLACE INTO wallets (user_id, wallet_id, wallet_address) VALUES (?, ?, ?)",
-      [userId, walletId, walletAddress]
+      'INSERT OR REPLACE INTO wallets (user_id, wallet_id, wallet_address) VALUES (?, ?, ?)',
+      [userId, walletId, walletAddress],
     );
   }
 
   async getAllWallets(): Promise<WalletRecord[]> {
-    if (!this.db) throw new Error("Database not initialized");
+    if (!this.db) {
+      throw new Error('Database not initialized');
+    }
 
-    return await this.db.all("SELECT * FROM wallets ORDER BY created_at DESC");
+    return await this.db.all('SELECT * FROM wallets ORDER BY created_at DESC');
   }
 
   async close(): Promise<void> {

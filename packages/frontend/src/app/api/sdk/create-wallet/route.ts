@@ -1,16 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { MyceliumService } from "@/libs/MyceliumService";
-import { WalletDatabase } from "@/libs/WalletDatabase";
+import { type NextRequest, NextResponse } from 'next/server';
+import { MyceliumService } from '@/libs/MyceliumService';
+import { WalletDatabase } from '@/libs/WalletDatabase';
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await request.json();
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
     const walletDb = WalletDatabase.getInstance();
@@ -29,10 +26,7 @@ export async function POST(request: NextRequest) {
       success: true,
     });
   } catch (error) {
-    console.error("Error creating wallet:", error);
-    return NextResponse.json(
-      { error: `Failed to create wallet: ${error}` },
-      { status: 500 }
-    );
+    console.error('Error creating wallet:', error);
+    return NextResponse.json({ error: `Failed to create wallet: ${error}` }, { status: 500 });
   }
 }

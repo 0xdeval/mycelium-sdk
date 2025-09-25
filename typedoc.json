@@ -1,0 +1,13 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "packages": ["packages/sdk", "packages/blockchain"],
+  "out": "docs",
+  "tsconfig": "tsconfig.json",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeExternals": false,
+  "readme": "none",
+  "categorizeByGroup": true,
+  "sort": ["source-order", "alphabetical"]
+}

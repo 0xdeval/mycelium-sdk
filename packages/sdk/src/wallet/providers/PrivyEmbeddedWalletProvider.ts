@@ -1,10 +1,10 @@
-import type { PrivyClient } from "@privy-io/server-auth";
-import { getAddress } from "viem";
+import type { PrivyClient } from '@privy-io/server-auth';
+import { getAddress } from 'viem';
 
-import type { ChainManager } from "@/tools/ChainManager";
+import type { ChainManager } from '@/tools/ChainManager';
 // import type { LendProvider } from "@/types/lend.js";
-import { PrivyWallet } from "@/wallet/PrivyWallet";
-import { EmbeddedWalletProvider } from "@/wallet/base/providers/EmbeddedWalletProvider";
+import { PrivyWallet } from '@/wallet/PrivyWallet';
+import { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWalletProvider';
 
 /**
  * Options for getting all wallets
@@ -31,7 +31,7 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
    */
   constructor(
     privyClient: PrivyClient,
-    chainManager: ChainManager
+    chainManager: ChainManager,
     // lendProvider: LendProvider
   ) {
     super();
@@ -49,19 +49,19 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
   async createWallet(): Promise<PrivyWallet> {
     try {
       const wallet = await this.privy.walletApi.createWallet({
-        chainType: "ethereum",
+        chainType: 'ethereum',
       });
 
       const walletInstance = new PrivyWallet(
         this.privy,
         wallet.id,
         getAddress(wallet.address),
-        this.chainManager
+        this.chainManager,
         // this.lendProvider
       );
       return walletInstance;
     } catch (error) {
-      console.error("Failed to create wallet: ", error);
+      console.error('Failed to create wallet: ', error);
       throw new Error(`Failed to create wallet: ${error}`);
     }
   }
@@ -82,7 +82,7 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
         this.privy,
         wallet.id,
         getAddress(wallet.address),
-        this.chainManager
+        this.chainManager,
         // this.lendProvider
       );
       return walletInstance;
@@ -97,9 +97,7 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
    * @param options - Optional parameters for filtering and pagination
    * @returns Promise resolving to array of wallets
    */
-  async getAllWallets(
-    options?: PrivyProviderGetAllWalletsOptions
-  ): Promise<PrivyWallet[]> {
+  async getAllWallets(options?: PrivyProviderGetAllWalletsOptions): Promise<PrivyWallet[]> {
     try {
       const response = await this.privy.walletApi.getWallets({
         limit: options?.limit,
@@ -111,13 +109,13 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
           this.privy,
           wallet.id,
           getAddress(wallet.address),
-          this.chainManager
+          this.chainManager,
           //   this.lendProvider
         );
         return walletInstance;
       });
     } catch {
-      throw new Error("Failed to retrieve wallets");
+      throw new Error('Failed to retrieve wallets');
     }
   }
 }

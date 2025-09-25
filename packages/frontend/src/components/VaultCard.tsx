@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Box,
   Heading,
@@ -12,7 +12,7 @@ import {
   Badge,
   Spinner,
   Code,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
 interface VaultCardProps {
   walletId?: string;
@@ -22,13 +22,12 @@ interface VaultCardProps {
 export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   const [vaultInfo, setVaultInfo] = useState<any>(null);
   const [vaultBalance, setVaultBalance] = useState<any>(null);
-  const [depositAmount, setDepositAmount] = useState("");
-  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Инициализация протокола и тестового vault
   useEffect(() => {
     if (walletId && walletAddress) {
       loadVaultBalance();
@@ -42,29 +41,24 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
     try {
       const response = await fetch(`/api/sdk/vault-balance`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
-          walletAddress,
-          vaultInfo,
-          chainId: 8453,
         }),
       });
 
       const data = await response.json();
 
-      console.log("Balance data >>>>> ", data);
+      console.log('Balance data >>>>> ', data);
       if (data.success) {
         setVaultBalance(data.balance || { shares: "0", depositedAmount: "0", ppfs: "0" });
       } else {
         setError(data.error);
       }
     } catch (err) {
-      console.error("Failed to load vault balance:", err);
-      setError(
-        `Failed to load balance: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      console.error('Failed to load vault balance:', err);
+      setError(`Failed to load balance: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
@@ -80,29 +74,24 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
     try {
       const response = await fetch(`/api/sdk/vault-deposit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
-          walletAddress,
-          vaultInfo,
           amount: depositAmount,
-          chainId: 8453,
         }),
       });
 
       const data = await response.json();
       if (data.success) {
         setSuccess(`Deposit successful! Transaction hash: ${data.hash}`);
-        setDepositAmount("");
+        setDepositAmount('');
         await loadVaultBalance();
       } else {
         setError(data.error);
       }
     } catch (err) {
-      setError(
-        `Deposit failed: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      setError(`Deposit failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +99,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
   const handleWithdraw = async () => {
     if (!vaultInfo || !walletId || !walletAddress || !withdrawAmount) {
-      setError("Missing required data for withdraw");
+      setError('Missing required data for withdraw');
       return;
     }
 
@@ -120,8 +109,8 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
     try {
       const response = await fetch(`/api/sdk/vault-withdraw`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
           walletAddress,
@@ -134,15 +123,13 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
       const data = await response.json();
       if (data.success) {
         setSuccess(`Withdraw successful! Transaction hash: ${data.hash}`);
-        setWithdrawAmount("");
+        setWithdrawAmount('');
         await loadVaultBalance();
       } else {
         setError(data.error);
       }
     } catch (err) {
-      setError(
-        `Withdraw failed: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      setError(`Withdraw failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -180,9 +167,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
         setError(data.error);
       }
     } catch (err) {
-      setError(
-        `Withdraw all failed: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      setError(`Withdraw all failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -199,7 +184,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
     );
   }
 
-  console.log("VaultBalance >>>>> ", vaultBalance);
+  console.log('VaultBalance >>>>> ', vaultBalance);
   return (
     <Box>
       <Heading size="lg" mb={4}>
@@ -207,27 +192,13 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
       </Heading>
 
       {error && (
-        <Box
-          p={4}
-          bg="red.50"
-          borderRadius="md"
-          border="1px"
-          borderColor="red.200"
-          mb={4}
-        >
+        <Box p={4} bg="red.50" borderRadius="md" border="1px" borderColor="red.200" mb={4}>
           <Text color="red.600">{error}</Text>
         </Box>
       )}
 
       {success && (
-        <Box
-          p={4}
-          bg="green.50"
-          borderRadius="md"
-          border="1px"
-          borderColor="green.200"
-          mb={4}
-        >
+        <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200" mb={4}>
           <Text color="green.600">{success}</Text>
         </Box>
       )}
@@ -249,7 +220,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
               <Badge colorScheme="green">{vaultInfo.status}</Badge>
             </HStack>
             <Text fontSize="sm" color="blue.600" mb={1}>
-              Protocol: {vaultInfo.platformId?.toUpperCase() || "BEEFY"}
+              Protocol: {vaultInfo.platformId?.toUpperCase() || 'BEEFY'}
             </Text>
             <Text fontSize="sm" color="blue.600">
               Token: {vaultInfo.token} → {vaultInfo.earnedToken}

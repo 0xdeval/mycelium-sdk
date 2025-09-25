@@ -1,0 +1,11 @@
+echo "⏳ Running tests..."
+pnpm test
+echo "✅ Tests done"
+echo
+
+
+echo "⏳ Lint staged step..."
+pnpm lint-staged
+echo "✅ Lint staged done"
+echo
+

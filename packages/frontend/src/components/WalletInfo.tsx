@@ -1,31 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { FaLock } from "react-icons/fa";
-import {
-  Box,
-  Heading,
-  Text,
-  VStack,
-  Code,
-  Icon,
-  Button,
-  Spinner,
-} from "@chakra-ui/react";
-import { CustomAlert } from "@/components/ui/alert";
-import { type WalletInfoProps, type WalletData } from "@/types/wallet";
+import { useState, useEffect } from 'react';
+import { FaLock } from 'react-icons/fa';
+import { Box, Heading, Text, VStack, Code, Icon, Button, Spinner } from '@chakra-ui/react';
+import { CustomAlert } from '@/components/ui/alert';
+import { type WalletInfoProps, type WalletData } from '@/types/wallet';
 
-export default function WalletInfo({
-  walletId,
-  walletAddress,
-  error,
-}: WalletInfoProps) {
+export default function WalletInfo({ walletId, walletAddress, error }: WalletInfoProps) {
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
 
   const loadWalletData = async () => {
-    if (!walletId) return;
+    if (!walletId) {
+      return;
+    }
     setIsLoadingData(true);
     setDataError(null);
 
@@ -36,31 +25,27 @@ export default function WalletInfo({
       console.log("tokensBalances in WalletInfo: ", balance);
       setWalletData({ balance });
     } catch (error) {
-      setDataError(
-        error instanceof Error ? error.message : "Failed to load wallet data"
-      );
+      setDataError(error instanceof Error ? error.message : 'Failed to load wallet data');
     } finally {
       setIsLoadingData(false);
     }
   };
 
   const dropFunds = async () => {
-    if (!walletId) return;
+    if (!walletId) {
+      return;
+    }
     setIsLoadingData(true);
     setDataError(null);
 
     try {
-      console.log("data for a facuet service", {
-        to: walletAddress,
-        amountUsdc: "1000",
-      });
       const response = await fetch(`http://localhost:3001/drop-funds`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: walletAddress,
-          amountUsdc: "100",
-          amountEth: "0.1",
+          amountUsdc: '100',
+          amountEth: '0.1',
         }),
       });
       if (!response.ok) {
@@ -69,13 +54,11 @@ export default function WalletInfo({
       }
 
       const data = await response.json();
-      console.log("data after drop funds: ", data);
+      console.log('data after drop funds: ', data);
 
       await loadWalletData();
     } catch (error) {
-      setDataError(
-        error instanceof Error ? error.message : "Failed to drop funds"
-      );
+      setDataError(error instanceof Error ? error.message : 'Failed to drop funds');
     } finally {
       setIsLoadingData(false);
     }
@@ -114,13 +97,7 @@ export default function WalletInfo({
             <Text fontSize="sm" fontWeight="medium" mb={1} color="gray.700">
               Wallet ID
             </Text>
-            <Box
-              p={3}
-              bg="gray.50"
-              border="1px"
-              borderColor="gray.200"
-              borderRadius="md"
-            >
+            <Box p={3} bg="gray.50" border="1px" borderColor="gray.200" borderRadius="md">
               <Code fontSize="sm" wordBreak="break-all">
                 {walletId}
               </Code>
@@ -131,13 +108,7 @@ export default function WalletInfo({
             <Text fontSize="sm" fontWeight="medium" mb={1} color="gray.700">
               Wallet Address
             </Text>
-            <Box
-              p={3}
-              bg="gray.50"
-              border="1px"
-              borderColor="gray.200"
-              borderRadius="md"
-            >
+            <Box p={3} bg="gray.50" border="1px" borderColor="gray.200" borderRadius="md">
               <Code fontSize="sm" wordBreak="break-all">
                 {walletAddress}
               </Code>
@@ -159,13 +130,7 @@ export default function WalletInfo({
                 <Text fontSize="sm" fontWeight="medium" mb={1} color="gray.700">
                   Balance
                 </Text>
-                <Box
-                  p={3}
-                  bg="blue.50"
-                  border="1px"
-                  borderColor="blue.200"
-                  borderRadius="md"
-                >
+                <Box p={3} bg="blue.50" border="1px" borderColor="blue.200" borderRadius="md">
                   <Text fontSize="lg" fontWeight="bold" color="blue.700">
                     {walletData &&
                       walletData?.balance
@@ -178,20 +143,10 @@ export default function WalletInfo({
                 </Box>
               </Box>
 
-              <Button
-                onClick={loadWalletData}
-                size="sm"
-                colorScheme="blue"
-                variant="solid"
-              >
+              <Button onClick={loadWalletData} size="sm" colorScheme="blue" variant="solid">
                 Refresh Data
               </Button>
-              <Button
-                onClick={dropFunds}
-                size="sm"
-                colorScheme="grey"
-                variant="outline"
-              >
+              <Button onClick={dropFunds} size="sm" colorScheme="grey" variant="outline">
                 Get funds
               </Button>
             </VStack>
@@ -208,8 +163,8 @@ export default function WalletInfo({
           >
             <Text fontWeight="bold">Wallet Ready!</Text>
             <Text mt={2} fontSize="sm">
-              Your wallet has been successfully created or retrieved. You can
-              now use it for transactions on the blockchain.
+              Your wallet has been successfully created or retrieved. You can now use it for
+              transactions on the blockchain.
             </Text>
           </Box>
         </VStack>

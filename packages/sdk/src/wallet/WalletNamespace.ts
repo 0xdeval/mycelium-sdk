@@ -4,10 +4,10 @@ import type {
   GetEmbeddedWalletOptions,
   GetSmartWalletOptions,
   GetSmartWalletWithEmbeddedSignerOptions,
-} from "@/types/wallet";
-import type { EmbeddedWallet } from "@/wallet/base/wallets/EmbeddedWallet";
-import type { SmartWallet } from "@/wallet/base/wallets/SmartWallet";
-import type { WalletProvider } from "@/wallet/WalletProvider";
+} from '@/types/wallet';
+import type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
+import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
+import type { WalletProvider } from '@/wallet/WalletProvider';
 
 // WHAT IS THIS CLASS?
 // Basically this is a wallet class that is connected to a particular user.
@@ -64,9 +64,7 @@ export class WalletNamespace {
    * @param params.nonce - Optional nonce for smart wallet address generation (defaults to 0)
    * @returns Promise resolving to the created smart wallet instance
    */
-  async createSmartWallet(
-    params: CreateSmartWalletOptions
-  ): Promise<SmartWallet> {
+  async createSmartWallet(params: CreateSmartWalletOptions): Promise<SmartWallet> {
     return this.provider.createSmartWallet(params);
   }
 
@@ -81,7 +79,7 @@ export class WalletNamespace {
    * @returns Promise resolving to the created smart wallet instance
    */
   async createWalletWithEmbeddedSigner(
-    params?: CreateWalletWithEmbeddedSignerOptions
+    params?: CreateWalletWithEmbeddedSignerOptions,
   ): Promise<SmartWallet> {
     return this.provider.createWalletWithEmbeddedSigner(params);
   }
@@ -101,9 +99,7 @@ export class WalletNamespace {
    * @returns Promise resolving to the smart wallet instance with embedded wallet as signer
    * @throws Error if embedded wallet is not found
    */
-  async getSmartWalletWithEmbeddedSigner(
-    params: GetSmartWalletWithEmbeddedSignerOptions
-  ) {
+  async getSmartWalletWithEmbeddedSigner(params: GetSmartWalletWithEmbeddedSignerOptions) {
     return this.provider.getSmartWalletWithEmbeddedSigner(params);
   }
 

@@ -1,13 +1,12 @@
-import type { Address, LocalAccount } from "viem";
-import { pad } from "viem";
-import { type WebAuthnAccount } from "viem/account-abstraction";
+import { pad, type Address, type LocalAccount } from 'viem';
+import { type WebAuthnAccount } from 'viem/account-abstraction';
 
-import { smartWalletFactoryAbi } from "@/abis/smartWalletFactory";
-import { smartWalletFactoryAddress } from "@/constants/addresses";
-import type { ChainManager } from "@/tools/ChainManager";
-import { DefaultSmartWallet } from "@/wallet/DefaultSmartWallet";
-import { SmartWalletProvider } from "@/wallet/base/providers/SmartWalletProvider";
-import type { Protocol, ProtocolInfo } from "@/types/protocols/general";
+import { smartWalletFactoryAbi } from '@/abis/smartWalletFactory';
+import { smartWalletFactoryAddress } from '@/constants/addresses';
+import type { ChainManager } from '@/tools/ChainManager';
+import { DefaultSmartWallet } from '@/wallet/DefaultSmartWallet';
+import { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
+import type { Protocol, ProtocolInfo } from '@/types/protocols/general';
 
 /**
  * Smart Wallet Provider
@@ -21,7 +20,7 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
   //   private lendProvider: LendProvider;
 
   /** Already initialized protocol provider */
-  private protocolProvider: Protocol["instance"];
+  private protocolProvider: Protocol['instance'];
 
   /** Protocol info */
   private protocolInfo: ProtocolInfo;
@@ -64,7 +63,7 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       this.protocolProvider,
       undefined,
       undefined,
-      nonce
+      nonce,
     );
   }
 
@@ -76,27 +75,28 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
    * @param params.nonce - Nonce for address generation (defaults to 0)
    * @returns Promise resolving to the predicted wallet address
    */
-  async getWalletAddress(params: {
-    owners: Array<Address | WebAuthnAccount>;
-    nonce?: bigint;
-  }) {
+  async getWalletAddress(params: { owners: Array<Address | WebAuthnAccount>; nonce?: bigint }) {
     const { owners, nonce = 0n } = params;
     const owners_bytes = owners.map((owner) => {
-      if (typeof owner === "string") return pad(owner);
-      if (owner.type === "webAuthn") return owner.publicKey;
-      throw new Error("invalid owner type");
+      if (typeof owner === 'string') {
+        return pad(owner);
+      }
+      if (owner.type === 'webAuthn') {
+        return owner.publicKey;
+      }
+      throw new Error('invalid owner type');
     });
 
     // Factory is the same accross all chains, so we can use the first chain to get the wallet address
     const supportedChain = this.chainManager.getSupportedChain();
     if (!supportedChain) {
-      throw new Error("No supported chains configured");
+      throw new Error('No supported chains configured');
     }
     const publicClient = this.chainManager.getPublicClient(supportedChain);
     const smartWalletAddress = await publicClient.readContract({
       abi: smartWalletFactoryAbi,
       address: smartWalletFactoryAddress,
-      functionName: "getAddress",
+      functionName: 'getAddress',
       args: [owners_bytes, nonce],
     });
     return smartWalletAddress;
@@ -124,7 +124,7 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       //   this.lendProvider,
       this.protocolProvider,
       walletAddress,
-      ownerIndex
+      ownerIndex,
     );
   }
 

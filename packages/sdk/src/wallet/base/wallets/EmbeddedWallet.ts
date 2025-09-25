@@ -1,6 +1,6 @@
-import type { Address, LocalAccount, WalletClient } from "viem";
+import type { Address, LocalAccount, WalletClient } from 'viem';
 
-import type { SupportedChainId } from "@/constants/chains";
+import type { SupportedChainId } from '@/constants/chains';
 
 /**
  * Base embedded wallet class

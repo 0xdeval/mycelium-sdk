@@ -1,10 +1,9 @@
-import type { Address } from "viem";
-import { erc20Abi, formatEther, formatUnits } from "viem";
+import { type Address, erc20Abi, formatEther, formatUnits } from 'viem';
 
-import type { SupportedChainId } from "@/constants/chains";
-import type { ChainManager } from "@/tools/ChainManager";
-import { getTokenAddress, type TokenInfo } from "@/utils/tokens";
-import type { TokenBalance } from "@/types/token.js";
+import type { SupportedChainId } from '@/constants/chains';
+import type { ChainManager } from '@/tools/ChainManager';
+import { getTokenAddress, type TokenInfo } from '@/utils/tokens';
+import type { TokenBalance } from '@/types/token.js';
 
 /**
  * Fetch ETH balance across all supported chains
@@ -14,7 +13,7 @@ import type { TokenBalance } from "@/types/token.js";
  */
 export async function fetchETHBalance(
   chainManager: ChainManager,
-  walletAddress: Address
+  walletAddress: Address,
 ): Promise<TokenBalance> {
   const supportedChain = chainManager.getSupportedChain();
 
@@ -24,7 +23,7 @@ export async function fetchETHBalance(
   });
 
   return {
-    symbol: "ETH",
+    symbol: 'ETH',
     totalBalance: balance,
     totalFormattedBalance: formatEther(balance),
     chainBalances: [
@@ -43,7 +42,7 @@ export async function fetchETHBalance(
 export async function fetchERC20Balance(
   chainManager: ChainManager,
   walletAddress: Address,
-  token: TokenInfo
+  token: TokenInfo,
 ): Promise<TokenBalance> {
   const supportedChain = chainManager.getSupportedChain();
 
@@ -51,7 +50,7 @@ export async function fetchERC20Balance(
     token,
     supportedChain,
     walletAddress,
-    chainManager
+    chainManager,
   );
 
   return {
@@ -75,7 +74,7 @@ async function fetchERC20BalanceForChain(
   token: TokenInfo,
   chainId: SupportedChainId,
   walletAddress: Address,
-  chainManager: ChainManager
+  chainManager: ChainManager,
 ): Promise<bigint> {
   const tokenAddress = getTokenAddress(token.symbol, chainId);
   if (!tokenAddress) {
@@ -85,7 +84,7 @@ async function fetchERC20BalanceForChain(
   const publicClient = chainManager.getPublicClient(chainId);
 
   // Handle native ETH balance
-  if (token.symbol === "ETH") {
+  if (token.symbol === 'ETH') {
     return publicClient.getBalance({
       address: walletAddress,
     });
@@ -95,7 +94,7 @@ async function fetchERC20BalanceForChain(
   return publicClient.readContract({
     address: tokenAddress,
     abi: erc20Abi,
-    functionName: "balanceOf",
+    functionName: 'balanceOf',
     args: [walletAddress],
   });
 }

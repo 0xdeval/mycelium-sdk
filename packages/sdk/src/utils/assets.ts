@@ -1,9 +1,8 @@
-import type { Address } from "viem";
-import { parseUnits } from "viem";
+import { type Address, parseUnits } from 'viem';
 
-import type { SupportedChainId } from "@/constants/chains";
-import { getTokenAddress } from "@/utils/tokens";
-import { SUPPORTED_TOKENS } from "@/constants/tokens";
+import type { SupportedChainId } from '@/constants/chains';
+import { getTokenAddress } from '@/utils/tokens';
+import { SUPPORTED_TOKENS } from '@/constants/tokens';
 
 /**
  * Asset identifier - can be a symbol (like 'usdc') or address
@@ -26,21 +25,15 @@ export interface ResolvedAsset {
  * @returns Resolved asset information
  * @throws Error if asset is not supported or found
  */
-export function resolveAsset(
-  asset: AssetIdentifier,
-  chainId: SupportedChainId
-): ResolvedAsset {
+export function resolveAsset(asset: AssetIdentifier, chainId: SupportedChainId): ResolvedAsset {
   // If it's an address (starts with 0x), validate and find symbol
-  if (asset.startsWith("0x")) {
+  if (asset.startsWith('0x')) {
     const address = asset as Address;
 
     // Try to find the symbol for this address
     for (const [, tokenInfo] of Object.entries(SUPPORTED_TOKENS)) {
       const tokenAddress = tokenInfo.addresses[chainId];
-      if (
-        tokenAddress &&
-        tokenAddress.toLowerCase() === address.toLowerCase()
-      ) {
+      if (tokenAddress && tokenAddress.toLowerCase() === address.toLowerCase()) {
         return {
           address: tokenAddress,
           symbol: tokenInfo.symbol,
@@ -51,7 +44,7 @@ export function resolveAsset(
 
     // If not found in supported tokens, we can't determine decimals
     throw new Error(
-      `Unknown asset address: ${address}. Please use a supported asset symbol like 'usdc' or add the token to SUPPORTED_TOKENS.`
+      `Unknown asset address: ${address}. Please use a supported asset symbol like 'usdc' or add the token to SUPPORTED_TOKENS.`,
     );
   }
 
@@ -60,16 +53,14 @@ export function resolveAsset(
   const tokenInfo = SUPPORTED_TOKENS[normalizedSymbol];
 
   if (!tokenInfo) {
-    const availableSymbols = Object.keys(SUPPORTED_TOKENS).join(", ");
-    throw new Error(
-      `Unsupported asset symbol: ${asset}. Supported assets: ${availableSymbols}`
-    );
+    const availableSymbols = Object.keys(SUPPORTED_TOKENS).join(', ');
+    throw new Error(`Unsupported asset symbol: ${asset}. Supported assets: ${availableSymbols}`);
   }
 
   const address = getTokenAddress(normalizedSymbol, chainId);
   if (!address) {
     throw new Error(
-      `Asset ${asset} is not supported on chain ${chainId}. Available chains: ${Object.keys(tokenInfo.addresses).join(", ")}`
+      `Asset ${asset} is not supported on chain ${chainId}. Available chains: ${Object.keys(tokenInfo.addresses).join(', ')}`,
     );
   }
 
@@ -107,7 +98,7 @@ export function formatAssetAmount(amount: bigint, decimals: number): number {
   const fractionalPart = amount % divisor;
 
   // Handle fractional part with proper precision
-  const fractionalStr = fractionalPart.toString().padStart(decimals, "0");
+  const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
   const result = `${wholePart}.${fractionalStr}`;
 
   return parseFloat(result);
@@ -123,13 +114,13 @@ export function formatAssetAmount(amount: bigint, decimals: number): number {
 export function parseLendParams(
   amount: number,
   asset: AssetIdentifier,
-  chainId: SupportedChainId
+  chainId: SupportedChainId,
 ): {
   amount: bigint;
   asset: ResolvedAsset;
 } {
   if (amount <= 0) {
-    throw new Error("Amount must be greater than 0");
+    throw new Error('Amount must be greater than 0');
   }
 
   const resolvedAsset = resolveAsset(asset, chainId);

@@ -1,8 +1,5 @@
-import type { PrivyClient } from "@privy-io/server-auth";
-import {
-  createViemAccount,
-  type GetViemAccountInputType,
-} from "@privy-io/server-auth/viem";
+import type { PrivyClient } from '@privy-io/server-auth';
+import { createViemAccount, type GetViemAccountInputType } from '@privy-io/server-auth/viem';
 import {
   type Address,
   createWalletClient,
@@ -10,20 +7,19 @@ import {
   http,
   type LocalAccount,
   type WalletClient,
-} from "viem";
-import { unichain } from "viem/chains";
+} from 'viem';
+import { unichain } from 'viem/chains';
 
-import type { SupportedChainId } from "@/constants/chains";
-import type { ChainManager } from "@/tools/ChainManager";
+import type { SupportedChainId } from '@/constants/chains';
+import type { ChainManager } from '@/tools/ChainManager';
 // import type {
 //   LendOptions,
 //   LendProvider,
 //   LendTransaction,
 //   TransactionData,
 // } from "@/types/lend.js";
-import { type AssetIdentifier, parseLendParams } from "@/utils/assets.js";
-import { EmbeddedWallet } from "@/wallet/base/wallets/EmbeddedWallet.js";
-import type { TransactionData } from "@/types/transaction";
+import { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet.js';
+import type { TransactionData } from '@/types/transaction';
 
 /**
  * Privy wallet implementation
@@ -44,7 +40,7 @@ export class PrivyWallet extends EmbeddedWallet {
     privyClient: PrivyClient,
     walletId: string,
     address: Address,
-    chainManager: ChainManager
+    chainManager: ChainManager,
     // lendProvider: LendProvider
   ) {
     super(address, walletId);
@@ -67,7 +63,7 @@ export class PrivyWallet extends EmbeddedWallet {
       walletId: this.walletId,
       address: this.address,
       // TODO: Fix this type error
-      privy: this.privyClient as unknown as GetViemAccountInputType["privy"],
+      privy: this.privyClient as unknown as GetViemAccountInputType['privy'],
     });
     return account;
   }
@@ -183,7 +179,7 @@ export class PrivyWallet extends EmbeddedWallet {
       // Get current nonce for the wallet - manual management since Privy isn't handling it properly
       const nonce = await publicClient.getTransactionCount({
         address: privyWallet.address as Address,
-        blockTag: "pending", // Use pending to get the next nonce including any pending txs
+        blockTag: 'pending', // Use pending to get the next nonce including any pending txs
       });
 
       // According to Privy docs: if you provide ANY gas parameters, you must provide ALL of them
@@ -200,21 +196,20 @@ export class PrivyWallet extends EmbeddedWallet {
       };
 
       console.log(
-        `[PRIVY_PROVIDER] Complete tx params - Type: ${txParams.type}, Nonce: ${nonce}, Limit: ${gasLimit}, MaxFee: ${feeData.maxFeePerGas || "fallback"}, Priority: ${feeData.maxPriorityFeePerGas || "fallback"}`
+        `[PRIVY_PROVIDER] Complete tx params - Type: ${txParams.type}, Nonce: ${nonce}, Limit: ${gasLimit}, MaxFee: ${feeData.maxFeePerGas || 'fallback'}, Priority: ${feeData.maxPriorityFeePerGas || 'fallback'}`,
       );
 
-      const response =
-        await this.privyClient.walletApi.ethereum.signTransaction({
-          walletId: this.walletId,
-          transaction: txParams,
-        });
+      const response = await this.privyClient.walletApi.ethereum.signTransaction({
+        walletId: this.walletId,
+        transaction: txParams,
+      });
 
       return response.signedTransaction;
     } catch (error) {
       throw new Error(
         `Failed to sign transaction for wallet ${this.walletId}: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     }
   }
@@ -234,9 +229,7 @@ export class PrivyWallet extends EmbeddedWallet {
       return hash;
     } catch (error) {
       throw new Error(
-        `Failed to send transaction: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+        `Failed to send transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     }
   }
