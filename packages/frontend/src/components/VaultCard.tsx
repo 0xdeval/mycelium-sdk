@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Heading, VStack, Text, Button, Input, HStack, Spinner, Code } from '@chakra-ui/react';
 import type { JSX } from '@emotion/react/jsx-runtime';
+import type { VaultBalance } from '@mycelium-sdk/core';
 
 interface VaultCardProps {
   walletId?: string;
@@ -10,7 +11,7 @@ interface VaultCardProps {
 }
 
 export default function VaultCard({ walletId, walletAddress }: VaultCardProps): JSX.Element {
-  const [vaultBalance, setVaultBalance] = useState<any>(null);
+  const [vaultBalance, setVaultBalance] = useState<VaultBalance | null>(null);
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +25,9 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
   }, [walletId, walletAddress]);
 
   const loadVaultBalance = async () => {
-    if (!walletAddress) {return;}
+    if (!walletAddress) {
+      return;
+    }
     console.log('===loadVaultBalance===', walletId, walletAddress);
 
     try {

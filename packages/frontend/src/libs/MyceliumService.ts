@@ -43,7 +43,7 @@ export class MyceliumService {
           },
         },
         chain: {
-          chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID!) as any,
+          chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID!),
           rpcUrl: process.env.NEXT_PUBLIC_RPC_URL!,
           bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
         },

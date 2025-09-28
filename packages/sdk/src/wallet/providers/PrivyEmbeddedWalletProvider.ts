@@ -2,9 +2,9 @@ import type { PrivyClient } from '@privy-io/server-auth';
 import { getAddress } from 'viem';
 
 import type { ChainManager } from '@/tools/ChainManager';
-// import type { LendProvider } from "@/types/lend.js";
 import { PrivyWallet } from '@/wallet/PrivyWallet';
 import { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWalletProvider';
+import { logger } from '@/tools/Logger';
 
 /**
  * Options for getting all wallets
@@ -24,20 +24,14 @@ export interface PrivyProviderGetAllWalletsOptions {
 export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
   public privy: PrivyClient;
   private chainManager: ChainManager;
-  //   private lendProvider: LendProvider;
   /**
    * Create a new Privy wallet provider
    * @param privyClient - Privy client instance
    */
-  constructor(
-    privyClient: PrivyClient,
-    chainManager: ChainManager,
-    // lendProvider: LendProvider
-  ) {
+  constructor(privyClient: PrivyClient, chainManager: ChainManager) {
     super();
     this.privy = privyClient;
     this.chainManager = chainManager;
-    // this.lendProvider = lendProvider;
   }
 
   /**
@@ -61,7 +55,7 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
       );
       return walletInstance;
     } catch (error) {
-      console.error('Failed to create wallet: ', error);
+      logger.error('Failed to create wallet: ', error, 'PrivyEmbeddedWalletProvider');
       throw new Error(`Failed to create wallet: ${error}`);
     }
   }
@@ -83,7 +77,6 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
         wallet.id,
         getAddress(wallet.address),
         this.chainManager,
-        // this.lendProvider
       );
       return walletInstance;
     } catch {
@@ -110,7 +103,6 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
           wallet.id,
           getAddress(wallet.address),
           this.chainManager,
-          //   this.lendProvider
         );
         return walletInstance;
       });
