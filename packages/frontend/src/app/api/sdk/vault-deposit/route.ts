@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { MyceliumService } from "@/libs/MyceliumService";
+import { type NextRequest, NextResponse } from 'next/server';
+import { MyceliumService } from '@/libs/MyceliumService';
 
 export async function POST(request: NextRequest) {
   try {

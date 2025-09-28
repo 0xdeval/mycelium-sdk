@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { MyceliumService } from "@/libs/MyceliumService";
+import { type NextRequest, NextResponse } from 'next/server';
+import { MyceliumService } from '@/libs/MyceliumService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,8 +9,6 @@ export async function POST(request: NextRequest) {
     await myceliumService.init();
 
     const balance = await myceliumService.getEarnBalance(walletId);
-
-    console.log("Balance on server >>>>> ", balance, walletId);
 
     return NextResponse.json({ success: true, balance });
   } catch (error) {

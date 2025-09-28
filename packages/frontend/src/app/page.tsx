@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from "react";
-import { Box, Container, Heading, SimpleGrid } from "@chakra-ui/react";
-import WalletCreator from "@/components/WalletCreator";
-import WalletInfo from "@/components/WalletInfo";
-import VaultCard from "@/components/VaultCard";
+import { useState } from 'react';
+import { Box, Container, Heading, SimpleGrid } from '@chakra-ui/react';
+import WalletCreator from '@/components/WalletCreator';
+import WalletInfo from '@/components/WalletInfo';
+import VaultCard from '@/components/VaultCard';
+import type { JSX } from '@emotion/react/jsx-runtime';
 
-export default function Home() {
+export default function Home(): JSX.Element {
   const [walletId, setWalletId] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -34,18 +35,11 @@ export default function Home() {
           </Box>
 
           <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
-            <WalletInfo
-              walletId={walletId}
-              walletAddress={walletAddress}
-              error={error}
-            />
+            <WalletInfo walletId={walletId} walletAddress={walletAddress} error={error} />
           </Box>
-          
+
           <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
-            <VaultCard 
-              walletId={walletId}
-              walletAddress={walletAddress}
-            />
+            <VaultCard walletId={walletId} walletAddress={walletAddress} />
           </Box>
         </SimpleGrid>
       </Container>

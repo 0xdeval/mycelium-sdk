@@ -12,7 +12,7 @@ export interface VaultInfo {
   earnedTokenAddress: Address;
   oracle: string;
   oracleId: string;
-  status: 'active' | 'paused' | 'deprecated';
+  status: 'active' | 'eol';
   createdAt: number;
   platformId: string;
   assets: string[];
@@ -35,6 +35,21 @@ export interface VaultInfo {
     address: Address;
   };
   migrationIds?: string[];
+  apy?: number;
+  tvl?: number;
+  fees?:
+    | {
+        performance: {
+          total: number;
+          call: number;
+          strategist: number;
+          treasury: number;
+          stakers: number;
+        };
+        withdraw: number;
+        lastUpdated: number;
+      }
+    | number;
 }
 
 export interface VaultTransactionResult {

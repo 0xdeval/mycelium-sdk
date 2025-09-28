@@ -10,9 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: { walletId
     }
 
     const myceliumService = MyceliumService.getInstance();
-    console.log('=== About to call init() ===');
     await myceliumService.init();
-    console.log('=== init() completed ===');
 
     try {
       const balance = await myceliumService.getWalletBalance(walletId);

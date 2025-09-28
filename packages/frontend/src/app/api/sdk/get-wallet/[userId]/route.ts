@@ -6,8 +6,6 @@ export async function GET(request: NextRequest, { params }: { params: { userId: 
   try {
     const { userId } = await params;
 
-    console.log('userId in API: ', userId);
-
     if (!userId) {
       return NextResponse.json({ error: 'Wallet ID is required' }, { status: 400 });
     }

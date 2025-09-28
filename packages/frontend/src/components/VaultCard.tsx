@@ -1,26 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Heading,
-  VStack,
-  Text,
-  Button,
-  Input,
-  HStack,
-  Badge,
-  Spinner,
-  Code,
-} from '@chakra-ui/react';
+import { Box, Heading, VStack, Text, Button, Input, HStack, Spinner, Code } from '@chakra-ui/react';
+import type { JSX } from '@emotion/react/jsx-runtime';
 
 interface VaultCardProps {
   walletId?: string;
   walletAddress?: string;
 }
 
-export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
-  const [vaultInfo, setVaultInfo] = useState<any>(null);
+export default function VaultCard({ walletId, walletAddress }: VaultCardProps): JSX.Element {
   const [vaultBalance, setVaultBalance] = useState<any>(null);
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -35,8 +24,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   }, [walletId, walletAddress]);
 
   const loadVaultBalance = async () => {
-
-    if (!walletAddress) return;
+    if (!walletAddress) {return;}
     console.log('===loadVaultBalance===', walletId, walletAddress);
 
     try {
@@ -52,7 +40,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
       console.log('Balance data >>>>> ', data);
       if (data.success) {
-        setVaultBalance(data.balance || { shares: "0", depositedAmount: "0", ppfs: "0" });
+        setVaultBalance(data.balance || { shares: '0', depositedAmount: '0', ppfs: '0' });
       } else {
         setError(data.error);
       }
@@ -64,7 +52,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
   const handleDeposit = async () => {
     if (!walletId || !walletAddress || !depositAmount) {
-      setError("Missing required data for deposit");
+      setError('Missing required data for deposit');
       return;
     }
 
@@ -98,7 +86,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   };
 
   const handleWithdraw = async () => {
-    if (!vaultInfo || !walletId || !walletAddress || !withdrawAmount) {
+    if (!walletId || !withdrawAmount) {
       setError('Missing required data for withdraw');
       return;
     }
@@ -113,10 +101,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
-          walletAddress,
-          vaultInfo,
           amount: withdrawAmount,
-          chainId: 8453,
         }),
       });
 
@@ -136,9 +121,8 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
   };
 
   const handleWithdrawAll = async () => {
-    console.log('===handleWithdrawAll===', walletId, walletAddress, vaultInfo);
     if (!walletId || !walletAddress) {
-      setError("Missing required data for withdraw all");
+      setError('Missing required data for withdraw all');
       return;
     }
 
@@ -148,14 +132,11 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
 
     try {
       const response = await fetch(`/api/sdk/vault-withdraw`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           walletId,
-          walletAddress,
-          vaultInfo,
           amount: undefined,
-          chainId: 8453,
         }),
       });
 
@@ -204,63 +185,27 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
       )}
 
       <VStack gap={4} align="stretch">
-        {/* Vault Info */}
-        {vaultInfo && (
-          <Box
-            p={4}
-            bg="blue.50"
-            borderRadius="md"
-            border="1px"
-            borderColor="blue.200"
-          >
-            <HStack justify="space-between" mb={2}>
-              <Text fontWeight="bold" color="blue.700">
-                {vaultInfo.name}
-              </Text>
-              <Badge colorScheme="green">{vaultInfo.status}</Badge>
-            </HStack>
-            <Text fontSize="sm" color="blue.600" mb={1}>
-              Protocol: {vaultInfo.platformId?.toUpperCase() || 'BEEFY'}
-            </Text>
-            <Text fontSize="sm" color="blue.600">
-              Token: {vaultInfo.token} → {vaultInfo.earnedToken}
-            </Text>
-          </Box>
-        )}
-
         {/* Current Balance */}
-        <Box
-          p={4}
-          bg="green.50"
-          borderRadius="md"
-          border="1px"
-          borderColor="green.200"
-        >
+        <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200">
           <Text fontWeight="bold" color="green.700" mb={2}>
             Your Vault Balance
           </Text>
           {vaultBalance ? (
             <VStack gap={1} align="stretch">
               <Text fontSize="lg" fontWeight="bold">
-                {vaultBalance.shares} {vaultInfo?.earnedToken || "Shares"}
+                {vaultBalance.shares} vault tokens
               </Text>
               <Text fontSize="sm" color="green.600">
-                Shares: {vaultBalance.ppfs}
+                Price Per Full Share: {vaultBalance.ppfs}
               </Text>
               <Text fontSize="sm" color="green.600">
-                Value: {vaultBalance.depositedAmount} {vaultInfo?.token || "USDC"}
+                Value: {vaultBalance.depositedAmount} USDC
               </Text>
             </VStack>
           ) : (
             <Text color="green.600">Loading balance...</Text>
           )}
-          <Button
-            size="sm"
-            colorScheme="green"
-            variant="outline"
-            mt={2}
-            onClick={loadVaultBalance}
-          >
+          <Button size="sm" colorScheme="green" variant="outline" mt={2} onClick={loadVaultBalance}>
             Refresh Balance
           </Button>
         </Box>
@@ -268,7 +213,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
         {/* Deposit Section */}
         <Box>
           <Text fontWeight="bold" mb={2}>
-            Deposit {vaultInfo?.token || "USDC"}
+            Deposit USDC
           </Text>
           <HStack gap={2}>
             <Input
@@ -283,7 +228,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
               disabled={isLoading || !depositAmount}
               minW="100px"
             >
-              {isLoading ? <Spinner size="sm" /> : "Deposit"}
+              {isLoading ? <Spinner size="sm" /> : 'Deposit'}
             </Button>
           </HStack>
         </Box>
@@ -293,7 +238,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
           <>
             <Box>
               <Text fontWeight="bold" mb={2}>
-                Withdraw {vaultInfo?.earnedToken || "Shares"}
+                Withdraw USDC
               </Text>
               <HStack gap={2}>
                 <Input
@@ -308,7 +253,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
                   disabled={isLoading || !withdrawAmount}
                   minW="100px"
                 >
-                  {isLoading ? <Spinner size="sm" /> : "Withdraw"}
+                  {isLoading ? <Spinner size="sm" /> : 'Withdraw'}
                 </Button>
               </HStack>
             </Box>
@@ -322,7 +267,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
                 disabled={isLoading}
                 width="100%"
               >
-                {isLoading ? <Spinner size="sm" /> : "Withdraw All"}
+                {isLoading ? <Spinner size="sm" /> : 'Withdraw All'}
               </Button>
             </Box>
           </>
@@ -337,9 +282,6 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps) {
             Wallet: {walletAddress}
           </Code>
           <br />
-          <Code fontSize="xs" wordBreak="break-all">
-            Vault: {vaultInfo?.earnContractAddress || "Not loaded"}
-          </Code>
         </Box>
       </VStack>
     </Box>

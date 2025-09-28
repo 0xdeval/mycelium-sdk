@@ -53,10 +53,7 @@ export abstract class BaseProtocol {
    * Withdraw funds from a vault
    */
   abstract withdraw(
-    shares: string,
-    vaultInfo: VaultInfo,
-    walletAddress: Address,
-    chainId: SupportedChainId,
+    amountInShares: string,
     smartWallet: SmartWallet,
   ): Promise<VaultTransactionResult>;
 
