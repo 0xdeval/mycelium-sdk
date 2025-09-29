@@ -37,7 +37,9 @@
     "REPLAYABLE",
     "proxiable",
     "undeployed",
-    "accross"
+    "accross",
+    "xhash",
+    "xencodeddata"
   ],
   "enableFiletypes": ["!binary"],
   "overrides": [
