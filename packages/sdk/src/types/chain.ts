@@ -10,5 +10,5 @@ export interface ChainConfig {
   /** RPC URL for the chain */
   rpcUrl: string;
   /** Bundler URL for the chain */
-  bundlerUrl?: string;
+  bundlerUrl: string;
 }

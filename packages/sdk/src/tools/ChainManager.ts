@@ -34,6 +34,15 @@ export class ChainManager {
   }
 
   /**
+   * Check if a URL is valid
+   * @param url - The URL to check
+   * @returns True if the URL is valid, false otherwise
+   */
+  private isValidUrl(url: string): boolean {
+    return /^https?:\/\/.+$/.test(url);
+  }
+
+  /**
    * Get public client for a specific chain
    * @param chainId - The chain ID to retrieve the public client for
    * @returns PublicClient instance for the specified chain
@@ -89,6 +98,11 @@ export class ChainManager {
     if (!chainConfig) {
       throw new Error(`No chain config found for chain ID: ${chainId}`);
     }
+
+    if (!this.isValidUrl(chainConfig.rpcUrl)) {
+      throw new Error(`Invalid RPC URL for chain ID: ${chainId}`);
+    }
+
     return chainConfig.rpcUrl;
   }
 
@@ -102,6 +116,10 @@ export class ChainManager {
     const chainConfig = this.chainConfigs;
     if (!chainConfig) {
       throw new Error(`No chain config found for chain ID: ${chainId}`);
+    }
+
+    if (!this.isValidUrl(chainConfig.bundlerUrl)) {
+      throw new Error(`Invalid bundler URL for chain ID: ${chainId}`);
     }
     return chainConfig.bundlerUrl;
   }
@@ -171,7 +189,7 @@ export class ChainManager {
   }
 
   /**
-   * Check if chain is supported
+   * Check if chain is supported by a ChainManager
    * @param chainName - Chain name to check
    * @returns True if chain is supported
    */

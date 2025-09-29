@@ -17,13 +17,13 @@ import { PrivyEmbeddedWalletProvider } from './wallet/providers/PrivyEmbeddedWal
 import { PrivyClient } from '@privy-io/server-auth';
 import { ProtocolRouter } from './router/ProtocolRouter';
 import type { Protocol } from './types/protocols/general';
+import { logger } from './tools/Logger';
 
 export { BeefyProtocol } from './protocols/implementations/BeefyProtocol';
 
 export class MyceliumSDK {
   public readonly wallet: WalletNamespace;
   private _chainManager: ChainManager;
-  // private lendProvider?: LendProvider;
   private embeddedWalletProvider!: EmbeddedWalletProvider;
   private smartWalletProvider!: SmartWalletProvider;
   private protocol: Protocol;
@@ -33,8 +33,16 @@ export class MyceliumSDK {
       config.chain || {
         chainId: base.id,
         rpcUrl: base.rpcUrls.default.http[0],
+        bundlerUrl: 'https://public.pimlico.io/v2/8453/rpc',
       },
     );
+
+    if (!config.chain) {
+      logger.warn(
+        'No chain config provided, using default public RPC and Bundler URLs',
+        'MyceliumSDK',
+      );
+    }
 
     const protocolsRouterConfig = config.protocolsRouterConfig || {
       riskLevel: 'medium',

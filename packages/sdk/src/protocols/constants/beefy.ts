@@ -5,4 +5,4 @@ export const BEEFY_API_URLS = {
   tvl: 'https://api.beefy.finance/tvl',
 };
 
-export const ONE_E18 = 10n ** 18n;
+export const ONE_E18 = BigInt(10) ** BigInt(18);

@@ -259,7 +259,7 @@ export class BeefyProtocol extends BaseProtocol {
     amountInUnderlying: string | undefined,
     smartWallet: SmartWallet,
   ): Promise<VaultTransactionResult> {
-    const ceilDiv = (a: bigint, b: bigint) => (a + b - 1n) / b;
+    const ceilDiv = (a: bigint, b: bigint) => (a + b - BigInt(1)) / b;
 
     const vaultInfo = await this.fetchDepositedVaults(smartWallet);
 
@@ -311,6 +311,8 @@ export class BeefyProtocol extends BaseProtocol {
 
   /**
    * @description Read the price per full share from the vault
+   * If getPricePerFullShare calls it returns the current price per share of the vault (i.e. per mooToken) as an integer denominated in the "want" (i.e. underlying farm token)
+   * If pricePerShare fails then it uses pricePerShare to get the price per full share
    *
    * @param publicClient
    * @param vaultAddress
