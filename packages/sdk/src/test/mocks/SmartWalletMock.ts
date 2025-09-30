@@ -3,6 +3,10 @@ import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { Address, Hash } from 'viem';
 import type { TransactionData } from '@/types/transaction';
 
+/**
+ * Mock Smart Wallet for testing
+ * @description Provides a mock implementation of SmartWallet for testing purposes
+ */
 export const createMockSmartWallet = (): SmartWallet => {
   return {
     getAddress: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890' as Address),

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ChainManager } from './ChainManager';
-import type { ChainConfig } from '../types/chain';
+import { ChainManager } from '@mycelium/sdk/tools/ChainManager';
+import type { ChainConfig } from '@mycelium/sdk/types/chain';
 
 describe('ChainManager', () => {
   let mockChainConfig: ChainConfig;

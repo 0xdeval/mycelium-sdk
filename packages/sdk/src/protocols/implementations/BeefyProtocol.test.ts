@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BeefyProtocol } from './BeefyProtocol';
+import { BeefyProtocol } from '@mycelium/sdk/protocols/implementations/BeefyProtocol';
 import { parseUnits, formatUnits, type Address } from 'viem';
-import type { ChainManager } from '../../tools/ChainManager';
-import type { SmartWallet } from '../../wallet/base/wallets/SmartWallet';
+import type { ChainManager } from '@mycelium/sdk/tools/ChainManager';
+import type { SmartWallet } from '@mycelium/sdk/wallet/base/wallets/SmartWallet';
 
-import { mockApiResponses, mockVaultInfo } from '../../test/mocks/protocols/beefy';
-import { createMockChainManager } from '../../test/mocks/ChainManagerMock';
-import { createMockSmartWallet } from '../../test/mocks/SmartWalletMock';
+import { mockApiResponses, mockVaultInfo } from '@mycelium/sdk/test/mocks/protocols/beefy';
+import { createMockChainManager } from '@mycelium/sdk/test/mocks/ChainManagerMock';
+import { createMockSmartWallet } from '@mycelium/sdk/test/mocks/SmartWalletMock';
 
 vi.mock('viem', async () => {
   const actual = await vi.importActual('viem');
