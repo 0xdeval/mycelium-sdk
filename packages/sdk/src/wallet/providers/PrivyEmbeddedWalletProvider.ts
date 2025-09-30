@@ -51,7 +51,6 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
         wallet.id,
         getAddress(wallet.address),
         this.chainManager,
-        // this.lendProvider
       );
       return walletInstance;
     } catch (error) {

@@ -14,11 +14,6 @@ import type { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWal
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
 import { logger } from '@/tools/Logger';
 
-// WHAT IS THIS CLASS?
-// This is a provider class that is used to manage smart and embedded wallets
-// Currently supported Privy embedded wallet provider and Default smart wallet provider
-// New further wallet providers (e.g. Dynamic or Lit) can be added here
-
 /**
  * Unified Wallet Provider
  * @description Main wallet provider that combines embedded wallet and smart wallet functionality.

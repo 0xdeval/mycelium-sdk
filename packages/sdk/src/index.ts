@@ -19,8 +19,6 @@ import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
 
-export { BeefyProtocol } from './protocols/implementations/BeefyProtocol';
-
 export class MyceliumSDK {
   public readonly wallet: WalletNamespace;
   private _chainManager: ChainManager;

@@ -13,8 +13,6 @@ import { createMockProtocol } from '@mycelium/sdk/test/mocks/ProtocolMock';
 import type { Protocol } from '@mycelium/sdk/types/protocols/general';
 import type { TransactionData } from '@mycelium/sdk/types/transaction';
 
-// TODO: Add tests for 'earn', 'getEarnBalance', 'withdraw', 'sendBatch'
-
 vi.mock('viem/account-abstraction', () => ({
   toCoinbaseSmartAccount: vi.fn(),
 }));
@@ -152,5 +150,109 @@ describe('DefaultSmartWallet', () => {
       hash: '0xTransactionHash',
     });
     expect(result).toBe('0xTransactionHash');
+  });
+
+  it('should send a batch transaction via ERC-4337', async () => {
+    const wallet = new DefaultSmartWallet(
+      mockOwners,
+      mockSigner,
+      mockChainManager,
+      mockProtocol as unknown as Protocol['instance'],
+    );
+    const chainId = unichain.id;
+    const recipientAddress = getRandomAddress();
+    const value = BigInt(1000);
+    const data = '0x123';
+    const transactionData: TransactionData[] = [
+      {
+        to: recipientAddress,
+        value,
+        data,
+      },
+    ];
+    const mockAccount = {
+      address: '0x123',
+      client: mockChainManager.getPublicClient(baseSepolia.id),
+      owners: [mockSigner],
+      nonce: BigInt(0),
+    } as any;
+    vi.mocked(toCoinbaseSmartAccount).mockResolvedValue(mockAccount);
+    const bundlerClient = mockChainManager.getBundlerClient(chainId, mockAccount);
+
+    vi.mocked(bundlerClient.sendUserOperation).mockResolvedValue('0xTransactionHash');
+
+    const result = await wallet.sendBatch(transactionData, chainId);
+
+    expect(mockChainManager.getBundlerClient).toHaveBeenCalledWith(chainId, mockAccount);
+    expect(bundlerClient.sendUserOperation).toHaveBeenCalledWith({
+      account: mockAccount,
+      calls: transactionData,
+      callGasLimit: BigInt(140000),
+      verificationGasLimit: BigInt(140000),
+      preVerificationGas: BigInt(140000),
+    });
+    expect(bundlerClient.waitForUserOperationReceipt).toHaveBeenCalledWith({
+      hash: '0xTransactionHash',
+    });
+    expect(result).toBe('0xTransactionHash');
+  });
+
+  it('should use earn method and deposit to a vault', async () => {
+    const wallet = new DefaultSmartWallet(
+      mockOwners,
+      mockSigner,
+      mockChainManager,
+      mockProtocol as unknown as Protocol['instance'],
+    );
+
+    const depositSpy = vi.mocked(mockProtocol).deposit as ReturnType<typeof vi.fn>;
+
+    const amount = '1000';
+
+    const result = await wallet.earn(amount);
+
+    expect(depositSpy).toHaveBeenCalledWith(amount, wallet);
+    expect(result.hash).toBe('0x3c36293ab6884794bda1271b570ca9e9b68a406e93486359e7213a30f88c349b');
+    expect(result.success).toBe(true);
+  });
+
+  it('should use withdraw method and withdraw from a vault', async () => {
+    const wallet = new DefaultSmartWallet(
+      mockOwners,
+      mockSigner,
+      mockChainManager,
+      mockProtocol as unknown as Protocol['instance'],
+    );
+
+    const withdrawSpy = vi.mocked(mockProtocol).withdraw as ReturnType<typeof vi.fn>;
+
+    const amount = '1000';
+
+    const result = await wallet.withdraw(amount);
+
+    expect(withdrawSpy).toHaveBeenCalledWith(amount, wallet);
+    expect(result.hash).toBe('0x3c36293ab6884794bda1271b570ca9e9b68a406e93486359e7213a30f88c349b');
+    expect(result.success).toBe(true);
+  });
+
+  it('should use getEarnBalance method and get the balance of the vault', async () => {
+    const wallet = new DefaultSmartWallet(
+      mockOwners,
+      mockSigner,
+      mockChainManager,
+      mockProtocol as unknown as Protocol['instance'],
+    );
+
+    const fetchDepositedVaultsSpy = vi.mocked(mockProtocol).fetchDepositedVaults as ReturnType<
+      typeof vi.fn
+    >;
+
+    const result = await wallet.getEarnBalance();
+
+    expect(fetchDepositedVaultsSpy).toHaveBeenCalledWith(wallet);
+    expect(result).not.toBeNull();
+    expect(result?.shares).toBe('100');
+    expect(result?.depositedAmount).toBe('100');
+    expect(result?.ppfs).toBe('100');
   });
 });

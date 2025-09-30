@@ -9,10 +9,6 @@ import type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
 import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { WalletProvider } from '@/wallet/WalletProvider';
 
-// WHAT IS THIS CLASS?
-// Basically this is a wallet class that is connected to a particular user.
-// All further functionalities that are related to a wallet should be added here and should be provided through this class
-
 /**
  * Wallet namespace that provides unified wallet operations
  * @description Provides access to wallet functionality through a single provider interface

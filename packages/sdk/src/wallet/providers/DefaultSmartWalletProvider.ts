@@ -6,7 +6,7 @@ import { smartWalletFactoryAddress } from '@/constants/addresses';
 import type { ChainManager } from '@/tools/ChainManager';
 import { DefaultSmartWallet } from '@/wallet/DefaultSmartWallet';
 import { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
-import type { Protocol, ProtocolInfo } from '@/types/protocols/general';
+import type { Protocol } from '@/types/protocols/general';
 
 /**
  * Smart Wallet Provider
@@ -16,28 +16,19 @@ import type { Protocol, ProtocolInfo } from '@/types/protocols/general';
 export class DefaultSmartWalletProvider extends SmartWalletProvider {
   /** Manages supported blockchain networks */
   private chainManager: ChainManager;
-  /** Provider for lending market operations */
-  //   private lendProvider: LendProvider;
 
   /** Already initialized protocol provider */
   private protocolProvider: Protocol['instance'];
-
-  /** Protocol info */
-  private protocolInfo: ProtocolInfo;
 
   /**
    * Initialize the Smart Wallet Provider
    * @param chainManager - Manages supported blockchain networks
    * @param paymasterAndBundlerUrl - URL for ERC-4337 bundler and paymaster services
-   * @param lendProvider - Provider for lending market operations
    */
   constructor(chainManager: ChainManager, protocol: Protocol) {
-    //  lendProvider: LendProvider) {
     super();
     this.chainManager = chainManager;
     this.protocolProvider = protocol.instance;
-    this.protocolInfo = protocol.info;
-    // this.lendProvider = lendProvider;
   }
 
   /**
@@ -59,7 +50,6 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       owners,
       signer,
       this.chainManager,
-      //   this.lendProvider,
       this.protocolProvider,
       undefined,
       undefined,
@@ -121,7 +111,6 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       [signer.address],
       signer,
       this.chainManager,
-      //   this.lendProvider,
       this.protocolProvider,
       walletAddress,
       ownerIndex,

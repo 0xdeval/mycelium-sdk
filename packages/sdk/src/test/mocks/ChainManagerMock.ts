@@ -10,6 +10,7 @@ import type { SupportedChainId } from '@/constants/chains';
 export const createMockChainManager = (): ChainManager => {
   const mockPublicClient = {
     readContract: vi.fn(),
+    getBalance: vi.fn(),
   } as unknown as PublicClient;
 
   const mockBundlerClient = {
