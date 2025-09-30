@@ -8,7 +8,7 @@
     "clean": "turbo run clean",
     "dev": "turbo run dev --filter=./packages/*",
     "docs": "typedoc",
-    "prepare": "pnpm exec husky init",
+    "prepare": "husky",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
