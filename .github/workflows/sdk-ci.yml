@@ -1,8 +1,17 @@
-name: SDK build
+name: SDK CI
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'packages/sdk/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/sdk-ci.yml'
+
+concurrency:
+  group: sdk-ci-${{ github.event.pull_request.head.ref }}
+  cancel-in-progress: true
 
 jobs:
   sdk:
@@ -15,18 +24,27 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10.9.0
+          run_install: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install deps
+      - name: Install deps (workspace)
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests + build SDK
+      - name: Test + Build SDK
         working-directory: packages/sdk
         run: |
           pnpm run test
           pnpm run build
+
+      - name: Upload SDK dist (artifact)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-dist
+          path: packages/sdk/dist
