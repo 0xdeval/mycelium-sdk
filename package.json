@@ -7,7 +7,6 @@
     "test": "turbo run test",
     "clean": "turbo run clean",
     "dev": "turbo run dev --filter=./packages/*",
-    "docs": "typedoc",
     "prepare": "husky",
     "lint": "eslint .",
     "format": "prettier --check .",
@@ -28,7 +27,6 @@
     "lint-staged": "^16.2.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.6",
-    "typedoc": "^0.28.13",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.44.1"
   },

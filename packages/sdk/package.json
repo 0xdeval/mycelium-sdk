@@ -21,10 +21,13 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean --tsconfig tsconfig.build.json",
     "watch": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch --tsconfig tsconfig.build.json",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "docs": "typedoc"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "typedoc": "^0.28.13",
+    "typedoc-plugin-markdown": "^4.9.0",
     "vitest": "^3.2.4"
   },
   "peerDependencies": {

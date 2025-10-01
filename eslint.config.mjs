@@ -26,6 +26,7 @@ export default [
       '**/.next/**',
       '.vercel/',
       'wallets.db',
+      'pnpm-lock.yaml',
       '*.db',
       'packages/frontend/.next/**',
     ],

@@ -17,7 +17,9 @@
     "*.lock",
     "*.log",
     "*.lockb",
-    "src/abi/"
+    "src/abi/",
+    "pnpm-lock.yaml",
+    ".gitignore"
   ],
   "caseSensitive": false,
   "words": [
