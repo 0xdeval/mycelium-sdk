@@ -12,11 +12,7 @@ import type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
 import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWalletProvider';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
-
-// WHAT IS THIS CLASS?
-// This is a provider class that is used to manage smart and embedded wallets
-// Currently supported Privy embedded wallet provider and Default smart wallet provider
-// New further wallet providers (e.g. Dynamic or Lit) can be added here
+import { logger } from '@/tools/Logger';
 
 /**
  * Unified Wallet Provider
@@ -180,7 +176,7 @@ export class WalletProvider {
           'Either walletAddress or deploymentOwners array must be provided to locate the smart wallet',
         );
       } catch (error) {
-        console.error(error);
+        logger.error('Error getting smart wallet', error, 'WalletProvider');
         throw new Error(
           'Either walletAddress or deploymentOwners array must be provided to locate the smart wallet',
         );

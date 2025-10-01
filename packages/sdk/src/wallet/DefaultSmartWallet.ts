@@ -61,7 +61,6 @@ export class DefaultSmartWallet extends SmartWallet {
     owners: Array<Address | WebAuthnAccount>,
     signer: LocalAccount,
     chainManager: ChainManager,
-    // lendProvider: LendProvider,
     protocolProvider: Protocol['instance'],
     deploymentAddress?: Address,
     signerOwnerIndex?: number,
@@ -73,7 +72,6 @@ export class DefaultSmartWallet extends SmartWallet {
     this.signerOwnerIndex = signerOwnerIndex;
     this.deploymentAddress = deploymentAddress;
     this.chainManager = chainManager;
-    // this.lendProvider = lendProvider;
     this.nonce = nonce;
     this.protocolProvider = protocolProvider;
   }
@@ -162,18 +160,8 @@ export class DefaultSmartWallet extends SmartWallet {
   /**
    * Make a deposit to a protocol vault that was selected before on the initialization step
    */
-  async earn(
-    amount: string,
-    // chainId: SupportedChainId
-  ): Promise<VaultTransactionResult> {
+  async earn(amount: string): Promise<VaultTransactionResult> {
     this.chainManager.getSupportedChain();
-    // const isChainSupportedByProtocol =
-    //   this.protocolInfo.supportedChains.includes(chainId);
-    // if (!isChainSupportedByProtocol) {
-    //   throw new Error(
-    //     `Chain ${chainId} is not supported by protocol ${this.protocolInfo.name}`
-    //   );
-    // }
 
     const depositTransactionResult = this.protocolProvider.deposit(amount, this);
 
@@ -181,7 +169,7 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   *
+   * Get the balance of the protocol vault
    */
   async getEarnBalance(): Promise<VaultBalance | null> {
     const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
@@ -191,46 +179,14 @@ export class DefaultSmartWallet extends SmartWallet {
     return this.protocolProvider.getBalance(vaultInfo, await this.getAddress());
   }
 
-  //   /**
-  //    * Lend assets to a lending market
-  //    * @description Lends assets using the configured lending provider with human-readable amounts
-  //    * @param amount - Human-readable amount to lend (e.g. 1.5)
-  //    * @param asset - Asset symbol (e.g. 'usdc') or token address
-  //    * @param marketId - Optional specific market ID or vault name
-  //    * @param options - Optional lending configuration
-  //    * @returns Promise resolving to lending transaction details
-  //    * @throws Error if no lending provider is configured
-  //    */
-  //   async lend(
-  //     amount: number,
-  //     asset: AssetIdentifier,
-  //     chainId: SupportedChainId,
-  //     marketId?: string,
-  //     options?: LendOptions
-  //   ): Promise<LendTransaction> {
-  //     // Parse human-readable inputs
-  //     const { amount: parsedAmount, asset: resolvedAsset } = parseLendParams(
-  //       amount,
-  //       asset,
-  //       chainId
-  //     );
-  //     const address = await this.getAddress();
+  /**
+   * Withdraw specific amount from the protocol vault
+   */
+  async withdraw(amount: string): Promise<VaultTransactionResult> {
+    const withdrawTransactionResult = await this.protocolProvider.withdraw(amount, this);
 
-  //     // Set receiver to wallet address if not specified
-  //     const lendOptions: LendOptions = {
-  //       ...options,
-  //       receiver: options?.receiver || address,
-  //     };
-
-  //     const result = await this.lendProvider.deposit(
-  //       resolvedAsset.address,
-  //       parsedAmount,
-  //       marketId,
-  //       lendOptions
-  //     );
-
-  //     return result;
-  //   }
+    return withdrawTransactionResult;
+  }
 
   /**
    * Send a transaction via ERC-4337
@@ -246,9 +202,20 @@ export class DefaultSmartWallet extends SmartWallet {
       const account = await this.getCoinbaseSmartAccount(chainId);
       const bundlerClient = this.chainManager.getBundlerClient(chainId, account);
 
+      // Extra buffer for gas limits
+      const bump = (x: bigint, pct = 40n) => x + (x * pct) / 100n;
+
+      const gas = await bundlerClient.estimateUserOperationGas({
+        account,
+        calls: [transactionData],
+      });
+
       const hash = await bundlerClient.sendUserOperation({
         account,
         calls: [transactionData],
+        callGasLimit: bump(gas.callGasLimit),
+        verificationGasLimit: bump(gas.verificationGasLimit),
+        preVerificationGas: bump(gas.preVerificationGas),
       });
 
       // Wait for the transaction to be included in a block
@@ -269,10 +236,21 @@ export class DefaultSmartWallet extends SmartWallet {
       const account = await this.getCoinbaseSmartAccount(chainId);
       const bundlerClient = this.chainManager.getBundlerClient(chainId, account);
 
+      // Extra buffer for gas limits
+      const bump = (x: bigint, pct = 40n) => x + (x * pct) / 100n;
+
+      const gas = await bundlerClient.estimateUserOperationGas({
+        account,
+        calls: transactionData,
+      });
+
       // Wait for the transaction to be included in a block
       const hash = await bundlerClient.sendUserOperation({
         account,
         calls: transactionData,
+        callGasLimit: bump(gas.callGasLimit),
+        verificationGasLimit: bump(gas.verificationGasLimit),
+        preVerificationGas: bump(gas.preVerificationGas),
       });
 
       await bundlerClient.waitForUserOperationReceipt({

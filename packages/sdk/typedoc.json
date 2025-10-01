@@ -1,0 +1,9 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "tsconfig": "tsconfig.json",
+  "plugin": ["typedoc-plugin-markdown"],
+  "out": "../../docs/api/sdk",
+  "hideBreadcrumbs": false,
+  "hidePageTitle": false,
+  "readme": "none"
+}

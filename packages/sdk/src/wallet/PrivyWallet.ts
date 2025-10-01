@@ -12,14 +12,9 @@ import { unichain } from 'viem/chains';
 
 import type { SupportedChainId } from '@/constants/chains';
 import type { ChainManager } from '@/tools/ChainManager';
-// import type {
-//   LendOptions,
-//   LendProvider,
-//   LendTransaction,
-//   TransactionData,
-// } from "@/types/lend.js";
 import { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet.js';
 import type { TransactionData } from '@/types/transaction';
+import { logger } from '@/tools/Logger';
 
 /**
  * Privy wallet implementation
@@ -29,7 +24,6 @@ export class PrivyWallet extends EmbeddedWallet {
   public override walletId: string;
   private privyClient: PrivyClient;
   private chainManager: ChainManager;
-  //   private lendProvider: LendProvider;
   /**
    * Create a new Privy wallet provider
    * @param appId - Privy application ID
@@ -41,13 +35,11 @@ export class PrivyWallet extends EmbeddedWallet {
     walletId: string,
     address: Address,
     chainManager: ChainManager,
-    // lendProvider: LendProvider
   ) {
     super(address, walletId);
     this.privyClient = privyClient;
     this.walletId = walletId;
     this.chainManager = chainManager;
-    // this.lendProvider = lendProvider;
   }
 
   /**
@@ -85,58 +77,6 @@ export class PrivyWallet extends EmbeddedWallet {
       transport: http(this.chainManager.getRpcUrl(chainId)),
     });
   }
-
-  // ⚠️  WARNING: TECH DEBT BELOW ⚠️
-  // =====================================
-  // The methods below this comment are legacy tech debt from the POC
-  // and will most likely be REMOVED in a future refactor.
-  //
-  // DO NOT rely on these methods in production code!
-  // DO NOT extend or modify these methods!
-  //
-  // If you need this functionality, please discuss with the team
-  // before using or building upon these methods.
-  // =====================================
-
-  /**
-   * Lend assets to a lending market
-   * @description Lends assets using the configured lending provider with human-readable amounts
-   * @param amount - Human-readable amount to lend (e.g. 1.5)
-   * @param asset - Asset symbol (e.g. 'usdc') or token address
-   * @param marketId - Optional specific market ID or vault name
-   * @param options - Optional lending configuration
-   * @returns Promise resolving to lending transaction details
-   * @throws Error if no lending provider is configured
-   */
-  //   async lend(
-  //     amount: number,
-  //     asset: AssetIdentifier,
-  //     marketId?: string,
-  //     options?: LendOptions
-  //   ): Promise<LendTransaction> {
-  //     // Parse human-readable inputs
-  //     // TODO: Get actual chain ID from wallet context, for now using Unichain
-  //     const { amount: parsedAmount, asset: resolvedAsset } = parseLendParams(
-  //       amount,
-  //       asset,
-  //       unichain.id
-  //     );
-
-  //     // Set receiver to wallet address if not specified
-  //     const lendOptions: LendOptions = {
-  //       ...options,
-  //       receiver: options?.receiver || this.address,
-  //     };
-
-  //     const result = await this.lendProvider.deposit(
-  //       resolvedAsset.address,
-  //       parsedAmount,
-  //       marketId,
-  //       lendOptions
-  //     );
-
-  //     return result;
-  //   }
 
   /**
    * Sign a transaction without sending it
@@ -195,8 +135,16 @@ export class PrivyWallet extends EmbeddedWallet {
         nonce: `0x${nonce.toString(16)}`, // Explicitly provide the correct nonce
       };
 
-      console.log(
-        `[PRIVY_PROVIDER] Complete tx params - Type: ${txParams.type}, Nonce: ${nonce}, Limit: ${gasLimit}, MaxFee: ${feeData.maxFeePerGas || 'fallback'}, Priority: ${feeData.maxPriorityFeePerGas || 'fallback'}`,
+      logger.info(
+        'Complete tx params: ',
+        {
+          txParamsType: txParams.type,
+          txParamsNonce: nonce,
+          txParamsLimit: gasLimit,
+          txParamsMaxFee: feeData.maxFeePerGas || 'fallback',
+          txParamsPriority: feeData.maxPriorityFeePerGas || 'fallback',
+        },
+        'PrivyWallet',
       );
 
       const response = await this.privyClient.walletApi.ethereum.signTransaction({

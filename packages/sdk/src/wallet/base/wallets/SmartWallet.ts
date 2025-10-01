@@ -83,18 +83,12 @@ export abstract class SmartWallet {
    */
   abstract getEarnBalance(): Promise<VaultBalance | null>;
 
-  //   /**
-  //    * Withdraw tokens from this smart wallet to a fiat
-  //    * @description Prepares an off ramp link to withdraw tokens from this smart wallet
-  //    * to a fiat account (bank account)
-  //    * @param amount - Amount to withdraw in human-readable format
-  //    * @param asset - Asset identifier for the token to withdraw
-  //    * @param bankAccount - Destination bank account for the tokens
-  //    * @returns Promise resolving to prepared transaction data
-  //    */
-  //   abstract withdrawTokens(
-  //     amount: number,
-  //     asset: AssetIdentifier,
-  //     bankAccount: string
-  //   ): Promise<string>; // TODO: Add a correct type
+  /**
+   * Withdraw specific amount from the protocol vault
+   * @description Withdraws a specific amount of shares from the protocol vault
+   * @param amount - Amount of shares to withdraw
+   * @returns Promise resolving to transaction result
+   */
+  abstract withdraw(amount: string): Promise<VaultTransactionResult>;
+
 }

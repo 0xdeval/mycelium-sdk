@@ -15,15 +15,13 @@ import { WalletProvider } from '@/wallet/WalletProvider';
 import type { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWalletProvider';
 import { PrivyEmbeddedWalletProvider } from './wallet/providers/PrivyEmbeddedWalletProvider';
 import { PrivyClient } from '@privy-io/server-auth';
-import { ProtocolRouter } from './router/ProtocolRouter';
-import type { Protocol } from './types/protocols/general';
-
-export { BeefyProtocol } from './protocols/implementations/BeefyProtocol';
+import { ProtocolRouter } from '@/router/ProtocolRouter';
+import type { Protocol } from '@/types/protocols/general';
+import { logger } from '@/tools/Logger';
 
 export class MyceliumSDK {
   public readonly wallet: WalletNamespace;
   private _chainManager: ChainManager;
-  // private lendProvider?: LendProvider;
   private embeddedWalletProvider!: EmbeddedWalletProvider;
   private smartWalletProvider!: SmartWalletProvider;
   private protocol: Protocol;
@@ -33,8 +31,16 @@ export class MyceliumSDK {
       config.chain || {
         chainId: base.id,
         rpcUrl: base.rpcUrls.default.http[0],
+        bundlerUrl: 'https://public.pimlico.io/v2/8453/rpc',
       },
     );
+
+    if (!config.chain) {
+      logger.warn(
+        'No chain config provided, using default public RPC and Bundler URLs',
+        'MyceliumSDK',
+      );
+    }
 
     const protocolsRouterConfig = config.protocolsRouterConfig || {
       riskLevel: 'medium',
@@ -55,7 +61,8 @@ export class MyceliumSDK {
   }
 
   /**
-   *
+   * Find a protocol instance that was recommended by the smart router based on the given config
+   * @description Find a protocol instance that was recommended by the smart router based on the given config
    * @param config Return a protocol provider instance that was recommended by the smart router based on the given config
    */
   private findProtocol(config: MyceliumSDKConfig['protocolsRouterConfig']): Protocol {
@@ -90,10 +97,8 @@ export class MyceliumSDK {
       );
 
       this.embeddedWalletProvider = new PrivyEmbeddedWalletProvider(
-        // config.embeddedWalletConfig.provider.privyClient,
         privyClient,
         this._chainManager,
-        // this.lendProvider!
       );
     } else {
       throw new Error(
@@ -102,11 +107,7 @@ export class MyceliumSDK {
     }
 
     if (!config.smartWalletConfig || config.smartWalletConfig.provider.type === 'default') {
-      this.smartWalletProvider = new DefaultSmartWalletProvider(
-        this.chainManager,
-        this.protocol,
-        // this.lend
-      );
+      this.smartWalletProvider = new DefaultSmartWalletProvider(this.chainManager, this.protocol);
     } else {
       throw new Error(
         `Unsupported smart wallet provider: ${config.smartWalletConfig.provider.type}`,

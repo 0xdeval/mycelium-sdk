@@ -1,5 +1,4 @@
-import sqlite3 from 'sqlite3';
-import { open, type Database } from 'sqlite';
+import Database, { type Database as DatabaseType } from 'better-sqlite3';
 
 export interface WalletRecord {
   user_id: string;
@@ -10,7 +9,7 @@ export interface WalletRecord {
 
 export class WalletDatabase {
   private static instance: WalletDatabase;
-  private db: Database | null = null;
+  private db: DatabaseType | null = null;
   private initialized: boolean = false;
 
   private constructor() {}
@@ -28,10 +27,7 @@ export class WalletDatabase {
     }
 
     try {
-      this.db = await open({
-        filename: './wallets.db',
-        driver: sqlite3.Database,
-      });
+      this.db = new Database('./wallets.db');
 
       await this.createTables();
       this.initialized = true;
@@ -61,8 +57,8 @@ export class WalletDatabase {
       throw new Error('Database not initialized');
     }
 
-    const wallet = await this.db.get('SELECT * FROM wallets WHERE user_id = ?', [userId]);
-    return wallet || null;
+    const wallet = await this.db.prepare('SELECT * FROM wallets WHERE user_id = ?').get(userId);
+    return wallet as WalletRecord | null;
   }
 
   async saveWallet(userId: string, walletId: string, walletAddress: string): Promise<void> {
@@ -70,10 +66,11 @@ export class WalletDatabase {
       throw new Error('Database not initialized');
     }
 
-    await this.db.run(
-      'INSERT OR REPLACE INTO wallets (user_id, wallet_id, wallet_address) VALUES (?, ?, ?)',
-      [userId, walletId, walletAddress],
-    );
+    this.db
+      .prepare(
+        'INSERT OR REPLACE INTO wallets (user_id, wallet_id, wallet_address) VALUES (?, ?, ?)',
+      )
+      .run(userId, walletId, walletAddress);
   }
 
   async getAllWallets(): Promise<WalletRecord[]> {
@@ -81,7 +78,9 @@ export class WalletDatabase {
       throw new Error('Database not initialized');
     }
 
-    return await this.db.all('SELECT * FROM wallets ORDER BY created_at DESC');
+    return this.db
+      .prepare('SELECT * FROM wallets ORDER BY created_at DESC')
+      .all() as WalletRecord[];
   }
 
   async close(): Promise<void> {

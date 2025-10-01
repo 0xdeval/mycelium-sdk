@@ -26,6 +26,7 @@ export default [
       '**/.next/**',
       '.vercel/',
       'wallets.db',
+      'pnpm-lock.yaml',
       '*.db',
       'packages/frontend/.next/**',
     ],
@@ -49,6 +50,7 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
+        tsconfigRootDir: __dirname,
         projectService: true,
         ecmaVersion: 'latest',
         sourceType: 'module',
@@ -56,7 +58,7 @@ export default [
     },
     rules: {
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-empty-function': 'off',
       'no-unused-vars': 'off',
@@ -85,6 +87,7 @@ export default [
     rules: {
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      'no-console': 'off',
     },
   },
 
@@ -99,7 +102,7 @@ export default [
 
   {
     rules: {
-      'no-console': ['warn', { allow: ['warn', 'error', 'log'] }],
+      'no-console': 'off',
       'prefer-const': 'error',
       'no-var': 'error',
       eqeqeq: ['error', 'always'],
@@ -114,7 +117,7 @@ export default [
   {
     files: ['packages/sdk/**/*.{ts,tsx}'],
     rules: {
-      'no-console': 'off',
+      'no-console': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },

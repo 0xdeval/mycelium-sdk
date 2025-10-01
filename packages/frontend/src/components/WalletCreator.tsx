@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Box, Heading, VStack, Text, Input, Button } from '@chakra-ui/react';
+import type { JSX } from '@emotion/react/jsx-runtime';
 
 interface Props {
   onWalletCreated: (id: string, address: string) => void;
@@ -15,7 +16,7 @@ export default function WalletCreator({
   onError,
   isLoading,
   setIsLoading,
-}: Props) {
+}: Props): JSX.Element {
   const [userId, setUserId] = useState('');
 
   const handleCreateWallet = async () => {

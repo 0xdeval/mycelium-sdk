@@ -1,4 +1,4 @@
-import type { WalletRecord } from './WalletDatabase';
+import type { WalletRecord } from '@/libs/WalletDatabase';
 import MyceliumSDK, {
   type SmartWallet,
   type VaultBalance,
@@ -20,7 +20,6 @@ export class MyceliumService {
   }
 
   async init(): Promise<void> {
-    console.log('=== MyceliumService.init() called ===');
     if (this.initialized) {
       return;
     }
@@ -44,7 +43,7 @@ export class MyceliumService {
           },
         },
         chain: {
-          chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID!) as any,
+          chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID!),
           rpcUrl: process.env.NEXT_PUBLIC_RPC_URL!,
           bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
         },
@@ -54,7 +53,6 @@ export class MyceliumService {
       });
 
       this.initialized = true;
-      console.log('MyceliumService initialized');
     } catch (error) {
       throw new Error(`Failed to initialize MyceliumService: ${error}`);
     }
@@ -66,7 +64,6 @@ export class MyceliumService {
     }
     const embeddedWallet = await this.sdk.wallet.createEmbeddedWallet();
     const embeddedWalletId = embeddedWallet.walletId as string;
-    console.log('Embedded wallet ID: ', embeddedWalletId);
 
     const wallet = await this.sdk.wallet.createSmartWallet({
       owners: [embeddedWallet.address],
@@ -104,8 +101,6 @@ export class MyceliumService {
 
     const tokens = await wallet.getBalance();
 
-    console.log('all tokens info:', tokens);
-
     return tokens.map((token) => {
       return {
         symbol: token.symbol,
@@ -140,9 +135,18 @@ export class MyceliumService {
     return balance;
   }
 
-  // getSDK(): MyceliumSDK | null {
-  //   return this.sdk;
-  // }
+  async withdraw(walletId: string, amount: string): Promise<VaultTransactionResult> {
+    if (!this.sdk) {
+      throw new Error('SDK not initialized');
+    }
+
+    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+      walletId,
+    });
+
+    const transactionResult = await wallet.withdraw(amount);
+    return transactionResult;
+  }
 }
 
 export const myceliumService = MyceliumService.getInstance();

@@ -1,7 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { MyceliumService } from '@/libs/MyceliumService';
 
-export async function GET(request: NextRequest, { params }: { params: { walletId: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ walletId: string }> },
+) {
   try {
     const { walletId } = await params;
 
@@ -10,15 +13,13 @@ export async function GET(request: NextRequest, { params }: { params: { walletId
     }
 
     const myceliumService = MyceliumService.getInstance();
-    console.log('=== About to call init() ===');
     await myceliumService.init();
-    console.log('=== init() completed ===');
 
     try {
-      const balances = await myceliumService.getWalletBalance(walletId);
+      const balance = await myceliumService.getWalletBalance(walletId);
       return NextResponse.json({
         success: true,
-        balances,
+        balance,
       });
     } catch (error) {
       return NextResponse.json({

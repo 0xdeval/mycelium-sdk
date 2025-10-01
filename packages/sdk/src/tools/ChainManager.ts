@@ -8,6 +8,7 @@ import {
 import { type SUPPORTED_CHAIN_IDS, type SupportedChainId, CHAINS_MAP } from '@/constants/chains';
 import type { ChainConfig } from '@/types/chain';
 import { chainById } from '@/utils/chains';
+import { logger } from '@/tools/Logger';
 
 /**
  * Chain Manager Service
@@ -30,6 +31,15 @@ export class ChainManager {
     this.chainConfigs = chains;
     this.publicClient = this.createPublicClient(chains);
     this.chainNames = CHAINS_MAP;
+  }
+
+  /**
+   * Check if a URL is valid
+   * @param url - The URL to check
+   * @returns True if the URL is valid, false otherwise
+   */
+  private isValidUrl(url: string): boolean {
+    return /^https?:\/\/.+$/.test(url);
   }
 
   /**
@@ -63,7 +73,7 @@ export class ChainManager {
       throw new Error(`No bundler URL configured for chain ID: ${chainId}`);
     }
 
-    console.log('Public client setup:', { bundlerUrl, chainId });
+    logger.info('Public client setup:', { bundlerUrl, chainId }, 'ChainManager');
     const client = createPublicClient({
       chain: this.getChain(chainId),
       transport: http(rpcUrl),
@@ -88,6 +98,11 @@ export class ChainManager {
     if (!chainConfig) {
       throw new Error(`No chain config found for chain ID: ${chainId}`);
     }
+
+    if (!this.isValidUrl(chainConfig.rpcUrl)) {
+      throw new Error(`Invalid RPC URL for chain ID: ${chainId}`);
+    }
+
     return chainConfig.rpcUrl;
   }
 
@@ -101,6 +116,10 @@ export class ChainManager {
     const chainConfig = this.chainConfigs;
     if (!chainConfig) {
       throw new Error(`No chain config found for chain ID: ${chainId}`);
+    }
+
+    if (!this.isValidUrl(chainConfig.bundlerUrl)) {
+      throw new Error(`Invalid bundler URL for chain ID: ${chainId}`);
     }
     return chainConfig.bundlerUrl;
   }
@@ -143,11 +162,38 @@ export class ChainManager {
     return client;
   }
 
+  /**
+   * Get chain ID by name
+   * @param name - Chain name to get the ID for
+   * @returns Chain ID
+   */
   getChainIdByName(name: string): SupportedChainId {
+    // TODO: strange case
+    if (name === 'ethereum') {
+      // @ts-ignore
+      return this.chainNames['mainnet'].id;
+    }
     const chain = this.chainNames[name];
     if (!chain) {
       throw new Error(`Chain not found for name: ${name}`);
     }
     return chain.id;
+  }
+
+  /**
+   * Get all supported chain names
+   * @returns Array of supported chain names
+   */
+  getSupportedChainNames(): string[] {
+    return Object.keys(this.chainNames);
+  }
+
+  /**
+   * Check if chain is supported by a ChainManager
+   * @param chainName - Chain name to check
+   * @returns True if chain is supported
+   */
+  isChainSupported(chainName: string): boolean {
+    return chainName in this.chainNames;
   }
 }

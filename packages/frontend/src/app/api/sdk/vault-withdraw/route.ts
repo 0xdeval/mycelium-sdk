@@ -3,14 +3,14 @@ import { MyceliumService } from '@/libs/MyceliumService';
 
 export async function POST(request: NextRequest) {
   try {
-    const { walletId } = await request.json();
+    const { walletId, amount } = await request.json();
 
     const myceliumService = MyceliumService.getInstance();
     await myceliumService.init();
 
-    const balance = await myceliumService.getEarnBalance(walletId);
+    const result = await myceliumService.withdraw(walletId, amount);
 
-    return NextResponse.json({ success: true, balance });
+    return NextResponse.json({ success: true, hash: result.hash });
   } catch (error) {
     return NextResponse.json(
       {

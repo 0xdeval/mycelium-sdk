@@ -17,7 +17,9 @@
     "*.lock",
     "*.log",
     "*.lockb",
-    "src/abi/"
+    "src/abi/",
+    "pnpm-lock.yaml",
+    ".gitignore"
   ],
   "caseSensitive": false,
   "words": [
@@ -37,7 +39,9 @@
     "REPLAYABLE",
     "proxiable",
     "undeployed",
-    "accross"
+    "accross",
+    "xhash",
+    "xencodeddata"
   ],
   "enableFiletypes": ["!binary"],
   "overrides": [
