@@ -3,9 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "predev": "bun run --cwd ../sdk build",
+    "predev": "pnpm run --cwd ../sdk build",
     "dev": "next dev",
-    "prebuild": "bun run --cwd ../sdk build",
+    "prebuild": "pnpm run --cwd ../sdk build",
     "build": "next build",
     "start": "next start"
   },
