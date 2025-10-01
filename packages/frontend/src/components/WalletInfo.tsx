@@ -5,8 +5,13 @@ import { FaLock } from 'react-icons/fa';
 import { Box, Heading, Text, VStack, Code, Icon, Button, Spinner } from '@chakra-ui/react';
 import { CustomAlert } from '@/components/ui/alert';
 import { type WalletInfoProps, type WalletData } from '@/types/wallet';
+import type { JSX } from '@emotion/react/jsx-runtime';
 
-export default function WalletInfo({ walletId, walletAddress, error }: WalletInfoProps) {
+export default function WalletInfo({
+  walletId,
+  walletAddress,
+  error,
+}: WalletInfoProps): JSX.Element {
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
@@ -22,8 +27,8 @@ export default function WalletInfo({ walletId, walletAddress, error }: WalletInf
       const response = await fetch(`/api/sdk/get-balance/${walletId}`);
       const { balance } = await response.json();
 
-      console.log("tokensBalances in WalletInfo: ", balance);
-      setWalletData({ balance });
+      console.log('tokensBalances in WalletInfo: ', balance);
+      setWalletData({ balances: balance });
     } catch (error) {
       setDataError(error instanceof Error ? error.message : 'Failed to load wallet data');
     } finally {
@@ -133,12 +138,9 @@ export default function WalletInfo({ walletId, walletAddress, error }: WalletInf
                 <Box p={3} bg="blue.50" border="1px" borderColor="blue.200" borderRadius="md">
                   <Text fontSize="lg" fontWeight="bold" color="blue.700">
                     {walletData &&
-                      walletData?.balance
-                        .map(
-                          (balance) =>
-                            balance.formattedBalance + " " + balance.symbol
-                        )
-                        .join(", ")}
+                      walletData?.balances
+                        .map((balance) => balance.formattedBalance + ' ' + balance.symbol)
+                        .join(', ')}
                   </Text>
                 </Box>
               </Box>

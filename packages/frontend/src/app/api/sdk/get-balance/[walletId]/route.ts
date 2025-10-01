@@ -1,7 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { MyceliumService } from '@/libs/MyceliumService';
 
-export async function GET(request: NextRequest, { params }: { params: { walletId: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ walletId: string }> },
+) {
   try {
     const { walletId } = await params;
 
