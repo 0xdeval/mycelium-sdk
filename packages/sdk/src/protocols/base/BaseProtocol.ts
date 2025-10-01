@@ -1,5 +1,4 @@
 import type { ChainManager } from '@/tools/ChainManager';
-import type { VaultInfo, VaultTransactionResult, VaultBalance } from '@/types/protocols/beefy';
 import {
   type Address,
   type LocalAccount,
@@ -11,7 +10,30 @@ import {
 import type { SupportedChainId } from '@/constants/chains';
 import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 
-export abstract class BaseProtocol {
+export interface BaseVaultInfo {
+  id: string;
+  chain: string;
+  tokenAddress: Address;
+  earnContractAddress: Address;
+  tokenDecimals?: number;
+  apy?: number;
+}
+
+export interface BaseVaultBalance {
+  shares: string;
+  depositedAmount: string;
+}
+
+export interface BaseVaultTransactionResult {
+  hash: string;
+  success: boolean;
+  error?: string;
+}
+export abstract class BaseProtocol<
+  TVaultInfo = BaseVaultInfo,
+  TVaultBalance = BaseVaultBalance,
+  TVaultTransactionResult = BaseVaultTransactionResult,
+> {
   /** the chain manager instance */
   public chainManager: ChainManager | undefined;
 
@@ -32,22 +54,22 @@ export abstract class BaseProtocol {
   /**
    * Get all vaults for the protocol that are available for a deposit operation
    */
-  abstract getVaults(): Promise<VaultInfo[]>;
+  abstract getVaults(): Promise<TVaultInfo[]>;
 
   /**
    * Get the best vault for the protocol to deposit based on the given parameters
    */
-  abstract getBestVault(): Promise<VaultInfo>;
+  abstract getBestVault(): Promise<TVaultInfo>;
 
   /**
    * Method defines and return a pool where a user could already have deposited funds previously
    */
-  abstract fetchDepositedVaults(smartWallet: SmartWallet): Promise<VaultInfo | null>;
+  abstract fetchDepositedVaults(smartWallet: SmartWallet): Promise<TVaultInfo | null>;
 
   /**
    * Deposit funds into a vault
    */
-  abstract deposit(amount: string, smartWallet: SmartWallet): Promise<VaultTransactionResult>;
+  abstract deposit(amount: string, smartWallet: SmartWallet): Promise<TVaultTransactionResult>;
 
   /**
    * Withdraw funds from a vault
@@ -55,15 +77,15 @@ export abstract class BaseProtocol {
   abstract withdraw(
     amountInShares: string,
     smartWallet: SmartWallet,
-  ): Promise<VaultTransactionResult>;
+  ): Promise<TVaultTransactionResult>;
 
   /**
    * Get the balance of deposited funds to a vault
    */
   abstract getBalance(
-    vaultInfo: VaultInfo,
+    vaultInfo: TVaultInfo,
     walletAddress: Address, // chainId: SupportedChainId
-  ): Promise<VaultBalance>;
+  ): Promise<TVaultBalance>;
 
   /**
    * Approve a token to be spent by a spender

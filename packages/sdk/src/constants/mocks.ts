@@ -1,6 +1,6 @@
-import type { VaultInfo } from '@/types/protocols/beefy';
+import type { BeefyVaultInfo } from '@/types/protocols/beefy';
 
-export const MOCK_BEEFY_VAULTS: VaultInfo[] = [
+export const MOCK_BEEFY_VAULTS: BeefyVaultInfo[] = [
   {
     id: 'compound-base-usdc',
     name: 'USDC',

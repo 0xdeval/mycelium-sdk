@@ -41,7 +41,8 @@
     "undeployed",
     "accross",
     "xhash",
-    "xencodeddata"
+    "xencodeddata",
+    "sUSDC"
   ],
   "enableFiletypes": ["!binary"],
   "overrides": [

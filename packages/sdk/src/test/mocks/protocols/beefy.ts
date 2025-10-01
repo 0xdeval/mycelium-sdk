@@ -1,6 +1,6 @@
-import type { VaultInfo } from '@/types/protocols/beefy';
+import type { BeefyVaultInfo } from '@/types/protocols/beefy';
 
-export const mockVaultInfo: VaultInfo = {
+export const mockVaultInfo: BeefyVaultInfo = {
   id: 'beefy-usdc-vault',
   name: 'Beefy USDC Vault',
   token: 'USDC',

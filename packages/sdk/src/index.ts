@@ -3,7 +3,7 @@ export type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
 export type { WalletNamespace } from '@/wallet/WalletNamespace';
 export type { ChainManager } from '@/tools/ChainManager';
 export type { TokenBalance } from '@/types/token';
-export type { VaultTransactionResult, VaultBalance } from '@/types/protocols/beefy';
+export type { BeefyVaultTransactionResult, BeefyVaultBalance } from '@/types/protocols/beefy';
 
 import { ChainManager } from '@/tools/ChainManager';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
@@ -43,7 +43,7 @@ export class MyceliumSDK {
     }
 
     const protocolsRouterConfig = config.protocolsRouterConfig || {
-      riskLevel: 'medium',
+      riskLevel: 'low',
     };
 
     // protocolsRouterConfig is the abstract settings that are clear for a dev, e.g. risk level, basic apy, etc

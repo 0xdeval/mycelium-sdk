@@ -22,7 +22,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
     if (walletId && walletAddress) {
       loadVaultBalance();
     }
-  }, [walletId, walletAddress]);
+  }, [walletId, walletAddress, loadVaultBalance]);
 
   const loadVaultBalance = async () => {
     if (!walletAddress) {
@@ -172,7 +172,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
   return (
     <Box>
       <Heading size="lg" mb={4}>
-        Beefy Vault Operations
+        Vault Operations
       </Heading>
 
       {error && (

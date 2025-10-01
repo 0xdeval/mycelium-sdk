@@ -1,7 +1,7 @@
 import type { SupportedChainId } from '@/constants/chains';
 import type { Address } from 'viem';
 
-export interface VaultInfo {
+export interface BeefyVaultInfo {
   id: string;
   name: string;
   token: string;
@@ -52,13 +52,13 @@ export interface VaultInfo {
     | number;
 }
 
-export interface VaultTransactionResult {
+export interface BeefyVaultTransactionResult {
   hash: string;
   success: boolean;
   error?: string;
 }
 
-export interface VaultBalance {
+export interface BeefyVaultBalance {
   shares: string;
   ppfs?: string;
   depositedAmount: string;

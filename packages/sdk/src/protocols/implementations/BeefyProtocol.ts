@@ -1,6 +1,10 @@
 import { BaseProtocol } from '@/protocols/base/BaseProtocol';
 import { beefyVaultAbi } from '@/abis/protocols/beefyVault';
-import type { VaultInfo, VaultTransactionResult, VaultBalance } from '@/types/protocols/beefy';
+import type {
+  BeefyVaultInfo,
+  BeefyVaultTransactionResult,
+  BeefyVaultBalance,
+} from '@/types/protocols/beefy';
 import type { ChainManager } from '@/tools/ChainManager';
 import type { SupportedChainId } from '@/constants/chains';
 
@@ -17,8 +21,8 @@ import { BEEFY_API_URLS, ONE_E18 } from '@/protocols/constants/beefy';
 import { logger } from '@/tools/Logger';
 
 export class BeefyProtocol extends BaseProtocol {
-  private vaultInfo: VaultInfo | undefined;
-  private allVaults: VaultInfo[] = [];
+  private vaultInfo: BeefyVaultInfo | undefined;
+  private allVaults: BeefyVaultInfo[] = [];
   private selectedChainId: SupportedChainId | undefined;
 
   /**
@@ -43,12 +47,12 @@ export class BeefyProtocol extends BaseProtocol {
    * @description Fetch all vaults for the protocol
    * @returns
    */
-  async getVaults(): Promise<VaultInfo[]> {
+  async getVaults(): Promise<BeefyVaultInfo[]> {
     try {
       const { vaults, apy, fees, tvl } = await this.fetchVaultsMetrics();
 
       const enrichedVaults = vaults
-        .filter((vault: VaultInfo) => {
+        .filter((vault: BeefyVaultInfo) => {
           const isSupportedChain = this.chainManager!.isChainSupported(vault.chain);
           if (!isSupportedChain) {
             return false;
@@ -62,7 +66,7 @@ export class BeefyProtocol extends BaseProtocol {
 
           return isCorrectChain && hasUSDC;
         })
-        .map((vault: VaultInfo) => {
+        .map((vault: BeefyVaultInfo) => {
           const vaultId = vault.id;
 
           return {
@@ -89,7 +93,7 @@ export class BeefyProtocol extends BaseProtocol {
    * @returns {vaults: VaultInfo[], apy: Record<string, number>, fees: Record<string, number>, tvl: Record<string, number>}
    */
   private async fetchVaultsMetrics(): Promise<{
-    vaults: VaultInfo[];
+    vaults: BeefyVaultInfo[];
     apy: Record<string, number>;
     fees: Record<string, number>;
     tvl: Record<string, number>;
@@ -122,7 +126,7 @@ export class BeefyProtocol extends BaseProtocol {
    * @description Get the best vault for the protocol to deposit based on the given parameters
    * @returns VaultInfo
    */
-  async getBestVault(): Promise<VaultInfo> {
+  async getBestVault(): Promise<BeefyVaultInfo> {
     // TODO: Implement the logic of getting the best vault for the protocol
     // TODO: Also implement logic of getting the best vault among all supported by the protocol chains
     // TODO: Check and take into account that a user could already have deposit to a vault
@@ -132,7 +136,7 @@ export class BeefyProtocol extends BaseProtocol {
     }
 
     // Filter out vaults with eol status (end of life)
-    const activeVaults: VaultInfo[] = this.allVaults.filter((vault) => {
+    const activeVaults: BeefyVaultInfo[] = this.allVaults.filter((vault) => {
       const status = vault.status;
       return status !== 'eol';
     });
@@ -158,13 +162,13 @@ export class BeefyProtocol extends BaseProtocol {
    * @param smartWallet
    * @returns
    */
-  async fetchDepositedVaults(smartWallet: SmartWallet): Promise<VaultInfo | null> {
+  async fetchDepositedVaults(smartWallet: SmartWallet): Promise<BeefyVaultInfo | null> {
     // TODO: Support logic for fetching info about vaults where a user already deposited funds previously:
     // 1. Fetch all vaults
     // 2. Check balance of each vault token for a provided wallet address
     // 3. Return all vaults where the balance is greater than 0. It means a user deposited to this vault previously
 
-    let depositedVaults: VaultInfo | undefined = undefined;
+    let depositedVaults: BeefyVaultInfo | undefined = undefined;
     const userAddress = await smartWallet.getAddress();
     for (const vault of this.allVaults) {
       const balance = await this.getBalance(vault, userAddress);
@@ -183,7 +187,7 @@ export class BeefyProtocol extends BaseProtocol {
    * @param smartWallet
    * @returns
    */
-  async deposit(amount: string, smartWallet: SmartWallet): Promise<VaultTransactionResult> {
+  async deposit(amount: string, smartWallet: SmartWallet): Promise<BeefyVaultTransactionResult> {
     // Check if a user deposited previously to any vault of the protocol
     const depositedVault = await this.fetchDepositedVaults(smartWallet);
 
@@ -258,7 +262,7 @@ export class BeefyProtocol extends BaseProtocol {
   async withdraw(
     amountInUnderlying: string | undefined,
     smartWallet: SmartWallet,
-  ): Promise<VaultTransactionResult> {
+  ): Promise<BeefyVaultTransactionResult> {
     const ceilDiv = (a: bigint, b: bigint) => (a + b - BigInt(1)) / b;
 
     const vaultInfo = await this.fetchDepositedVaults(smartWallet);
@@ -371,7 +375,7 @@ export class BeefyProtocol extends BaseProtocol {
    * @param walletAddress
    * @returns
    */
-  async getBalance(vaultInfo: VaultInfo, walletAddress: Address): Promise<VaultBalance> {
+  async getBalance(vaultInfo: BeefyVaultInfo, walletAddress: Address): Promise<BeefyVaultBalance> {
     const publicClient = this.chainManager!.getPublicClient(this.selectedChainId!);
     const shares = await this.getSharesAmount(
       publicClient,
