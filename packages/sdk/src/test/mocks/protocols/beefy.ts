@@ -4,6 +4,9 @@ export const mockVaultInfo: BeefyVaultInfo = {
   id: 'beefy-usdc-vault',
   name: 'Beefy USDC Vault',
   token: 'USDC',
+  depositTokenAddress: '0xA0b86a33E6441b8c4C8C0E4c8b8c4C8C0E4c8b8c4',
+  depositTokenDecimals: 6,
+  vaultAddress: '0xB1c86a33E6441b8c4C8C0E4c8b8c4C8C0E4c8b8c4',
   tokenAddress: '0xA0b86a33E6441b8c4C8C0E4c8b8c4C8C0E4c8b8c4',
   tokenDecimals: 6,
   earnContractAddress: '0xB1c86a33E6441b8c4C8C0E4c8b8c4C8C0E4c8b8c4',
@@ -26,18 +29,20 @@ export const mockVaultInfo: BeefyVaultInfo = {
   strategy: '0xD3c86a33E6441b8c4C8C0E4c8b8c4C8C0E4c8b8c4',
   pricePerFullShare: '1000000000000000000',
   lastHarvest: Date.now(),
-  apy: 0.05,
-  tvl: 1000000,
-  fees: {
-    lastUpdated: 123123123,
-    performance: {
-      call: 0.05,
-      stakers: 0.01,
-      strategist: 0.03,
-      total: 0.1,
-      treasury: 0.01,
+  metadata: {
+    apy: 0.05,
+    tvl: 1000000,
+    fees: {
+      lastUpdated: 123123123,
+      performance: {
+        call: 0.05,
+        stakers: 0.01,
+        strategist: 0.03,
+        total: 0.1,
+        treasury: 0.01,
+      },
+      withdraw: 0,
     },
-    withdraw: 0,
   },
 };
 

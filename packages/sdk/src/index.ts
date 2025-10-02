@@ -3,7 +3,7 @@ export type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
 export type { WalletNamespace } from '@/wallet/WalletNamespace';
 export type { ChainManager } from '@/tools/ChainManager';
 export type { TokenBalance } from '@/types/token';
-export type { BeefyVaultTransactionResult, BeefyVaultBalance } from '@/types/protocols/beefy';
+export type { VaultTxnResult, VaultBalance } from '@/types/protocols/general';
 
 import { ChainManager } from '@/tools/ChainManager';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';

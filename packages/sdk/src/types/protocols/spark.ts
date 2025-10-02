@@ -1,21 +1,17 @@
+import type { VaultInfo } from '@/types/protocols/general';
 import type { Address } from 'viem';
 
-export interface SparkVaultInfo {
+export interface SparkVaultInfo extends VaultInfo {
   id: string;
   chain: string;
-  tokenAddress: Address;
-  earnContractAddress: Address;
-  tokenDecimals?: number;
-  apy?: number;
-  vaultAddress: Address;
-  underlyingAddress: Address;
-  underlyingSymbol: string;
-  underlyingDecimals: number;
-  shareSymbol: string;
-  shareDecimals: number;
+  earnTokenAddress: Address;
+  earnTokenDecimals: number;
+  metadata?: {
+    apy?: number;
+  };
 }
 
-export interface SparkVaultTransactionResult {
+export interface SparkVaultTxnResult {
   success: boolean;
   hash: string;
 }

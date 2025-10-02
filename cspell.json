@@ -19,6 +19,7 @@
     "*.lockb",
     "src/abi/",
     "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
     ".gitignore"
   ],
   "caseSensitive": false,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Box, Heading, VStack, Text, Button, Input, HStack, Spinner, Code } from '@chakra-ui/react';
 import type { JSX } from '@emotion/react/jsx-runtime';
 import type { VaultBalance } from '@mycelium-sdk/core';
@@ -18,13 +18,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (walletId && walletAddress) {
-      loadVaultBalance();
-    }
-  }, [walletId, walletAddress, loadVaultBalance]);
-
-  const loadVaultBalance = async () => {
+  const loadVaultBalance = useCallback(async () => {
     if (!walletAddress) {
       return;
     }
@@ -51,7 +45,13 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
       console.error('Failed to load vault balance:', err);
       setError(`Failed to load balance: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-  };
+  }, [walletId, walletAddress]);
+
+  useEffect(() => {
+    if (walletId && walletAddress) {
+      loadVaultBalance();
+    }
+  }, [walletId, walletAddress, loadVaultBalance]);
 
   const handleDeposit = async () => {
     if (!walletId || !walletAddress || !depositAmount) {

@@ -9,32 +9,14 @@ import {
 } from 'viem';
 import type { SupportedChainId } from '@/constants/chains';
 import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
+import type { VaultInfo, VaultBalance, VaultTxnResult } from '@/types/protocols/general';
 
-export interface BaseVaultInfo {
-  id: string;
-  chain: string;
-  tokenAddress: Address;
-  earnContractAddress: Address;
-  tokenDecimals?: number;
-  apy?: number;
-}
-
-export interface BaseVaultBalance {
-  shares: string;
-  depositedAmount: string;
-}
-
-export interface BaseVaultTransactionResult {
-  hash: string;
-  success: boolean;
-  error?: string;
-}
 export abstract class BaseProtocol<
-  TVaultInfo = BaseVaultInfo,
-  TVaultBalance = BaseVaultBalance,
-  TVaultTransactionResult = BaseVaultTransactionResult,
+  TVaultInfo extends VaultInfo = VaultInfo,
+  TVaultBalance extends VaultBalance = VaultBalance,
+  TVaultTxnResult extends VaultTxnResult = VaultTxnResult,
 > {
-  /** the chain manager instance */
+  /** The chain manager instance */
   public chainManager: ChainManager | undefined;
 
   /**
@@ -54,12 +36,12 @@ export abstract class BaseProtocol<
   /**
    * Get all vaults for the protocol that are available for a deposit operation
    */
-  abstract getVaults(): Promise<TVaultInfo[]>;
+  abstract getVaults(): Promise<TVaultInfo[]> | TVaultInfo[];
 
   /**
    * Get the best vault for the protocol to deposit based on the given parameters
    */
-  abstract getBestVault(): Promise<TVaultInfo>;
+  abstract getBestVault(): Promise<TVaultInfo> | TVaultInfo;
 
   /**
    * Method defines and return a pool where a user could already have deposited funds previously
@@ -69,15 +51,12 @@ export abstract class BaseProtocol<
   /**
    * Deposit funds into a vault
    */
-  abstract deposit(amount: string, smartWallet: SmartWallet): Promise<TVaultTransactionResult>;
+  abstract deposit(amount: string, smartWallet: SmartWallet): Promise<TVaultTxnResult>;
 
   /**
    * Withdraw funds from a vault
    */
-  abstract withdraw(
-    amountInShares: string,
-    smartWallet: SmartWallet,
-  ): Promise<TVaultTransactionResult>;
+  abstract withdraw(amountInShares: string, smartWallet: SmartWallet): Promise<TVaultTxnResult>;
 
   /**
    * Get the balance of deposited funds to a vault

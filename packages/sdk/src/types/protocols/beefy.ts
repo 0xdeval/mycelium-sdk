@@ -1,21 +1,40 @@
 import type { SupportedChainId } from '@/constants/chains';
 import type { Address } from 'viem';
+import type { VaultInfo } from '@/types/protocols/general';
 
-export interface BeefyVaultInfo {
+export interface BeefyVaultInfo extends VaultInfo {
   id: string;
   name: string;
   token: string;
   tokenAddress: Address;
   tokenDecimals: number;
+  metadata?: {
+    apy?: number;
+    tvl?: number;
+    fees?:
+      | {
+          performance: {
+            total: number;
+            call: number;
+            strategist: number;
+            treasury: number;
+            stakers: number;
+          };
+          withdraw: number;
+          lastUpdated: number;
+        }
+      | number;
+  };
+  oracle: string;
+  assets: string[];
+  status: 'active' | 'eol';
+
   earnContractAddress: Address;
   earnedToken: string;
   earnedTokenAddress: Address;
-  oracle: string;
   oracleId: string;
-  status: 'active' | 'eol';
   createdAt: number;
   platformId: string;
-  assets: string[];
   risks: string[];
   strategyTypeId: string;
   network: string;
@@ -35,24 +54,9 @@ export interface BeefyVaultInfo {
     address: Address;
   };
   migrationIds?: string[];
-  apy?: number;
-  tvl?: number;
-  fees?:
-    | {
-        performance: {
-          total: number;
-          call: number;
-          strategist: number;
-          treasury: number;
-          stakers: number;
-        };
-        withdraw: number;
-        lastUpdated: number;
-      }
-    | number;
 }
 
-export interface BeefyVaultTransactionResult {
+export interface BeefyVaultTxnResult {
   hash: string;
   success: boolean;
   error?: string;

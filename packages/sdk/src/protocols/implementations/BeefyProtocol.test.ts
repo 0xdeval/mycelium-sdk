@@ -75,8 +75,8 @@ describe('BeefyProtocol', () => {
       expect(vaults).toHaveLength(1);
       expect(vaults[0]).toBeDefined();
       expect(vaults[0]?.id).toBe('beefy-usdc-vault');
-      expect(vaults[0]?.apy).toBe(0.05);
-      expect(vaults[0]?.tvl).toBe(1000000);
+      expect(vaults[0]?.metadata?.apy).toBe(0.05);
+      expect(vaults[0]?.metadata?.tvl).toBe(1000000);
     });
 
     it('should handle API errors', async () => {
@@ -95,7 +95,7 @@ describe('BeefyProtocol', () => {
       const bestVault = await beefyProtocol.getBestVault();
 
       expect(bestVault.id).toBe('beefy-usdc-vault');
-      expect(bestVault.tvl).toBe(1000000);
+      expect(bestVault.metadata?.tvl).toBe(1000000);
     });
 
     it('should throw error when no vaults available', async () => {
