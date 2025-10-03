@@ -3,19 +3,26 @@ import type { Address, LocalAccount, WalletClient } from 'viem';
 import type { SupportedChainId } from '@/constants/chains';
 
 /**
- * Base embedded wallet class
- * @description Abstract base class for embedded wallet implementations (Privy, Dynamic, etc.).
- * Provides a standard interface for embedded wallets that can be used as signers for smart wallets.
+ * Abstract base class for embedded wallet implementations
+ *
+ * @internal
+ * @category Wallets
+ * @remarks
+ * Provides a standard interface for embedded wallets (Privy, Dynamic, etc.)
+ * Can be used as a signer for smart wallets when the embedded wallet is an owner
  */
 export abstract class EmbeddedWallet {
-  /** The wallet's Ethereum address */
+  /** Ethereum address of the wallet */
   public readonly address: Address;
-
+  /** Optional provider-specific wallet identifier */
   public readonly walletId?: string;
 
   /**
-   * Create an embedded wallet instance
-   * @param address - The wallet's Ethereum address
+   * Creates an embedded wallet instance
+   *
+   * @internal
+   * @param address Ethereum address of the wallet
+   * @param walletId Optional provider-specific identifier
    */
   constructor(address: Address, walletId?: string) {
     this.address = address;
@@ -23,20 +30,24 @@ export abstract class EmbeddedWallet {
   }
 
   /**
-   * Get an account for this embedded wallet
-   * @description Returns a LocalAccount that can be used to sign transactions and messages.
-   * This can be used as the account for smart wallet operations if the embedded wallet is an
-   * owner on the smart wallet.
-   * @returns Promise resolving to a LocalAccount configured for signing operations
+   * Returns a {@link LocalAccount} that can sign transactions and messages
+   *
+   * @internal
+   * @category Accounts
+   * @remarks
+   * Useful for smart wallet operations if the embedded wallet is included as an owner
+   *
+   * @returns Promise resolving to a {@link LocalAccount}
    */
   abstract account(): Promise<LocalAccount>;
 
   /**
-   * Get a wallet client for this embedded wallet
-   * @description Returns a WalletClient that can be used to send transactions and interact
-   * with smart contracts.
-   * @param chainId - The chain ID to create the wallet client for
-   * @returns Promise resolving to a WalletClient configured for the specified chain
+   * Returns a {@link WalletClient} for interacting with contracts on a specific chain
+   *
+   * @internal
+   * @category Accounts
+   * @param chainId Target chain ID
+   * @returns Promise resolving to a {@link WalletClient} configured for the given chain
    */
   abstract walletClient(chainId: SupportedChainId): Promise<WalletClient>;
 }

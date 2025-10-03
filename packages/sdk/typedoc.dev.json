@@ -1,0 +1,12 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "entryPointStrategy": "resolve",
+  "tsconfig": "tsconfig.json",
+  "out": "../../docs-dev",
+  "readme": "README.md",
+  "excludePrivate": false,
+  "excludeInternal": false,
+  "excludeProtected": false,
+  "categorizeByGroup": true,
+  "includeVersion": true
+}

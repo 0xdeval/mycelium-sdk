@@ -11,21 +11,27 @@ import { chainById } from '@/utils/chains';
 import { logger } from '@/tools/Logger';
 
 /**
- * Chain Manager Service
- * @description Manages public clients and chain infrastructure for the Verbs SDK.
- * Provides utilities for accessing RPC and bundler URLs, and creating clients for supported chains.
+ * Service for managing supported blockchain networks and their clients
+ *
+ * @internal
+ * @category Infrastructure
+ * @remarks
+ * Provides RPC and bundler URL access, creates {@link PublicClient} and {@link BundlerClient} instances
+ * Central point for chain-level configuration in the SDK
  */
 export class ChainManager {
-  /** Map of chain IDs to their corresponding public clients */
+  /** Public client for the configured chain */
   private publicClient: PublicClient;
-  /** Configuration for each supported chain */
+  /** Chain configuration */
   private chainConfigs: ChainConfig;
-  /** Map of chain names to their corresponding chain IDs */
+  /** Map of chain names to chain metadata */
   private chainNames: Record<string, Chain>;
 
   /**
-   * Initialize the ChainManager with chain configurations
-   * @param chains - Array of chain configurations
+   * Initializes the chain manager with the given configuration
+   *
+   * @internal
+   * @param chains Configuration object for a supported chain
    */
   constructor(chains: ChainConfig) {
     this.chainConfigs = chains;
@@ -34,19 +40,24 @@ export class ChainManager {
   }
 
   /**
-   * Check if a URL is valid
-   * @param url - The URL to check
-   * @returns True if the URL is valid, false otherwise
+   * Utility to validate if a string is a valid HTTP(S) URL
+   *
+   * @internal
+   * @param url Candidate URL
+   * @returns True if valid, false otherwise
    */
   private isValidUrl(url: string): boolean {
     return /^https?:\/\/.+$/.test(url);
   }
 
   /**
-   * Get public client for a specific chain
-   * @param chainId - The chain ID to retrieve the public client for
-   * @returns PublicClient instance for the specified chain
-   * @throws Error if no client is configured for the chain ID
+   * Returns a {@link PublicClient} for the given chain ID
+   *
+   * @internal
+   * @category Clients
+   * @param chainId Target chain ID
+   * @returns {@link PublicClient} instance
+   * @throws Error if client is not configured
    */
   getPublicClient(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): PublicClient {
     const client = this.publicClient;
@@ -57,11 +68,14 @@ export class ChainManager {
   }
 
   /**
-   * Get bundler client for a specific chain
-   * @param chainId - The chain ID to retrieve the bundler client for
-   * @param account - SmartAccount to use with the bundler client
-   * @returns BundlerClient instance for the specified chain
-   * @throws Error if no bundler URL is configured for the chain ID
+   * Returns a {@link BundlerClient} for the given chain ID
+   *
+   * @internal
+   * @category Clients
+   * @param chainId Target chain ID
+   * @param account SmartAccount to bind to the bundler client
+   * @returns {@link BundlerClient} instance
+   * @throws Error if no bundler URL is configured
    */
   getBundlerClient(
     chainId: (typeof SUPPORTED_CHAIN_IDS)[number],
@@ -88,10 +102,13 @@ export class ChainManager {
   }
 
   /**
-   * Get RPC URL for a specific chain
-   * @param chainId - The chain ID to retrieve the RPC URL for
-   * @returns RPC URL as a string
-   * @throws Error if no chain config is found for the chain ID
+   * Returns the RPC URL for the given chain ID
+   *
+   * @internal
+   * @category URLs
+   * @param chainId Target chain ID
+   * @returns RPC URL string
+   * @throws Error if chain config is missing or URL is invalid
    */
   getRpcUrl(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): string {
     const chainConfig = this.chainConfigs;
@@ -107,10 +124,13 @@ export class ChainManager {
   }
 
   /**
-   * Get bundler URL for a specific chain
-   * @param chainId - The chain ID to retrieve the bundler URL for
-   * @returns Bundler URL as a string or undefined if not configured
-   * @throws Error if no chain config is found for the chain ID
+   * Returns the bundler URL for the given chain ID
+   *
+   * @internal
+   * @category URLs
+   * @param chainId Target chain ID
+   * @returns Bundler URL string
+   * @throws Error if chain config is missing or URL is invalid
    */
   getBundlerUrl(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): string | undefined {
     const chainConfig = this.chainConfigs;
@@ -125,9 +145,13 @@ export class ChainManager {
   }
 
   /**
-   * Get chain information for a specific chain ID
-   * @param chainId - The chain ID to retrieve information for
-   * @returns Chain object containing chain details
+   * Returns the {@link Chain} object for the given chain ID
+   *
+   * @internal
+   * @category Info
+   * @param chainId Target chain ID
+   * @returns Chain metadata
+   * @throws Error if chain is not found
    */
   getChain(chainId: (typeof SUPPORTED_CHAIN_IDS)[number]): Chain {
     const chain = chainById[chainId];
@@ -138,18 +162,23 @@ export class ChainManager {
   }
 
   /**
-   * Get all supported chain IDs
-   * @returns Array of supported chain IDs
+   * Returns the currently configured supported chain ID
+   *
+   * @internal
+   * @category Info
+   * @returns Supported chain ID
    */
   getSupportedChain() {
     return this.chainConfigs.chainId;
   }
 
   /**
-   * Create public clients for all configured chains
-   * @param chains - Array of chain configurations
-   * @returns Map of chain IDs to their corresponding public clients
-   * @throws Error if a chain is not found or already configured
+   * Creates a {@link PublicClient} for a chain
+   *
+   * @internal
+   * @category Clients
+   * @param chain Chain configuration
+   * @returns PublicClient instance
    */
   private createPublicClient(chain: ChainConfig): PublicClient {
     const chainObject = chainById[chain.chainId];
@@ -163,9 +192,13 @@ export class ChainManager {
   }
 
   /**
-   * Get chain ID by name
-   * @param name - Chain name to get the ID for
+   * Returns a supported chain that was initiated in SDK
+   *
+   * @internal
+   * @category Info
+   * @param name Name of the chain
    * @returns Chain ID
+   * @throws Error if chain is not found
    */
   getChainIdByName(name: string): SupportedChainId {
     // TODO: strange case
@@ -181,7 +214,10 @@ export class ChainManager {
   }
 
   /**
-   * Get all supported chain names
+   * Returns all supported chain names
+   *
+   * @internal
+   * @category Info
    * @returns Array of supported chain names
    */
   getSupportedChainNames(): string[] {
@@ -189,9 +225,12 @@ export class ChainManager {
   }
 
   /**
-   * Check if chain is supported by a ChainManager
-   * @param chainName - Chain name to check
-   * @returns True if chain is supported
+   * Returns whether the given chain name is supported
+   *
+   * @internal
+   * @category Info
+   * @param chainName Name of the chain
+   * @returns True if supported
    */
   isChainSupported(chainName: string): boolean {
     return chainName in this.chainNames;

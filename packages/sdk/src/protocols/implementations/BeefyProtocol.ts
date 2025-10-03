@@ -21,14 +21,26 @@ import { BEEFY_API_URLS, ONE_E18 } from '@/protocols/constants/beefy';
 import { logger } from '@/tools/Logger';
 // TODO:  init should take SmartWallet instance and then init this.vaultInfo. After this, this.vaultInfo should be used for all other methods.
 
+/**
+ * Beefy protocol implementation
+ *
+ * @internal
+ * @category Protocols
+ * @remarks
+ * Integrates Beefy vaults for deposit, withdrawal, and balance reads
+ * Current MVP focuses on single-asset USDC vaults on the selected chain
+ */
 export class BeefyProtocol extends BaseProtocol {
   private vaultInfo: BeefyVaultInfo | undefined;
   private allVaults: BeefyVaultInfo[] = [];
   private selectedChainId: SupportedChainId | undefined;
 
   /**
-   * @description Initialize the protocol with all necessary parameters for it
-   * @param chainManager
+   * Initializes the protocol with required dependencies
+   *
+   * @internal
+   * @category Lifecycle
+   * @param chainManager Chain manager instance
    */
   async init(chainManager: ChainManager): Promise<void> {
     // TODO: Add more necessary parameters for the protocol init
@@ -45,8 +57,11 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Fetch all vaults for the protocol
-   * @returns
+   * Fetches all available Beefy vaults and enriches them with APY, TVL, and fees
+   *
+   * @internal
+   * @category Discovery
+   * @returns Array of enriched vault definitions
    */
   async getVaults(): Promise<BeefyVaultInfo[]> {
     try {
@@ -95,8 +110,11 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Fetch vaults metrics from the Beefy API
-   * @returns {vaults: VaultInfo[], apy: Record<string, number>, fees: Record<string, number>, tvl: Record<string, number>}
+   * Fetches vault metrics from Beefy public API
+   *
+   * @internal
+   * @category Discovery
+   * @returns Combined vault metadata for the selected chain
    */
   private async fetchVaultsMetrics(): Promise<{
     vaults: BeefyVaultInfo[];
@@ -129,8 +147,16 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Get the best vault for the protocol to deposit based on the given parameters
-   * @returns VaultInfo
+   * Returns the best vault candidate for deposits
+   *
+   * @internal
+   * @category Recommendation
+   * @remarks
+   * Current heuristic picks the active vault with highest TVL
+   * Future work: incorporate APY, user history, and fees
+   *
+   * @returns Selected vault info
+   * @throws Error if no active vaults found
    */
   async getBestVault(): Promise<BeefyVaultInfo> {
     // TODO: Implement the logic of getting the best vault for the protocol
@@ -164,9 +190,12 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Fetch a vault where a user deposited funds previously
-   * @param smartWallet
-   * @returns
+   * Tries to find a vault where the user already has shares
+   *
+   * @internal
+   * @category Discovery
+   * @param smartWallet Smart wallet used to query user address
+   * @returns Previously used vault or null
    */
   async fetchDepositedVaults(smartWallet: SmartWallet): Promise<BeefyVaultInfo | null> {
     // TODO: Support logic for fetching info about vaults where a user already deposited funds previously:
@@ -188,10 +217,14 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Deposit funds into a best vault for the protocol OR to the same vault where a user deposited previously
-   * @param amount
-   * @param smartWallet
-   * @returns
+   * Withdraws funds from the selected vault
+   *
+   * @internal
+   * @category Actions
+   * @param amountInUnderlying Optional human-readable amount to withdraw, withdraws all if omitted
+   * @param smartWallet Smart wallet that will execute the withdrawal
+   * @returns Result object including transaction hash
+   * @throws Error if no vault is found to withdraw from
    */
   async deposit(amount: string, smartWallet: SmartWallet): Promise<BeefyVaultTxnResult> {
     // Check if a user deposited previously to any vault of the protocol
@@ -266,7 +299,14 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Partially withdraw funds from a vault
+   * Withdraws funds from the selected vault
+   *
+   * @internal
+   * @category Actions
+   * @param amountInUnderlying Optional human-readable amount to withdraw, withdraws all if omitted
+   * @param smartWallet Smart wallet that will execute the withdrawal
+   * @returns Result object including transaction hash
+   * @throws Error if no vault is found to withdraw from
    */
   async withdraw(
     amountInUnderlying: string | undefined,
@@ -323,13 +363,16 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Read the price per full share from the vault
-   * If getPricePerFullShare calls it returns the current price per share of the vault (i.e. per mooToken) as an integer denominated in the "want" (i.e. underlying farm token)
-   * If pricePerShare fails then it uses pricePerShare to get the price per full share
+   * Reads price per full share from the vault
    *
-   * @param publicClient
-   * @param vaultAddress
-   * @returns
+   * @internal
+   * @category Helpers
+   * @remarks
+   * Uses `getPricePerFullShare` and falls back to `pricePerShare` if needed
+   *
+   * @param publicClient Public viem client
+   * @param vaultAddress Vault contract address
+   * @returns Bigint PPFS value
    */
   private async readPpfs(publicClient: PublicClient, vaultAddress: Address) {
     let ppfs: bigint;
@@ -355,11 +398,14 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Get the amount of shares that a user has in a vault
-   * @param publicClient
-   * @param vaultAddress
-   * @param walletAddress
-   * @returns shares
+   * Reads the number of shares held by a wallet in a vault
+   *
+   * @internal
+   * @category Helpers
+   * @param publicClient Public viem client
+   * @param vaultAddress Vault contract address
+   * @param walletAddress User wallet address
+   * @returns Bigint shares amount
    */
   private async getSharesAmount(
     publicClient: PublicClient,
@@ -378,11 +424,13 @@ export class BeefyProtocol extends BaseProtocol {
   }
 
   /**
-   * @description Get the balance of deposited funds to a vault
+   * Returns deposited balance information for a wallet
    *
-   * @param vaultInfo
-   * @param walletAddress
-   * @returns
+   * @internal
+   * @category Reads
+   * @param vaultInfo Vault to query
+   * @param walletAddress User wallet address
+   * @returns Balance object with shares, ppfs, and deposited amount
    */
   async getBalance(vaultInfo: BeefyVaultInfo, walletAddress: Address): Promise<BeefyVaultBalance> {
     const publicClient = this.chainManager!.getPublicClient(this.selectedChainId!);

@@ -4,30 +4,37 @@ import { ApiKeysValidator } from '@/tools/ApiKeysValidator';
 import type { Protocol, ProtocolsRouterConfig } from '@/types/protocols/general';
 
 /**
- * Base protocol router class
- * @description Abstract base class for protocol router implementations to recommend protocols (Beefy, Aave, Morpho, etc.).
- * Provides a standard interface for extracting best protocols for a given router config
+ * Base Protocol Router
+ *
+ * @internal
+ * @abstract
+ * @category Protocols
+ * @remarks
+ * Abstract base class for protocol router implementations such as Beefy, Aave, Morpho, etc
+ * Provides a standard interface for selecting protocols based on configuration parameters
  */
 export abstract class ProtocolRouterBase {
-  /** The risk level the is required by an integrator */
+  /** Required risk level specified by the integrator */
   public readonly riskLevel: ProtocolsRouterConfig['riskLevel'];
 
-  /** The minimum apy that is required by an integrator */
+  /** Minimum APY required by the integrator */
   public readonly minApy?: ProtocolsRouterConfig['minApy'];
 
-  /** The API key to access premium protocols with a higher APY*/
+  /** API key to access premium protocols with higher yields */
   public readonly apiKey?: string; // TODO: Add an API key validation
 
-  /** The API key validator instance */
+  /** API key validator instance */
   public readonly apiKeyValidator: ApiKeysValidator = new ApiKeysValidator();
 
-  /** The chain manager instance */
+  /** Chain manager instance for network access */
   public readonly chainManager: ChainManager;
 
   /**
-   * Create a protocol router instance
-   * @param riskLevel - The risk level the is required by an integrator
-   * @param minApy - The minimum apy that is required by an integrator
+   * Initialize a base protocol router
+   * @param riskLevel Risk level required by the integrator
+   * @param chainManager Chain manager instance for network operations
+   * @param minApy Optional minimum APY filter
+   * @param apiKey Optional API key for premium protocol access
    */
   constructor(
     riskLevel: ProtocolsRouterConfig['riskLevel'],
@@ -42,21 +49,22 @@ export abstract class ProtocolRouterBase {
   }
 
   /**
-   * Get all protocols that are supported by the router
-   * @returns Promise resolving to an array of protocols
+   * Get all supported protocols
+   * @returns Array of protocols supported by this router
    */
   abstract getProtocols(): Protocol[];
 
   /**
-   * Check if a protocol is supported by the chain id that was provided to the SDK
-   * @param chainIds
+   * Check if the given chains are supported by the router
+   * @param chainIds List of chain IDs to check
+   * @returns True if at least one chain is supported
    */
   abstract isProtocolSupportedChain(chainIds: SupportedChainId[]): boolean;
 
   /**
-   * Recommend a protocol based on a router config
-   * @description Returns a protocol that is best suited for the given router config
-   * @returns Promise resolving to a protocol
+   * Recommend the most suitable protocol based on router configuration
+   * @description Returns a protocol that best matches the configured risk level, APY, and chain support
+   * @returns Protocol instance considered the best match
    */
   abstract recommend(): Protocol;
 }

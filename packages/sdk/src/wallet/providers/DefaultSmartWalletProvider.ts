@@ -9,21 +9,27 @@ import { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider
 import type { Protocol } from '@/types/protocols/general';
 
 /**
- * Smart Wallet Provider
- * @description Factory for creating and managing Smart Wallet instances.
- * Handles wallet address prediction, creation, and retrieval using ERC-4337 account abstraction.
+ * Default provider for creating and managing ERC-4337 smart wallets
+ *
+ * @internal
+ * @category Wallets
+ * @remarks
+ * Factory that composes {@link DefaultSmartWallet} instances
+ * Handles deterministic address prediction and instance construction
  */
 export class DefaultSmartWalletProvider extends SmartWalletProvider {
   /** Manages supported blockchain networks */
   private chainManager: ChainManager;
 
-  /** Already initialized protocol provider */
+  /** Already initialized protocol provider instance */
   private protocolProvider: Protocol['instance'];
 
   /**
-   * Initialize the Smart Wallet Provider
-   * @param chainManager - Manages supported blockchain networks
-   * @param paymasterAndBundlerUrl - URL for ERC-4337 bundler and paymaster services
+   * Initializes the smart wallet provider
+   *
+   * @internal
+   * @param chainManager Manager for chains and viem clients
+   * @param protocol Selected protocol descriptor that exposes an initialized instance
    */
   constructor(chainManager: ChainManager, protocol: Protocol) {
     super();
@@ -32,13 +38,18 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
   }
 
   /**
-   * Create a new smart wallet instance
-   * @description Creates a new smart wallet that will be deployed on first transaction.
-   * The wallet address is deterministically calculated from owners and nonce.
-   * @param owners - Array of wallet owners (addresses or WebAuthn public keys)
-   * @param signer - Local account used for signing transactions
-   * @param nonce - Optional nonce for address generation (defaults to 0)
-   * @returns Promise resolving to a new SmartWallet instance
+   * Creates a new smart wallet instance that deploys on first use
+   *
+   * @internal
+   * @category Creation
+   * @remarks
+   * Address is derived deterministically from `owners` and `nonce`
+   *
+   * @param params Parameters for wallet creation
+   * @param params.owners Owners as EVM addresses or WebAuthn owners
+   * @param params.signer Local account used to sign UserOperations and transactions
+   * @param params.nonce Optional salt for deterministic address calculation, default 0
+   * @returns Promise that resolves to a {@link DefaultSmartWallet} instance
    */
   async createWallet(params: {
     owners: Array<Address | WebAuthnAccount>;
@@ -58,12 +69,19 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
   }
 
   /**
-   * Get the predicted smart wallet address
-   * @description Calculates the deterministic address where a smart wallet would be deployed
-   * given the specified owners and nonce. Uses CREATE2 for address prediction.
-   * @param params.owners - Array of wallet owners (addresses or WebAuthn public keys)
-   * @param params.nonce - Nonce for address generation (defaults to 0)
-   * @returns Promise resolving to the predicted wallet address
+   * Predicts the deterministic smart wallet address for the given owners and nonce
+   *
+   * @internal
+   * @category Addressing
+   * @remarks
+   * Uses the smart wallet factory `getAddress` to compute the CREATE2 address
+   *
+   * @param params Address prediction parameters
+   * @param params.owners Owners as EVM addresses or WebAuthn owners
+   * @param params.nonce Optional salt for deterministic address calculation, default 0
+   * @returns Promise that resolves to the predicted wallet address
+   * @throws Error if no supported chains are configured
+   * @throws Error if an owner has an invalid type
    */
   async getWalletAddress(params: { owners: Array<Address | WebAuthnAccount>; nonce?: bigint }) {
     const { owners, nonce = 0n } = params;
@@ -93,13 +111,18 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
   }
 
   /**
-   * Get an existing smart wallet instance
-   * @description Creates a SmartWallet instance for an already deployed wallet.
-   * Use this when you know the wallet address and want to interact with it.
-   * @param params.walletAddress - Address of the deployed smart wallet
-   * @param params.signer - Local account used for signing transactions
-   * @param params.ownerIndex - Index of the signer in the wallet's owner list (defaults to 0)
-   * @returns SmartWallet instance
+   * Returns a smart wallet instance for an already deployed address
+   *
+   * @internal
+   * @category Retrieval
+   * @remarks
+   * Use when you already know the deployment address and want an instance bound to a signer
+   *
+   * @param params Retrieval parameters
+   * @param params.walletAddress Deployed smart wallet address
+   * @param params.signer Local account to operate the wallet
+   * @param params.ownerIndex Optional index of `signer` within the current owners set, default 0
+   * @returns A {@link DefaultSmartWallet} instance
    */
   getWallet(params: {
     walletAddress: Address;
@@ -118,10 +141,14 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
   }
 
   /**
-   * Fund the wallet via a faucet
-   * @description Funds the current wallet via a faucet. Can only work if a selected chain is supported by a faucet and is a test network.
-   * @param chainId - Chain ID
-   * @returns Promise resolving to the transaction hash
+   * Funds a wallet via a faucet if supported by the selected chain
+   *
+   * @internal
+   * @category Funding
+   * @remarks
+   * Placeholder for testnet faucet integration
+   *
+   * @returns Future transaction hash or provider response
    */
   fundViaFaucet() {}
 }

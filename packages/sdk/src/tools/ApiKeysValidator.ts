@@ -2,16 +2,23 @@ import type { ProtocolsRouterConfig } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
 
 /**
- * A class to validate if the api key tha was provided to a config is valid. The API key is used to access premium protocols with a higher APY
- * It is important to validate the API key to avoid any potential security issues or unexpected behavior
+ * Utility class for validating API keys used in protocol configurations
+ *
+ * @internal
+ * @category Utilities
+ * @remarks
+ * API keys may be required for accessing premium protocols with higher APY
+ * Validation helps prevent invalid configurations and potential security risks
  */
 export class ApiKeysValidator {
   // TODO: Implement the validation logic
 
   /**
-   * Validate if the api key is valid
-   * @param apiKey - The api key to validate
-   * @returns True if the api key is valid, false otherwise
+   * Validates whether the provided API key is valid
+   *
+   * @internal
+   * @param apiKey API key from {@link ProtocolsRouterConfig}
+   * @returns True if the API key is considered valid
    */
   validate(apiKey: ProtocolsRouterConfig['apiKey']) {
     logger.info('Validating api key...', apiKey, 'ApiKeysValidator');

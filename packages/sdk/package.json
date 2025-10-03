@@ -26,7 +26,10 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "i": "^0.3.7",
+    "npm": "^11.6.1",
     "typedoc": "^0.28.13",
+    "typedoc-material-theme": "^1.4.0",
     "typedoc-plugin-markdown": "^4.9.0",
     "vitest": "^3.2.4"
   },

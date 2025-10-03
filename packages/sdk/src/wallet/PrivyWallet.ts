@@ -17,18 +17,30 @@ import type { TransactionData } from '@/types/transaction';
 import { logger } from '@/tools/Logger';
 
 /**
- * Privy wallet implementation
- * @description Wallet implementation using Privy service
+ * Internal embedded wallet implementation backed by Privy
+ *
+ * @internal
+ * @category Wallets
+ * @remarks
+ * Wraps Privy’s server-auth wallet to expose a viem-compatible {@link LocalAccount}
+ * and {@link WalletClient}
+ * Not exported in the public API — composed by higher-level providers/namespaces
  */
 export class PrivyWallet extends EmbeddedWallet {
+  /** Privy wallet ID */
   public override walletId: string;
+  /** Privy client instance */
   private privyClient: PrivyClient;
+  /** Network and client manager */
   private chainManager: ChainManager;
   /**
-   * Create a new Privy wallet provider
-   * @param appId - Privy application ID
-   * @param appSecret - Privy application secret
-   * @param verbs - Verbs instance for accessing configured providers
+   * Creates a Privy-backed embedded wallet
+   *
+   * @internal
+   * @param privyClient Privy client used to access wallet and signing APIs
+   * @param walletId Privy wallet identifier
+   * @param address Wallet EVM address
+   * @param chainManager Chain and client manager
    */
   constructor(
     privyClient: PrivyClient,
@@ -43,12 +55,15 @@ export class PrivyWallet extends EmbeddedWallet {
   }
 
   /**
-   * Create a LocalAccount from this Privy wallet
-   * @description Converts the Privy wallet into a viem-compatible LocalAccount that can sign
-   * messages and transactions. The returned account uses Privy's signing infrastructure
-   * under the hood while providing a standard viem interface.
-   * @returns Promise resolving to a LocalAccount configured for signing operations
-   * @throws Error if wallet retrieval fails or signing operations are not supported
+   * Returns a viem-compatible {@link LocalAccount} for this Privy wallet
+   *
+   * @internal
+   * @category Accounts
+   * @remarks
+   * Uses Privy’s signing infra under the hood while exposing the standard viem interface
+   *
+   * @returns Promise that resolves to a {@link LocalAccount}
+   * @throws Error if wallet retrieval or account construction fails
    */
   async account(): Promise<LocalAccount> {
     const account = await createViemAccount({
@@ -61,13 +76,13 @@ export class PrivyWallet extends EmbeddedWallet {
   }
 
   /**
-   * Create a WalletClient for this Privy wallet
-   * @description Creates a viem-compatible WalletClient configured with this wallet's account
-   * and the specified chain. The returned client can be used to send transactions and interact
-   * with smart contracts using Privy's signing infrastructure under the hood.
-   * @param chainId - The chain ID to create the wallet client for
-   * @returns Promise resolving to a WalletClient configured for the specified chain
-   * @throws Error if chain is not supported or wallet client creation fails
+   * Creates a viem {@link WalletClient} for a given chain
+   *
+   * @internal
+   * @category Accounts
+   * @param chainId Target chain ID
+   * @returns Promise that resolves to a {@link WalletClient}
+   * @throws Error if the chain is unsupported or client creation fails
    */
   async walletClient(chainId: SupportedChainId): Promise<WalletClient> {
     const account = await this.account();
@@ -79,23 +94,29 @@ export class PrivyWallet extends EmbeddedWallet {
   }
 
   /**
-   * Sign a transaction without sending it
-   * @description Signs a transaction using the configured wallet provider but doesn't send it
-   * @param transactionData - Transaction data to sign
-   * @returns Promise resolving to signed transaction
-   * @throws Error if wallet is not initialized or no wallet provider is configured
+   * Signs a transaction without broadcasting it
+   *
+   * @internal
+   * @category Signing
+   * @param transactionData Transaction payload to sign
+   * @returns Promise that resolves to a signed transaction hex string
    */
   async sign(transactionData: TransactionData): Promise<`0x${string}`> {
     return (await this.signOnly(transactionData)) as `0x${string}`;
   }
 
   /**
-   * Sign a transaction without sending it
-   * @description Signs a transaction using Privy's wallet API but doesn't send it
-   * @param walletId - Wallet ID to use for signing
-   * @param transactionData - Transaction data to sign
-   * @returns Promise resolving to signed transaction
-   * @throws Error if transaction signing fails
+   * Produces a signed transaction using Privy’s wallet API without sending it
+   *
+   * @internal
+   * @category Signing
+   * @remarks
+   * Estimates gas, fees, and nonce to build a complete EIP-1559 transaction
+   * Per Privy docs, if any gas field is set, all must be set
+   *
+   * @param transactionData Transaction payload to sign
+   * @returns Promise that resolves to a signed transaction string
+   * @throws Error if signing fails
    */
   async signOnly(transactionData: TransactionData): Promise<string> {
     try {
@@ -163,11 +184,14 @@ export class PrivyWallet extends EmbeddedWallet {
   }
 
   /**
-   * Send a signed transaction
-   * @description Sends a pre-signed transaction to the network
-   * @param signedTransaction - Signed transaction to send
-   * @param publicClient - Viem public client to send the transaction
-   * @returns Promise resolving to transaction hash
+   * Broadcasts a previously-signed transaction
+   *
+   * @internal
+   * @category Sending
+   * @param signedTransaction Signed transaction hex
+   * @param publicClient Viem public client to send the transaction
+   * @returns Promise that resolves to the transaction {@link Hash}
+   * @throws Error if submission fails
    */
   async send(signedTransaction: string, publicClient: any): Promise<Hash> {
     try {

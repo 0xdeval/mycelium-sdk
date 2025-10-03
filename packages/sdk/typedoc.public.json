@@ -1,0 +1,14 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "entryPointStrategy": "resolve",
+  "tsconfig": "tsconfig.json",
+  "out": "../../docs",
+  "readme": "README.md",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeProtected": true,
+  "categorizeByGroup": true,
+  "includeVersion": true,
+  "plugin": ["typedoc-material-theme"],
+  "themeColor": "#4f46e5"
+}
