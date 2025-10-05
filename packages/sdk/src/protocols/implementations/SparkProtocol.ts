@@ -56,12 +56,7 @@ export class SparkProtocol extends BaseProtocol<
       throw new Error('No vaults found');
     }
 
-    const sortedVaults = this.allVaults.sort((a, b) => {
-      const apyA = a.metadata?.apy || 0;
-      const apyB = b.metadata?.apy || 0;
-      return apyB - apyA;
-    });
-    return sortedVaults[0]!;
+    return this.allVaults[0]!;
   }
 
   /**
@@ -157,33 +152,34 @@ export class SparkProtocol extends BaseProtocol<
     }
 
     const owner = await smartWallet.getAddress();
-    const ops: { to: Address; data: `0x${string}` }[] = [];
+
+    let withdrawData: { to: Address; data: `0x${string}` };
 
     if (amountInUnderlying) {
       const assets = parseUnits(amountInUnderlying, vaultInfo.depositTokenDecimals);
       logger.info('Withdraw amount:', { amountInUnderlying, assets }, 'SparkProtocol');
-      ops.push({
+      withdrawData = {
         to: vaultInfo.vaultAddress,
         data: encodeFunctionData({
           abi: ERC4626_ABI,
           functionName: 'withdraw',
           args: [assets, owner, owner] as const,
         }),
-      });
+      };
     } else {
       const maxShares = await this.getMaxRedeemableShares(vaultInfo, owner);
       logger.info('Withdrawing all funds:', { maxShares }, 'SparkProtocol');
-      ops.push({
+      withdrawData = {
         to: vaultInfo.vaultAddress,
         data: encodeFunctionData({
           abi: ERC4626_ABI,
           functionName: 'redeem',
           args: [maxShares, owner, owner] as const,
         }),
-      });
+      };
     }
 
-    const hash = await smartWallet.sendBatch(ops, this.selectedChainId!);
+    const hash = await smartWallet.send(withdrawData, this.selectedChainId!);
     logger.info('Withdraw transaction sent:', { hash }, 'SparkProtocol');
     return { success: true, hash };
   }
