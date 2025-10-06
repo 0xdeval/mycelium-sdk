@@ -149,22 +149,8 @@ EXPRESS_ENTRY=src/service.ts
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Make your changes
-4. Run tests and linting (`pnpm run test && pnpm run lint`)
-5. Commit your changes (`git commit -m 'Add feature'`)
-6. Push to your branch (`git push origin feature/your-feature`)
-7. Open a pull request
-
-### Code standards
-
-- Follow TypeScript best practices
-- Use consistent naming conventions
-- Include tests for new features
-- Update documentation as needed
-- Ensure all linting and formatting checks pass
+Check the [CONTRIBUTION.md](https://github.com/0xdeval/mycelium-sdk/blob/main/CONTRIBUTION.md)
 
 ## License
 
-This project is licensed under the dual license - Apache 2.0 + Commercial - see the [LICENSE](https://github.com/0xdeval/mycelium-sdk/blob/main/LICENSE.md) file for details
+This project is licensed under the dual license - Apache 2.0 + Commercial - see the [LICENSE](https://github.com/0xdeval/mycelium-sdk/blob/main/LICENSE.md)

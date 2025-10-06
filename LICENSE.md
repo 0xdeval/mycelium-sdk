@@ -45,8 +45,8 @@ you must obtain a valid **Commercial License** from the copyright holder.
 
 To inquire about a commercial license, please contact:
 
-📧 Email: [license@mycelium.sh]  
-🌐 Website: [https://mycelium.sh](https://mycelium.sh)
+Email: license@mycelium.sh
+Website: [https://mycelium.sh](https://mycelium.sh)
 
 ## 3. No Warranty
 
