@@ -1,2 +1,9 @@
 packages:
-  - "packages/*"
+  - packages/*
+
+ignoredBuiltDependencies:
+  - '@reown/appkit'
+  - better-sqlite3
+  - bufferutil
+  - sharp
+  - utf-8-validate

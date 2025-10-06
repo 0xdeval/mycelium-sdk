@@ -1,4 +1,5 @@
 import { BeefyProtocol } from '@/protocols/implementations/BeefyProtocol';
+import { SparkProtocol } from '@/protocols/implementations/SparkProtocol';
 import type { Protocol } from '@/types/protocols/general';
 
 /**
@@ -15,8 +16,20 @@ export const availableProtocols: Protocol[] = [
       logo: '/logos/beefy.png',
       supportedChains: [8453],
       riskLevel: 'medium',
-      isPremium: false,
+      isPremium: true,
     },
     instance: new BeefyProtocol(),
+  },
+  {
+    info: {
+      id: 'spark',
+      name: 'Spark',
+      website: 'https://spark.fi/',
+      logo: '/logos/spark.png',
+      supportedChains: [1, 8453, 42161],
+      riskLevel: 'low',
+      isPremium: false,
+    },
+    instance: new SparkProtocol(),
   },
 ];

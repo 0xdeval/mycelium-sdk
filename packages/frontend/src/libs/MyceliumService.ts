@@ -2,7 +2,7 @@ import type { WalletRecord } from '@/libs/WalletDatabase';
 import MyceliumSDK, {
   type SmartWallet,
   type VaultBalance,
-  type VaultTransactionResult,
+  type VaultTxnResult,
 } from '@mycelium-sdk/core';
 
 export class MyceliumService {
@@ -48,7 +48,7 @@ export class MyceliumService {
           bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
         },
         protocolsRouterConfig: {
-          riskLevel: 'medium',
+          riskLevel: 'low',
         },
       });
 
@@ -109,7 +109,7 @@ export class MyceliumService {
     });
   }
 
-  async earn(walletId: string, amount: string): Promise<VaultTransactionResult> {
+  async earn(walletId: string, amount: string): Promise<VaultTxnResult> {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }
@@ -135,7 +135,7 @@ export class MyceliumService {
     return balance;
   }
 
-  async withdraw(walletId: string, amount: string): Promise<VaultTransactionResult> {
+  async withdraw(walletId: string, amount: string): Promise<VaultTxnResult> {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }

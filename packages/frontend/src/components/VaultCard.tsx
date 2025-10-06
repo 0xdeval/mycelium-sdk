@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Box, Heading, VStack, Text, Button, Input, HStack, Spinner, Code } from '@chakra-ui/react';
 import type { JSX } from '@emotion/react/jsx-runtime';
 import type { VaultBalance } from '@mycelium-sdk/core';
@@ -18,17 +18,10 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (walletId && walletAddress) {
-      loadVaultBalance();
-    }
-  }, [walletId, walletAddress]);
-
-  const loadVaultBalance = async () => {
+  const loadVaultBalance = useCallback(async () => {
     if (!walletAddress) {
       return;
     }
-    console.log('===loadVaultBalance===', walletId, walletAddress);
 
     try {
       const response = await fetch(`/api/sdk/vault-balance`, {
@@ -41,17 +34,21 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
 
       const data = await response.json();
 
-      console.log('Balance data >>>>> ', data);
       if (data.success) {
         setVaultBalance(data.balance || { shares: '0', depositedAmount: '0', ppfs: '0' });
       } else {
         setError(data.error);
       }
     } catch (err) {
-      console.error('Failed to load vault balance:', err);
       setError(`Failed to load balance: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-  };
+  }, [walletId, walletAddress]);
+
+  useEffect(() => {
+    if (walletId && walletAddress) {
+      loadVaultBalance();
+    }
+  }, [walletId, walletAddress, loadVaultBalance]);
 
   const handleDeposit = async () => {
     if (!walletId || !walletAddress || !depositAmount) {
@@ -168,11 +165,10 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
     );
   }
 
-  console.log('VaultBalance >>>>> ', vaultBalance);
   return (
     <Box>
       <Heading size="lg" mb={4}>
-        Beefy Vault Operations
+        Vault Operations
       </Heading>
 
       {error && (
@@ -197,9 +193,6 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
             <VStack gap={1} align="stretch">
               <Text fontSize="lg" fontWeight="bold">
                 {vaultBalance.shares} vault tokens
-              </Text>
-              <Text fontSize="sm" color="green.600">
-                Price Per Full Share: {vaultBalance.ppfs}
               </Text>
               <Text fontSize="sm" color="green.600">
                 Value: {vaultBalance.depositedAmount} USDC

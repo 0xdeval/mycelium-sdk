@@ -37,3 +37,5 @@ bun.lock
 
 wallets.db
 .next
+
+wallets.json

@@ -21,8 +21,9 @@
     "noImplicitOverride": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
   },
+  "exclude": ["node_modules", "dist"],
   "references": [
     { "path": "./packages/sdk" },
     { "path": "./packages/frontend" }

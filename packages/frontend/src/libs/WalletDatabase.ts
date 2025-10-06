@@ -1,4 +1,5 @@
-import Database, { type Database as DatabaseType } from 'better-sqlite3';
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
 
 export interface WalletRecord {
   user_id: string;
@@ -7,12 +8,19 @@ export interface WalletRecord {
   created_at: string;
 }
 
+type WalletMap = Record<string, WalletRecord>;
+
 export class WalletDatabase {
   private static instance: WalletDatabase;
-  private db: DatabaseType | null = null;
-  private initialized: boolean = false;
+  private initialized = false;
+  private filePath: string;
+  private cache: WalletMap = {};
 
-  private constructor() {}
+  private lock: Promise<void> = Promise.resolve();
+
+  private constructor() {
+    this.filePath = path.join(process.cwd(), 'wallets.json');
+  }
 
   static getInstance(): WalletDatabase {
     if (!WalletDatabase.instance) {
@@ -25,70 +33,109 @@ export class WalletDatabase {
     if (this.initialized) {
       return;
     }
+    await this.ensureFile();
+    this.cache = await this.readFile();
+    this.initialized = true;
+    console.log('WalletDatabase (file) initialized:', this.filePath);
+  }
 
+  private async ensureFile(): Promise<void> {
     try {
-      this.db = new Database('./wallets.db');
-
-      await this.createTables();
-      this.initialized = true;
-      console.log('WalletDatabase initialized successfully');
-    } catch (error) {
-      throw new Error(`Failed to initialize database: ${error}`);
+      await fs.access(this.filePath);
+    } catch {
+      await fs.writeFile(this.filePath, JSON.stringify({}, null, 2), 'utf8');
     }
   }
 
-  private async createTables(): Promise<void> {
-    if (!this.db) {
-      throw new Error('Database not available');
+  private async readFile(): Promise<WalletMap> {
+    try {
+      const txt = await fs.readFile(this.filePath, 'utf8');
+      if (!txt.trim()) {
+        return {};
+      }
+      const data = JSON.parse(txt);
+      if (Array.isArray(data)) {
+        const map: WalletMap = {};
+        for (const r of data) {
+          if (r?.user_id) {
+            map[r.user_id] = r as WalletRecord;
+          }
+        }
+        return map;
+      }
+      return (data as WalletMap) || {};
+    } catch (e) {
+      try {
+        await fs.rename(this.filePath, `${this.filePath}.corrupt.${Date.now()}`);
+      } catch {
+        console.error('Error renaming corrupted file', e);
+      }
+      await fs.writeFile(this.filePath, JSON.stringify({}, null, 2), 'utf8');
+      return {};
     }
+  }
 
-    await this.db.exec(`
-      CREATE TABLE IF NOT EXISTS wallets (
-        user_id TEXT PRIMARY KEY,
-        wallet_id TEXT NOT NULL,
-        wallet_address TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+  private async writeFile(data: WalletMap): Promise<void> {
+    const tmp = `${this.filePath}.tmp`;
+    await fs.writeFile(tmp, JSON.stringify(data, null, 2), 'utf8');
+    await fs.rename(tmp, this.filePath);
+  }
+
+  private async withLock<T>(fn: () => Promise<T>): Promise<T> {
+    const prev = this.lock;
+    let release!: () => void;
+    this.lock = new Promise<void>((res) => {
+      release = res;
+    });
+    await prev;
+    try {
+      return await fn();
+    } finally {
+      release();
+    }
   }
 
   async getWallet(userId: string): Promise<WalletRecord | null> {
-    if (!this.db) {
+    if (!this.initialized) {
       throw new Error('Database not initialized');
     }
-
-    const wallet = await this.db.prepare('SELECT * FROM wallets WHERE user_id = ?').get(userId);
-    return wallet as WalletRecord | null;
+    return this.cache[userId] ?? null;
   }
 
   async saveWallet(userId: string, walletId: string, walletAddress: string): Promise<void> {
-    if (!this.db) {
+    if (!this.initialized) {
       throw new Error('Database not initialized');
     }
 
-    this.db
-      .prepare(
-        'INSERT OR REPLACE INTO wallets (user_id, wallet_id, wallet_address) VALUES (?, ?, ?)',
-      )
-      .run(userId, walletId, walletAddress);
+    await this.withLock(async () => {
+      const latest = await this.readFile();
+      const existing = latest[userId];
+
+      const record: WalletRecord = {
+        user_id: userId,
+        wallet_id: walletId,
+        wallet_address: walletAddress,
+        created_at: existing?.created_at ?? new Date().toISOString(),
+      };
+
+      latest[userId] = record;
+      this.cache = latest;
+      await this.writeFile(latest);
+    });
   }
 
   async getAllWallets(): Promise<WalletRecord[]> {
-    if (!this.db) {
+    if (!this.initialized) {
       throw new Error('Database not initialized');
     }
-
-    return this.db
-      .prepare('SELECT * FROM wallets ORDER BY created_at DESC')
-      .all() as WalletRecord[];
+    const arr = Object.values(this.cache);
+    arr.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+    return arr;
   }
 
   async close(): Promise<void> {
-    if (this.db) {
-      await this.db.close();
-      this.db = null;
-      this.initialized = false;
-    }
+    this.initialized = false;
+    this.cache = {};
   }
 }
 

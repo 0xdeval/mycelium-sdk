@@ -1,5 +1,4 @@
 import type { ChainManager } from '@/tools/ChainManager';
-import type { VaultInfo, VaultTransactionResult, VaultBalance } from '@/types/protocols/beefy';
 import {
   type Address,
   type LocalAccount,
@@ -10,9 +9,14 @@ import {
 } from 'viem';
 import type { SupportedChainId } from '@/constants/chains';
 import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
+import type { VaultInfo, VaultBalance, VaultTxnResult } from '@/types/protocols/general';
 
-export abstract class BaseProtocol {
-  /** the chain manager instance */
+export abstract class BaseProtocol<
+  TVaultInfo extends VaultInfo = VaultInfo,
+  TVaultBalance extends VaultBalance = VaultBalance,
+  TVaultTxnResult extends VaultTxnResult = VaultTxnResult,
+> {
+  /** The chain manager instance */
   public chainManager: ChainManager | undefined;
 
   /**
@@ -32,38 +36,35 @@ export abstract class BaseProtocol {
   /**
    * Get all vaults for the protocol that are available for a deposit operation
    */
-  abstract getVaults(): Promise<VaultInfo[]>;
+  abstract getVaults(): Promise<TVaultInfo[]> | TVaultInfo[];
 
   /**
    * Get the best vault for the protocol to deposit based on the given parameters
    */
-  abstract getBestVault(): Promise<VaultInfo>;
+  abstract getBestVault(): Promise<TVaultInfo> | TVaultInfo;
 
   /**
    * Method defines and return a pool where a user could already have deposited funds previously
    */
-  abstract fetchDepositedVaults(smartWallet: SmartWallet): Promise<VaultInfo | null>;
+  abstract fetchDepositedVaults(smartWallet: SmartWallet): Promise<TVaultInfo | null>;
 
   /**
    * Deposit funds into a vault
    */
-  abstract deposit(amount: string, smartWallet: SmartWallet): Promise<VaultTransactionResult>;
+  abstract deposit(amount: string, smartWallet: SmartWallet): Promise<TVaultTxnResult>;
 
   /**
    * Withdraw funds from a vault
    */
-  abstract withdraw(
-    amountInShares: string,
-    smartWallet: SmartWallet,
-  ): Promise<VaultTransactionResult>;
+  abstract withdraw(amountInShares: string, smartWallet: SmartWallet): Promise<TVaultTxnResult>;
 
   /**
    * Get the balance of deposited funds to a vault
    */
   abstract getBalance(
-    vaultInfo: VaultInfo,
+    vaultInfo: TVaultInfo,
     walletAddress: Address, // chainId: SupportedChainId
-  ): Promise<VaultBalance>;
+  ): Promise<TVaultBalance>;
 
   /**
    * Approve a token to be spent by a spender
