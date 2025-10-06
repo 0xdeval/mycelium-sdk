@@ -27,7 +27,6 @@ export default function WalletInfo({
       const response = await fetch(`/api/sdk/get-balance/${walletId}`);
       const { balance } = await response.json();
 
-      console.log('tokensBalances in WalletInfo: ', balance);
       setWalletData({ balances: balance });
     } catch (error) {
       setDataError(error instanceof Error ? error.message : 'Failed to load wallet data');
@@ -59,7 +58,10 @@ export default function WalletInfo({
       }
 
       const data = await response.json();
-      console.log('data after drop funds: ', data);
+
+      if (!data.ok) {
+        throw new Error(data.error);
+      }
 
       await loadWalletData();
     } catch (error) {

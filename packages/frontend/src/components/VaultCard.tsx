@@ -22,7 +22,6 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
     if (!walletAddress) {
       return;
     }
-    console.log('===loadVaultBalance===', walletId, walletAddress);
 
     try {
       const response = await fetch(`/api/sdk/vault-balance`, {
@@ -35,14 +34,12 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
 
       const data = await response.json();
 
-      console.log('Balance data >>>>> ', data);
       if (data.success) {
         setVaultBalance(data.balance || { shares: '0', depositedAmount: '0', ppfs: '0' });
       } else {
         setError(data.error);
       }
     } catch (err) {
-      console.error('Failed to load vault balance:', err);
       setError(`Failed to load balance: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   }, [walletId, walletAddress]);
@@ -168,7 +165,6 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
     );
   }
 
-  console.log('VaultBalance >>>>> ', vaultBalance);
   return (
     <Box>
       <Heading size="lg" mb={4}>
@@ -197,9 +193,6 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
             <VStack gap={1} align="stretch">
               <Text fontSize="lg" fontWeight="bold">
                 {vaultBalance.shares} vault tokens
-              </Text>
-              <Text fontSize="sm" color="green.600">
-                Price Per Full Share: {vaultBalance.ppfs}
               </Text>
               <Text fontSize="sm" color="green.600">
                 Value: {vaultBalance.depositedAmount} USDC

@@ -1,6 +1,6 @@
 import type { Address, LocalAccount } from 'viem';
 import type { WebAuthnAccount } from 'viem/account-abstraction';
-import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet.js';
+import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 
 /**
  * Abstract base class for smart wallet providers

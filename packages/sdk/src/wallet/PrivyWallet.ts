@@ -12,7 +12,7 @@ import { unichain } from 'viem/chains';
 
 import type { SupportedChainId } from '@/constants/chains';
 import type { ChainManager } from '@/tools/ChainManager';
-import { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet.js';
+import { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
 import type { TransactionData } from '@/types/transaction';
 import { logger } from '@/tools/Logger';
 
