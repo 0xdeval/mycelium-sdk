@@ -44,6 +44,7 @@ export class SparkProtocol extends BaseProtocol<
    * @returns The list of vaults
    */
   getVaults(): SparkVaultInfo[] {
+    // Constant array as all vaults are static
     return SPARK_VAULT;
   }
 

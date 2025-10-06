@@ -82,7 +82,7 @@ describe('SparkProtocol', () => {
       const newProtocol = new SparkProtocol();
       newProtocol['allVaults'] = [];
 
-      await expect(() => newProtocol.getBestVault()).toThrow('No vaults found');
+      expect(() => newProtocol.getBestVault()).toThrow('No vaults found');
     });
   });
 

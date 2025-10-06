@@ -19,8 +19,7 @@ import type { TokenBalance } from '@/types/token';
 import { type AssetIdentifier, parseAssetAmount, resolveAsset } from '@/utils/assets';
 import { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { TransactionData } from '@/types/transaction';
-import type { VaultBalance, VaultTransactionResult } from '@/types/protocols/beefy';
-import type { Protocol } from '@/types/protocols/general';
+import type { VaultBalance, VaultTxnResult, Protocol } from '@/types/protocols/general';
 
 /**
  * Smart Wallet Implementation
@@ -160,7 +159,7 @@ export class DefaultSmartWallet extends SmartWallet {
   /**
    * Make a deposit to a protocol vault that was selected before on the initialization step
    */
-  async earn(amount: string): Promise<VaultTransactionResult> {
+  async earn(amount: string): Promise<VaultTxnResult> {
     this.chainManager.getSupportedChain();
 
     const depositTransactionResult = this.protocolProvider.deposit(amount, this);
@@ -182,7 +181,7 @@ export class DefaultSmartWallet extends SmartWallet {
   /**
    * Withdraw specific amount from the protocol vault
    */
-  async withdraw(amount: string): Promise<VaultTransactionResult> {
+  async withdraw(amount: string): Promise<VaultTxnResult> {
     const withdrawTransactionResult = await this.protocolProvider.withdraw(amount, this);
 
     return withdrawTransactionResult;

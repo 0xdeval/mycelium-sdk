@@ -3,7 +3,7 @@ import { type Address, erc20Abi, formatEther, formatUnits } from 'viem';
 import type { SupportedChainId } from '@/constants/chains';
 import type { ChainManager } from '@/tools/ChainManager';
 import { getTokenAddress, type TokenInfo } from '@/utils/tokens';
-import type { TokenBalance } from '@/types/token.js';
+import type { TokenBalance } from '@/types/token';
 
 /**
  * Fetch ETH balance across all supported chains
