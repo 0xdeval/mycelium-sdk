@@ -2,15 +2,56 @@ import type { ChainConfig } from '@/types/chain';
 import type { ProtocolsRouterConfig } from '@/types/protocols/general';
 
 /**
- * Verbs SDK configuration
- * @description Configuration object for initializing the Verbs SDK
+ * Mycelium SDK configuration
+ * @description Configuration object for initializing the Mycelium SDK
+ * @example
+ * ```ts
+ * {
+ *   walletsConfig: {
+ *     embeddedWalletConfig: {
+ *       provider: {
+ *         type: 'privy',
+ *         providerConfig: {
+ *           appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
+ *           appSecret: process.env.NEXT_PUBLIC_PRIVY_APP_SECRET!,
+ *         },
+ *       },
+ *     },
+ *     smartWalletConfig: {
+ *       provider: {
+ *         type: 'default',
+ *       },
+ *     },
+ *   },
+ *   chain: {
+ *     chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID!),
+ *     rpcUrl: process.env.NEXT_PUBLIC_RPC_URL!,
+ *     bundlerUrl: process.env.NEXT_PUBLIC_BUNDLER_URL!,
+ *   },
+ *   protocolsRouterConfig: {
+ *     riskLevel: 'low',
+ *   },
+ * }
+ * ```
  */
 export interface MyceliumSDKConfig {
-  /** Wallet configuration */
+  /**
+   * Wallet configuration
+   * @remarks
+   * Settings for embedded wallets and smart account providers. Currently support only Privy provider with their API keys
+   * */
   walletsConfig: WalletConfig;
-  /** Chains to use for the SDK */
+  /**
+   * Chains to use for the SDK
+   * @remarks
+   * If no rpcUrl, bundlerUrl and chain id are not provided, the SDK will use Base chain by default and its public RPC and Bundler URLs
+   * */
   chain?: ChainConfig;
-  /** Protocols router configuration */
+  /**
+   * Protocols router configuration with different protocol based params
+   * @remarks
+   * If an integrator is not provided any requirements, `low` risk level protocols will be used by default
+   */
   protocolsRouterConfig?: ProtocolsRouterConfig;
 }
 

@@ -29,6 +29,8 @@ export default [
       'pnpm-lock.yaml',
       '*.db',
       'packages/frontend/.next/**',
+      'docs/**',
+      'packages/sdk/docs-dev/**',
     ],
   },
 

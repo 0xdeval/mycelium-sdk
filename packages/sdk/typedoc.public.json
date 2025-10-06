@@ -9,6 +9,5 @@
   "excludeProtected": true,
   "categorizeByGroup": true,
   "includeVersion": true,
-  "plugin": ["typedoc-material-theme"],
-  "themeColor": "#4f46e5"
+  "plugin": ["typedoc-github-theme"]
 }

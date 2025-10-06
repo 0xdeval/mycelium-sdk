@@ -1,8 +1,8 @@
-# Blockchain Service
+# Blockchain service
 
 A local blockchain service with Express API for testing and development
 
-## 🚀 Quick Start
+## Quick start
 
 ### Prerequisites
 
@@ -11,7 +11,7 @@ A local blockchain service with Express API for testing and development
 - node: v24.7.0+
 - Environment variables configured
 
-### Environment Setup
+### Envs
 
 Create a `.env` file in the `packages/blockchain` directory:
 
@@ -27,7 +27,7 @@ NODE_CMD=bun
 EXPRESS_ENTRY=src/service.ts
 ```
 
-### Launch Service
+### Launch
 
 ```bash
 # Navigate to blockchain package
@@ -44,7 +44,7 @@ This will start:
 
 - **Express API**: Faucet service on port 3001
 
-## 🎯 API Endpoints
+## 🎯 API endpoints
 
 ### ETH Faucet
 
@@ -69,7 +69,7 @@ curl -X POST http://localhost:3001/faucet \
 }
 ```
 
-### USDC Faucet
+### USDC faucet
 
 Fund an address with USDC using Anvil impersonation.
 
@@ -94,25 +94,25 @@ curl -X POST http://localhost:3001/faucet-usdc \
 }
 ```
 
-## 📋 Request Parameters
+## 📋 Request parameters
 
-### ETH Faucet
+### ETH faucet
 
 | Parameter   | Type   | Required | Default | Description              |
 | ----------- | ------ | -------- | ------- | ------------------------ |
 | `to`        | string | ✅       | -       | Ethereum address to fund |
 | `amountEth` | string | ❌       | "0.1"   | Amount of ETH to send    |
 
-### USDC Faucet
+### USDC faucet
 
 | Parameter    | Type   | Required | Default | Description              |
 | ------------ | ------ | -------- | ------- | ------------------------ |
 | `to`         | string | ✅       | -       | Ethereum address to fund |
 | `amountUsdc` | string | ❌       | "100"   | Amount of USDC to send   |
 
-## 🔧 Configuration
+## Configuration
 
-### Environment Variables
+### Environment variables
 
 | Variable                    | Default | Description                      |
 | --------------------------- | ------- | -------------------------------- |
@@ -123,14 +123,14 @@ curl -X POST http://localhost:3001/faucet-usdc \
 | `ANVIL_DEFAULT_BALANCE_ETH` | 100     | Default ETH balance for accounts |
 | `EXPRESS_PORT`              | 3001    | Express API port                 |
 
-### Anvil Features
+### Anvil features
 
 - **Forking**: Uses mainnet fork for real contract interactions
 - **Auto-impersonation**: Automatically impersonates accounts
 - **Free gas**: Zero gas prices for testing
 - **Fast blocks**: 1-second block time
 
-## 🛑 Stopping the Service
+## 🛑 Stopping the service
 
 Press `Ctrl+C` in the terminal to stop both Anvil and Express services. The script will automatically:
 

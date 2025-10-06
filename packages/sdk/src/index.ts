@@ -49,7 +49,6 @@ import { logger } from '@/tools/Logger';
  *
  * const sdk = new MyceliumSDK(config);
  *
- * // Use wallet namespace
  * const embeddedWallet = await sdk.wallet.createEmbeddedWallet();
  * const wallet = await sdk.wallet.createSmartWallet({
  *     owners: [embeddedWallet.address],
