@@ -158,7 +158,7 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
     return (
       <Box>
         <Heading size="lg" mb={4}>
-          Beefy Vault Operations
+          Vault Operations
         </Heading>
         <Text>Please create a wallet first to interact with vaults</Text>
       </Box>
