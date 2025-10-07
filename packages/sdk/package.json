@@ -1,0 +1,50 @@
+{
+  "name": "@mycelium-sdk/core",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch --tsconfig tsconfig.build.json",
+    "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean --tsconfig tsconfig.build.json",
+    "watch": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch --tsconfig tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "docs:public": "typedoc --options typedoc.public.json",
+    "docs:dev": "typedoc --options typedoc.dev.json",
+    "docs": "pnpm docs:public && pnpm docs:dev"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "i": "^0.3.7",
+    "npm": "^11.6.1",
+    "typedoc": "^0.28.13",
+    "typedoc-github-theme": "^0.3.1",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@privy-io/server-auth": "^1.32.2",
+    "dotenv": "^17.2.1",
+    "eslint": "^9.34.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "viem": "^2.37.1",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}

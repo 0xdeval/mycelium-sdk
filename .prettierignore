@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+docs
+.next
+abis
+.prettierrc.json
+pnpm-workspace.yaml
+tsconfig.json
