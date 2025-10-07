@@ -10,7 +10,7 @@ import type { Protocol, ProtocolsRouterConfig } from '@/types/protocols/general'
  * @abstract
  * @category Protocols
  * @remarks
- * Abstract base class for protocol router implementations such as Beefy, Aave, Morpho, etc
+ * Abstract base class for protocol router implementations such as Spark, Beefy, Aave, Morpho, etc
  * Provides a standard interface for selecting protocols based on configuration parameters
  */
 export abstract class ProtocolRouterBase {

@@ -18,7 +18,7 @@ import type { VaultInfo, VaultBalance, VaultTxnResult } from '@/types/protocols/
  * @abstract
  * @category Protocols
  * @remarks
- * Abstract class defining the contract for protocol integrations (e.g. Beefy, Aave, Morpho)
+ * Abstract class defining the contract for protocol integrations (e.g. Spark, Beefy, Aave, Morpho)
  * Provides lifecycle hooks (`init`) and required methods for vault discovery, deposit, withdrawal,
  * and balance tracking
  *

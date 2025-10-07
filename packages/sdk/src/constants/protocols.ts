@@ -1,4 +1,3 @@
-import { BeefyProtocol } from '@/protocols/implementations/BeefyProtocol';
 import { SparkProtocol } from '@/protocols/implementations/SparkProtocol';
 import type { Protocol } from '@/types/protocols/general';
 
@@ -8,18 +7,6 @@ import type { Protocol } from '@/types/protocols/general';
  * 2. Deposit funds of users to a best found vault
  */
 export const availableProtocols: Protocol[] = [
-  {
-    info: {
-      id: 'beefy',
-      name: 'Beefy Finance',
-      website: 'https://beefy.finance',
-      logo: '/logos/beefy.png',
-      supportedChains: [8453],
-      riskLevel: 'medium',
-      isPremium: true,
-    },
-    instance: new BeefyProtocol(),
-  },
   {
     info: {
       id: 'spark',

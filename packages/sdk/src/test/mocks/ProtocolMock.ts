@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import type { Protocol } from '@/types/protocols/general';
 import { createMockChainManager } from '@/test/mocks/ChainManagerMock';
-import { mockVaultInfo } from '@/test/mocks/protocols/beefy';
+import { mockVaultInfo } from '@/test/mocks/protocols/spark';
 
 /**
  * Mock Protocol for testing
