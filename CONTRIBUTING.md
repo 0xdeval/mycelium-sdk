@@ -273,25 +273,19 @@ pnpm run test
   - `@internal` to include the class/method description to a dev documentation
   - `@public` to include the class/method description to a public documentation
 
-````typescript
+```typescript
 /**
- * @internal
- *
- * Deposits funds into a protocol vault
- * @param amount - Amount to deposit in token units
- * @param protocol - Target protocol for deposit
- * @param wallet - Wallet instance for transaction
- * @returns Promise resolving to transaction result
- * @example
- * ```typescript
- * const result = await sdk.deposit('100', 'beefy', wallet);
- * console.log('Transaction hash:', result.hash);
- * ```
- */
-async deposit(amount: string, protocol: string, wallet: Wallet): Promise<TransactionResult> {
-  // Implementation
-}
-````
+   * Deposits into the selected protocol’s vault
+   *
+   * @internal
+   * @category Protocol
+   * @param amount Human-readable amount string
+   * @returns Transaction result for the deposit
+   */
+  async earn(amount: string): Promise<VaultTxnResult> {
+   // Implementation
+  }
+```
 
 ### README updates
 
