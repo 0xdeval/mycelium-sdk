@@ -1,10 +1,15 @@
-# Mycelium SDK frontend demo
+## Mycelium app
 
-This is demo UI to show the Mycelium SDK functionalities. Check the guide below to run the demo UI
+The frontend package demonstrates SDK integration with a Next.js application featuring:
 
-## Dependencies
+- Wallet creation and management
+- Balance checking and vault operations
+- Interactive UI built with Chakra UI
+- Real-time blockchain interactions
 
-1. bun >= 1.2.17
+## Requirements
+
+1. pnpm >= 10.9.0
 2. node >= 22.11.0
 
 ## Installation
@@ -12,17 +17,32 @@ This is demo UI to show the Mycelium SDK functionalities. Check the guide below 
 1. To install dependencies:
 
 ```bash
-bun install
+pnpm install
 ```
 
 2. Copy `.env.example` to `.env` and set necessary variables
 
-3. Make sure that Mycelium SDK is built in `package/sdk`
+3. Make sure that Mycelium SDK is built in **[packages/sdk](https://github.com/0xdeval/mycelium-sdk/blob/main/packages/sdk)**
 
 4. To run:
 
 ```bash
-bun run dev
+pnpm run dev
 ```
 
 5. Open `localhost:3000`
+
+## Envs
+
+Configure environment variables for the frontend:
+
+```bash
+# Required
+NEXT_PUBLIC_PRIVY_APP_ID=your-privy-app-id
+NEXT_PUBLIC_PRIVY_APP_SECRET=your-privy-app-secret
+
+# Optional
+NEXT_PUBLIC_CHAIN_ID=8453
+NEXT_PUBLIC_RPC_URL=your-rpc-url
+NEXT_PUBLIC_BUNDLER_URL=your-bundler-url
+```

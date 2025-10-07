@@ -7,7 +7,6 @@ import {
   pad,
 } from 'viem';
 import { type WebAuthnAccount, toCoinbaseSmartAccount } from 'viem/account-abstraction';
-import { unichain } from 'viem/chains';
 
 import { smartWalletFactoryAbi } from '@/abis/smartWalletFactory';
 import { smartWalletFactoryAddress } from '@/constants/addresses';
@@ -22,39 +21,44 @@ import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult, Protocol } from '@/types/protocols/general';
 
 /**
- * Smart Wallet Implementation
- * @description ERC-4337 compatible smart wallet that uses Coinbase Smart Account (https://github.com/coinbase/smart-wallet/blob/main/src/CoinbaseSmartWallet.sol).
- * Supports multi-owner wallets, gasless transactions via paymasters, and cross-chain operations.
+ * Default ERC-4337 smart wallet implementation (internal)
+ *
+ * @internal
+ * @category Wallets
+ * @remarks
+ * Backed by Coinbase Smart Account and compatible with ERC-4337 UserOperations
+ * Supports multi-owner wallets (EVM addresses or WebAuthn owners), gas-sponsored flows,
+ * and cross-chain operations via {@link ChainManager}
+ *
+ * Not exported in the public API. It’s composed internally by higher-level providers/namespaces
  */
 export class DefaultSmartWallet extends SmartWallet {
-  /** Array of wallet owners (Ethereum addresses or WebAuthn public keys) */
+  /** Owners (EVM addresses or WebAuthn public keys) */
   private owners: Array<Address | WebAuthnAccount>;
-  /** Local account used for signing transactions and UserOperations */
+  /** Signer for transactions and UserOperations */
   private _signer: LocalAccount;
-  /** Index of the signer in the owners array (defaults to 0 if not specified) */
+  /** Index of signer within the owners array (undefined → default 0) */
   private signerOwnerIndex?: number;
-  /** Known deployment address of the wallet (if already deployed) */
+  /** Known deployment address (if already deployed) */
   private deploymentAddress?: Address;
-  /** Provider for lending market operations */
-  //   private lendProvider: LendProvider;
-  /** Manages supported blockchain networks and RPC clients */
+  /** Network and client management */
   private chainManager: ChainManager;
-  /** Nonce used for deterministic address generation (defaults to 0) */
+  /** Nonce (salt) for deterministic address calculation */
   private nonce?: bigint;
-  /** Protocol provider */
+  /** Selected protocol provider instance */
   private protocolProvider: Protocol['instance'];
 
   /**
-   * Create a Smart Wallet instance
-   * @param owners - Array of wallet owners (addresses or WebAuthn accounts)
-   * @param signer - Local account for signing transactions
-   * @param chainManager - Network management service
-   * @param protocolProvider - Protocol provider
-   * @param protocolInfo - Protocol info
-   * @param bundlerUrl - ERC-4337 bundler service URL
-   * @param deploymentAddress - Known wallet address (if already deployed)
-   * @param ownerIndex - Index of signer in owners array
-   * @param nonce - Nonce for address generation
+   * Creates a smart wallet instance
+   *
+   * @internal
+   * @param owners Owners (addresses or WebAuthn accounts)
+   * @param signer Local account used to sign
+   * @param chainManager Chain/client manager
+   * @param protocolProvider Protocol provider instance (selected upstream)
+   * @param deploymentAddress Optional known deployment address
+   * @param signerOwnerIndex Optional index of `signer` in owners (default 0)
+   * @param nonce Optional salt for deterministic address calc (default 0)
    */
   constructor(
     owners: Array<Address | WebAuthnAccount>,
@@ -76,20 +80,29 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Get the signer account for this smart wallet
-   * @description Returns the LocalAccount instance used for signing transactions and UserOperations.
-   * This signer is used to authorize operations on behalf of the smart wallet.
-   * @returns The LocalAccount signer configured for this smart wallet
+   * Returns the signer account for this smart wallet
+   *
+   * @internal
+   * @category Accessors
+   * @remarks
+   * Used to authorize UserOperations and on-chain transactions
    */
   get signer(): LocalAccount {
     return this._signer;
   }
 
   /**
-   * Get the smart wallet address
-   * @description Returns the deployment address if known, otherwise calculates the deterministic
-   * address using CREATE2 based on owners and nonce.
-   * @returns Promise resolving to the wallet address
+   * Resolves the smart wallet address
+   *
+   * @internal
+   * @category Accessors
+   * @remarks
+   * If `deploymentAddress` is known, returns it. Otherwise derives a deterministic address
+   * via the factory (`getAddress`) using owners and `nonce` (CREATE2-style)
+   *
+   * @returns Promise that resolves to the wallet address
+   * @throws Error if no supported chains are configured
+   * @throws Error if an owner has an invalid type
    */
   async getAddress() {
     if (this.deploymentAddress) {
@@ -122,10 +135,12 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Create a Coinbase Smart Account instance
-   * @description Converts this wallet into a viem-compatible smart account for ERC-4337 operations.
-   * @param chainId - Target blockchain network ID
-   * @returns Coinbase Smart Account instance configured for the specified chain
+   * Builds a Coinbase Smart Account for a specific chain
+   *
+   * @internal
+   * @category Accounts
+   * @param chainId Target chain ID
+   * @returns Viem Coinbase Smart Account for the given chain
    */
   async getCoinbaseSmartAccount(
     chainId: SupportedChainId,
@@ -141,9 +156,11 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Get asset balances across all supported chains
-   * @description Fetches ETH and ERC20 token balances for this wallet across all supported networks.
-   * @returns Promise resolving to array of token balances with chain breakdown
+   * Fetches balances (ETH + ERC-20) across supported chains
+   *
+   * @internal
+   * @category Balances
+   * @returns Promise resolving to a list of {@link TokenBalance}
    */
   async getBalance(): Promise<TokenBalance[]> {
     const address = await this.getAddress();
@@ -157,7 +174,12 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Make a deposit to a protocol vault that was selected before on the initialization step
+   * Deposits into the selected protocol’s vault
+   *
+   * @internal
+   * @category Protocol
+   * @param amount Human-readable amount string
+   * @returns Transaction result for the deposit
    */
   async earn(amount: string): Promise<VaultTxnResult> {
     this.chainManager.getSupportedChain();
@@ -168,7 +190,11 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Get the balance of the protocol vault
+   * Reads current deposit balance from the selected protocol’s vault
+   *
+   * @internal
+   * @category Protocol
+   * @returns Vault balance or `null` if nothing deposited
    */
   async getEarnBalance(): Promise<VaultBalance | null> {
     const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
@@ -179,7 +205,12 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Withdraw specific amount from the protocol vault
+   * Withdraws from the selected protocol’s vault
+   *
+   * @internal
+   * @category Protocol
+   * @param amount Human-readable amount string
+   * @returns Transaction result for the withdrawal
    */
   async withdraw(amount: string): Promise<VaultTxnResult> {
     const withdrawTransactionResult = await this.protocolProvider.withdraw(amount, this);
@@ -188,13 +219,17 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Send a transaction via ERC-4337
-   * @description Executes a transaction using the smart wallet with automatic gas sponsorship.
-   * The transaction is sent as a UserOperation through the bundler service.
-   * @param transactionData - Transaction details (to, value, data)
-   * @param chainId - Target blockchain network ID
-   * @returns Promise resolving to UserOperation hash
-   * @throws Error if transaction fails or validation errors occur
+   * Sends a single transaction via ERC-4337 (gas-sponsored)
+   *
+   * @internal
+   * @category Transactions
+   * @remarks
+   * Builds a UserOperation and submits via the bundler, then waits for inclusion
+   *
+   * @param transactionData Transaction details (`to`, `value`, `data`)
+   * @param chainId Target chain ID
+   * @returns Promise that resolves to the UserOperation hash
+   * @throws Error with a readable message if submission or inclusion fails
    */
   async send(transactionData: TransactionData, chainId: SupportedChainId): Promise<Hash> {
     try {
@@ -230,6 +265,16 @@ export class DefaultSmartWallet extends SmartWallet {
     }
   }
 
+  /**
+   * Sends a batch of transactions via ERC-4337 (gas-sponsored)
+   *
+   * @internal
+   * @category Transactions
+   * @param transactionData An array of calls to execute
+   * @param chainId Target chain ID
+   * @returns Promise that resolves to the UserOperation hash for the batch
+   * @throws Error with a readable message if submission or inclusion fails
+   */
   async sendBatch(transactionData: TransactionData[], chainId: SupportedChainId): Promise<Hash> {
     try {
       const account = await this.getCoinbaseSmartAccount(chainId);
@@ -265,20 +310,27 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Fund a wallet with USDC using on-ramp service
-   * @description Funds the current wallet with USDC using on-ramp service
-   * @returns Return URL to the on-ramp service
+   * Funds the wallet with USDC via an on-ramp service
+   *
+   * @internal
+   * @category On-Ramp
+   * @remarks
+   * Placeholder for future on-ramp integration. Should return a URL to the provider’s flow
+   *
+   * @returns A URL string to the on-ramp service (to be implemented)
    */
   fundUSDC() {}
 
   /**
-   * Send tokens to another address
-   * @description Sends ETH or ERC20 tokens to a recipient address
-   * @param amount - Human-readable amount to send (e.g. 1.5)
-   * @param asset - Asset symbol (e.g. 'usdc', 'eth') or token address
-   * @param recipientAddress - Address to send to
-   * @returns Promise resolving to transaction data
-   * @throws Error if wallet is not initialized or asset is not supported
+   * Builds transaction data to send ETH or ERC-20 tokens
+   *
+   * @internal
+   * @category Transfers
+   * @param amount Human-readable amount (e.g., `1.5`)
+   * @param asset Asset symbol (e.g., `"usdc"`, `"eth"`) or token address
+   * @param recipientAddress Destination address
+   * @returns Transaction data suitable for inclusion in a UserOperation/call
+   * @throws Error if `recipientAddress` is missing, `amount` ≤ 0, or asset cannot be resolved
    */
   async sendTokens(
     amount: number,
@@ -294,8 +346,7 @@ export class DefaultSmartWallet extends SmartWallet {
       throw new Error('Amount must be greater than 0');
     }
 
-    // TODO: Get actual chain ID from wallet context, for now using Unichain
-    const chainId = unichain.id;
+    const chainId = this.chainManager.getSupportedChain();
 
     // Handle ETH transfers
     if (asset.toLowerCase() === 'eth') {

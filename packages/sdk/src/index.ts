@@ -1,9 +1,13 @@
-export type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
-export type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
-export type { WalletNamespace } from '@/wallet/WalletNamespace';
-export type { ChainManager } from '@/tools/ChainManager';
-export type { TokenBalance } from '@/types/token';
-export type { VaultTxnResult, VaultBalance } from '@/types/protocols/general';
+/**
+ * @packageDocumentation
+ * Entry point for the Mycelium SDK
+ *
+ * Exports stable types and the main SDK facade (`MyceliumSDK`)
+ * Internal base classes and implementations are not part of the public API
+ * and are hidden from public documentation
+ */
+
+export * from '@/public/types';
 
 import { ChainManager } from '@/tools/ChainManager';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
@@ -19,13 +23,73 @@ import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
 
+/**
+ * Main SDK facade for integrating wallets and protocols.
+ *
+ * @public
+ * @category Core
+ * @remarks
+ * This class encapsulates:
+ * - protocol selection and initialization (`Smart Router`),
+ * - chain/network management (`ChainManager`),
+ * - public wallet namespace (accessible through {@link MyceliumSDK.wallet | wallet}).
+ *
+ * By default, if no chain config is provided, it uses the public RPC
+ * and Bundler for the Base chain
+ *
+ * @example
+ * ```ts
+ * import { MyceliumSDK, type MyceliumSDKConfig } from '@mycelium-sdk/core';
+ *
+ * const config: MyceliumSDKConfig = {
+ *   walletsConfig: { /* ... *\/ },
+ *   protocolsRouterConfig: { /* ... *\/ },
+ *   chain: { /* ... *\/ }
+ * };
+ *
+ * const sdk = new MyceliumSDK(config);
+ *
+ * const embeddedWallet = await sdk.wallet.createEmbeddedWallet();
+ * const wallet = await sdk.wallet.createSmartWallet({
+ *     owners: [embeddedWallet.address],
+ *     signer: await embeddedWallet.account(),
+ * })
+ * const balance = await wallet.getBalance();
+ * ```
+ */
 export class MyceliumSDK {
+  /**
+   * Unified wallet namespace to manage embedded/smart wallets and related operations
+   * @public
+   * @category Wallets
+   */
   public readonly wallet: WalletNamespace;
+
+  /**
+   * Chain manager instance to manage chain related entities
+   * @internal
+   */
   private _chainManager: ChainManager;
+
+  /** @internal */
   private embeddedWalletProvider!: EmbeddedWalletProvider;
+
+  /** @internal */
   private smartWalletProvider!: SmartWalletProvider;
+
+  /**
+   * Protocol instance to perform earn related operations with a selected protocol
+   * @internal
+   */
   private protocol: Protocol;
 
+  /**
+   * Creates a new SDK instance
+   *
+   * @param config SDK configuration (networks, wallets, protocol router settings)
+   * @throws Throws if an unsupported wallet provider is given
+   * @see MyceliumSDKConfig
+   */
   constructor(config: MyceliumSDKConfig) {
     this._chainManager = new ChainManager(
       config.chain || {
@@ -53,17 +117,20 @@ export class MyceliumSDK {
   }
 
   /**
-   * Get the chain manager instance
-   * @returns ChainManager instance for multi-chain operations
+   * Returns the chain manager instance for multi-chain operations
+   * @internal
+   * @returns ChainManager instance of the type {@link ChainManager}
    */
   get chainManager(): ChainManager {
     return this._chainManager;
   }
 
   /**
-   * Find a protocol instance that was recommended by the smart router based on the given config
-   * @description Find a protocol instance that was recommended by the smart router based on the given config
-   * @param config Return a protocol provider instance that was recommended by the smart router based on the given config
+   * Recommends and initializes a protocol based on router settings
+   *
+   * @internal
+   * @param config Protocol router configuration (e.g. risk level)
+   * @returns Selected protocol object of the type {@link Protocol}
    */
   private findProtocol(config: MyceliumSDKConfig['protocolsRouterConfig']): Protocol {
     // 1. Create a smart router with the given config
@@ -85,9 +152,12 @@ export class MyceliumSDK {
   }
 
   /**
-   * Create the wallet provider instance
-   * @param config - Wallet configuration
-   * @returns WalletProvider instance
+   * Creates a wallet provider (embedded + smart) and combines them
+   *
+   * @internal
+   * @param config Wallet configuration
+   * @returns Configured {@link WalletProvider}
+   * @throws If an unsupported wallet provider type is specified
    */
   private createWalletProvider(config: MyceliumSDKConfig['walletsConfig']) {
     if (config.embeddedWalletConfig.provider.type === 'privy') {
@@ -123,9 +193,11 @@ export class MyceliumSDK {
   }
 
   /**
-   * Create the wallet namespace instance
-   * @param config - Wallet configuration
-   * @returns WalletNamespace instance
+   * Creates the public wallet namespace
+   *
+   * @internal
+   * @param config Wallet configuration.
+   * @returns A {@link WalletNamespace} instance
    */
   private createWalletNamespace(config: MyceliumSDKConfig['walletsConfig']) {
     const walletProvider = this.createWalletProvider(config);

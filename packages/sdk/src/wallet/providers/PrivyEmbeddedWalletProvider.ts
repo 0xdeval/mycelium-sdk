@@ -7,8 +7,10 @@ import { EmbeddedWalletProvider } from '@/wallet/base/providers/EmbeddedWalletPr
 import { logger } from '@/tools/Logger';
 
 /**
- * Options for getting all wallets
- * @description Parameters for filtering and paginating wallet results
+ * Options for querying all Privy wallets
+ *
+ * @internal
+ * @category Wallets
  */
 export interface PrivyProviderGetAllWalletsOptions {
   /** Maximum number of wallets to return */
@@ -18,15 +20,25 @@ export interface PrivyProviderGetAllWalletsOptions {
 }
 
 /**
- * Privy wallet provider implementation
- * @description Wallet provider implementation using Privy service
+ * Embedded wallet provider backed by Privy
+ *
+ * @internal
+ * @category Wallets
+ * @remarks
+ * Wraps Privy client API for creating, retrieving, and listing wallets
+ * Produces {@link PrivyWallet} instances used internally by the SDK
  */
 export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
+  /** Privy client instance */
   public privy: PrivyClient;
+  /** Manager for supported chains and clients */
   private chainManager: ChainManager;
   /**
-   * Create a new Privy wallet provider
-   * @param privyClient - Privy client instance
+   * Creates a new Privy-backed embedded wallet provider
+   *
+   * @internal
+   * @param privyClient Privy client instance
+   * @param chainManager Chain and client manager
    */
   constructor(privyClient: PrivyClient, chainManager: ChainManager) {
     super();
@@ -35,9 +47,11 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
   }
 
   /**
-   * Create new wallet via Privy
-   * @description Creates a new wallet using Privy's wallet API
-   * @returns Promise resolving to new wallet instance
+   * Creates a new wallet using Privy’s wallet API
+   *
+   * @internal
+   * @category Creation
+   * @returns Promise that resolves to a new {@link PrivyWallet} instance
    * @throws Error if wallet creation fails
    */
   async createWallet(): Promise<PrivyWallet> {
@@ -60,10 +74,13 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
   }
 
   /**
-   * Get wallet by wallet ID via Privy
-   * @description Retrieves wallet information from Privy service
-   * @param params - Parameters containing walletId
-   * @returns Promise resolving to wallet
+   * Retrieves a wallet by its ID via Privy
+   *
+   * @internal
+   * @category Retrieval
+   * @param params Parameters containing walletId
+   * @returns Promise that resolves to a {@link PrivyWallet} instance
+   * @throws Error if the wallet cannot be retrieved
    */
   async getWallet(params: { walletId: string }): Promise<PrivyWallet> {
     try {
@@ -84,10 +101,13 @@ export class PrivyEmbeddedWalletProvider extends EmbeddedWalletProvider {
   }
 
   /**
-   * Get all wallets via Privy
-   * @description Retrieves all wallets from Privy service with optional filtering
-   * @param options - Optional parameters for filtering and pagination
-   * @returns Promise resolving to array of wallets
+   * Retrieves all wallets from Privy with optional filtering and pagination
+   *
+   * @internal
+   * @category Retrieval
+   * @param options Optional filtering and pagination parameters
+   * @returns Promise that resolves to an array of {@link PrivyWallet} instances
+   * @throws Error if wallets cannot be retrieved
    */
   async getAllWallets(options?: PrivyProviderGetAllWalletsOptions): Promise<PrivyWallet[]> {
     try {

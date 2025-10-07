@@ -15,8 +15,13 @@ import { SPARK_VAULT } from '@/protocols/constants/spark';
 import { logger } from '@/tools/Logger';
 
 /**
- * @description Spark Protocol implementation for managing Spark vaults
- * Provides functionality to deposit, withdraw, and manage balances in Spark protocol vaults
+ * @internal
+ * @category Protocols
+ * @class SparkProtocol
+ * @classdesc
+ * Internal implementation of the Spark Protocol adapter
+ * Provides ERC-4626 vault management including deposits, withdrawals, and balance tracking
+ * Used by the SDK to interact with Spark-based yield vaults
  */
 export class SparkProtocol extends BaseProtocol<
   SparkVaultInfo,
@@ -28,8 +33,8 @@ export class SparkProtocol extends BaseProtocol<
   private allVaults: SparkVaultInfo[] = [];
 
   /**
-   * @description Initialize the protocol with all necessary parameters for it
-   * @param chainManager The chain manager instance
+   * Initialize the Spark protocol with the provided chain manager
+   * @param chainManager Chain manager instance used for network operations
    */
   async init(chainManager: ChainManager): Promise<void> {
     this.chainManager = chainManager;
@@ -49,8 +54,9 @@ export class SparkProtocol extends BaseProtocol<
   }
 
   /**
-   * @description Get the best vault from a Spark protocol based on all fetched vaults
-   * @returns The best vault
+   * Get the best available Spark vault
+   * @returns The top-ranked Spark vault
+   * @throws Error if no vaults found
    */
   getBestVault(): SparkVaultInfo {
     if (this.allVaults.length === 0) {
@@ -61,9 +67,9 @@ export class SparkProtocol extends BaseProtocol<
   }
 
   /**
-   * @description Fetch a vault where a user deposited funds previously
-   * @param smartWallet The smart wallet to check for deposits
-   * @returns The vault where user has deposits, or null if none found
+   * Fetch a vault where the user previously deposited funds
+   * @param smartWallet Smart wallet to inspect
+   * @returns The vault with user deposits, or null if none found
    */
   async fetchDepositedVaults(smartWallet: SmartWallet): Promise<SparkVaultInfo | null> {
     let depositedVaults: SparkVaultInfo | undefined = undefined;
@@ -80,10 +86,10 @@ export class SparkProtocol extends BaseProtocol<
   }
 
   /**
-   * @description Deposit funds into a Spark protocol
-   * @param amount The amount of funds to deposit
-   * @param smartWallet The smart wallet to deposit funds from
-   * @returns The transaction result
+   * Deposit funds into a Spark vault
+   * @param amount Amount to deposit (human-readable)
+   * @param smartWallet Smart wallet instance to use
+   * @returns Transaction result with hash
    */
   async deposit(amount: string, smartWallet: SmartWallet): Promise<SparkVaultTxnResult> {
     // Check if a user deposited previously to any vault of the protocol
@@ -137,10 +143,11 @@ export class SparkProtocol extends BaseProtocol<
   }
 
   /**
-   * @description Withdraw funds from a Spark protocol
-   * @param amountInUnderlying The amount of underlying tokens to withdraw (if undefined, withdraws all funds)
-   * @param smartWallet The smart wallet to withdraw funds from
-   * @returns The transaction result
+   * Withdraw funds from a Spark vault
+   * @param amountInUnderlying Amount in base token units (or undefined to withdraw all)
+   * @param smartWallet Smart wallet instance to withdraw from
+   * @returns Transaction result with hash
+   * @throws Error if no deposited vault found
    */
   async withdraw(
     amountInUnderlying: string | undefined,
@@ -186,10 +193,10 @@ export class SparkProtocol extends BaseProtocol<
   }
 
   /**
-   * @description Get the maximum amount of shares that can be redeemed by a user
-   * @param vaultInfo The vault info
-   * @param walletAddress The address of the wallet
-   * @returns The maximum redeemable shares
+   * Get the maximum redeemable shares for a wallet
+   * @param vaultInfo Vault information
+   * @param walletAddress Wallet address to check
+   * @returns Maximum redeemable shares as bigint
    */
   private async getMaxRedeemableShares(
     vaultInfo: SparkVaultInfo,
@@ -208,10 +215,10 @@ export class SparkProtocol extends BaseProtocol<
   }
 
   /**
-   * @description Get the balance of a vault
-   * @param vaultInfo The vault info
-   * @param walletAddress The address of the wallet
-   * @returns The balance of the vault
+   * Get vault balance for a wallet
+   * @param vaultInfo Vault information
+   * @param walletAddress Wallet address to check
+   * @returns Object containing shares and deposited amount
    */
   async getBalance(vaultInfo: SparkVaultInfo, walletAddress: Address): Promise<SparkVaultBalance> {
     const publicClient = this.chainManager!.getPublicClient(this.selectedChainId!);

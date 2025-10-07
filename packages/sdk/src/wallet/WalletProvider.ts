@@ -15,14 +15,43 @@ import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletPro
 import { logger } from '@/tools/Logger';
 
 /**
- * Unified Wallet Provider
- * @description Main wallet provider that combines embedded wallet and smart wallet functionality.
- * Provides a unified interface for all wallet operations while supporting pluggable providers.
+ * Unified Wallet Provider class
+ *
+ * @internal
+ * @category Wallets
+ * @remarks
+ * Internal facade that composes an embedded wallet provider and a smart wallet provider
+ * and exposes higher-level creation/retrieval flows. Not exported from user's usage
+ *
+ * Used in a higher level class - {@link WalletNamespace}
+ *
+ * Typical flows:
+ * - Create embedded wallet only: {@link createEmbeddedWallet}
+ * - Create smart wallet only (you provide signer/owners): {@link createSmartWallet}
+ * - Create smart wallet with embedded wallet as signer: {@link createWalletWithEmbeddedSigner}
+ * - Get smart wallet using embedded wallet as signer: {@link getSmartWalletWithEmbeddedSigner}
+ * - Get smart wallet using a provided signer: {@link getSmartWallet}
  */
 export class WalletProvider {
+  /**
+   * Embedded wallet provider instance
+   * @internal
+   */
   public readonly embeddedWalletProvider: EmbeddedWalletProvider;
+
+  /**
+   * Smart wallet provider instance
+   * @internal
+   */
   public readonly smartWalletProvider: SmartWalletProvider;
 
+  /**
+   * Creates a unified wallet provider
+   *
+   * @internal
+   * @param embeddedWalletProvider Provider for embedded wallet operations
+   * @param smartWalletProvider Provider for smart wallet operations
+   */
   constructor(
     embeddedWalletProvider: EmbeddedWalletProvider,
     smartWalletProvider: SmartWalletProvider,
@@ -32,24 +61,31 @@ export class WalletProvider {
   }
 
   /**
-   * Create a new embedded wallet
-   * @description Creates only an embedded wallet using the configured embedded wallet provider.
-   * @returns Promise resolving to the created embedded wallet instance
+   * Creates an embedded wallet
+   *
+   * @internal
+   * @remarks
+   * Thin wrapper around the embedded wallet provider’s `createWallet`
+   *
+   * @returns Promise that resolves to the newly created {@link EmbeddedWallet}
    */
   async createEmbeddedWallet(): Promise<EmbeddedWallet> {
     return this.embeddedWalletProvider.createWallet();
   }
 
   /**
-   * Create a new smart wallet
-   * @description Creates only a smart wallet using the configured smart wallet provider.
-   * This is useful when you already have a signer and want to create a smart wallet without
-   * creating an embedded wallet. You must provide your own signer and owners array.
-   * @param params - Smart wallet creation parameters
-   * @param params.owners - Array of owners for the smart wallet (addresses or WebAuthn public keys)
-   * @param params.signer - Local account used for signing transactions
-   * @param params.nonce - Optional nonce for smart wallet address generation (defaults to 0)
-   * @returns Promise resolving to the created smart wallet instance
+   * Creates a smart wallet (you provide signer and owners)
+   *
+   * @internal
+   * @remarks
+   * Use when you already control a signer and want to create a smart
+   * wallet without creating an embedded wallet
+   *
+   * @param params Smart wallet creation parameters
+   * @param params.owners Owners array for the smart wallet (EVM addresses or WebAuthn owners)
+   * @param params.signer Signer (local account) used for transactions
+   * @param params.nonce Optional salt/nonce for deterministic address calculation (defaults to 0)
+   * @returns Promise that resolves to the created {@link SmartWallet}
    */
   async createSmartWallet(params: CreateSmartWalletOptions): Promise<SmartWallet> {
     const { owners, signer, nonce } = params;
@@ -62,14 +98,18 @@ export class WalletProvider {
   }
 
   /**
-   * Create a new smart wallet with embedded wallet as signer
-   * @description Creates both an embedded wallet and a smart wallet, with the embedded wallet
-   * automatically added as one of the owners/signers of the smart wallet.
-   * @param params - Optional wallet creation parameters
-   * @param params.owners - Optional array of additional owners for the smart wallet. The embedded wallet will be added to this array at the specified index.
-   * @param params.embeddedWalletIndex - Optional index where the embedded wallet should be inserted in the owners array. If not specified, embedded wallet is added to the end of the array.
-   * @param params.nonce - Optional nonce for smart wallet address generation (defaults to 0)
-   * @returns Promise resolving to the created smart wallet instance
+   * Creates a smart wallet with an embedded wallet as signer
+   *
+   * @internal
+   * @remarks
+   * Creates an embedded wallet first, then inserts its address into the owners array
+   * and uses its account as the signer for the smart wallet. Default SDK option, embedded wallets manager is necessary to be provided
+   *
+   * @param params Optional creation parameters
+   * @param params.owners Optional additional owners. The embedded wallet address is inserted at the specified index
+   * @param params.embeddedWalletIndex Optional index where the embedded wallet address should be inserted (defaults to the end)
+   * @param params.nonce Optional salt/nonce for deterministic address calculation (defaults to 0)
+   * @returns Promise that resolves to the created {@link SmartWallet}
    */
   async createWalletWithEmbeddedSigner(
     params?: CreateWalletWithEmbeddedSignerOptions,
@@ -95,20 +135,22 @@ export class WalletProvider {
   }
 
   /**
-   * Get an existing smart wallet using embedded wallet as signer
-   * @description Retrieves an embedded wallet by walletId and uses it as the signer to get
-   * the corresponding smart wallet. This is useful when you have
-   * an embedded wallet ID and want to access the associated smart wallet functionality.
-   * @dev If neither walletAddress nor deploymentOwners is provided,
-   * defaults to using the embedded wallet as the single owner.
-   * @param params - Wallet retrieval parameters
-   * @param params.walletId - ID of the embedded wallet to use as signer
-   * @param params.deploymentOwners - Optional array of original deployment owners for smart wallet address calculation. If not provided and walletAddress is also not provided, defaults to using the embedded wallet as single owner.
-   * @param params.signerOwnerIndex - Current index of the signer in the smart wallet's current owners array (used for transaction signing). Defaults to 0 if not specified. This may differ from the original deployment index if owners have been modified.
-   * @param params.walletAddress - Optional explicit smart wallet address (skips address calculation)
-   * @param params.nonce - Optional nonce used during smart wallet creation
-   * @returns Promise resolving to the smart wallet instance with embedded wallet as signer
-   * @throws Error if embedded wallet is not found
+   * Gets a smart wallet using an embedded wallet as the signer
+   *
+   * @internal
+   * @remarks
+   * Fetches an embedded wallet by `walletId` and uses it as signer.
+   * If neither `walletAddress` nor `deploymentOwners` is provided, defaults to using
+   * the embedded wallet as the single owner for deterministic address calculation
+   *
+   * @param params Retrieval parameters
+   * @param params.walletId Embedded wallet ID used to locate the signer wallet
+   * @param params.deploymentOwners Optional original deployment owners used for address calculation
+   * @param params.signerOwnerIndex Index of the signer in the **current** owners set (defaults to 0)
+   * @param params.walletAddress Optional explicit smart wallet address (skips calculation)
+   * @param params.nonce Optional nonce used during original creation
+   * @returns Promise that resolves to the {@link SmartWallet}
+   * @throws Error if the embedded wallet cannot be found
    */
   async getSmartWalletWithEmbeddedSigner(params: GetSmartWalletWithEmbeddedSignerOptions) {
     const { walletId, deploymentOwners, walletAddress } = params;
@@ -132,12 +174,12 @@ export class WalletProvider {
   }
 
   /**
-   * Get an existing embedded wallet
-   * @description Retrieves an embedded wallet by walletId. This is useful when you have an embedded wallet ID and
-   * want to access the associated embedded wallet functionality.
-   * @param params - Wallet retrieval parameters
-   * @param params.walletId - ID of the embedded wallet to retrieve
-   * @returns Promise resolving to the embedded wallet instance
+   * Gets an existing embedded wallet by ID
+   *
+   * @internal
+   * @param params Retrieval parameters
+   * @param params.walletId Embedded wallet ID
+   * @returns Promise that resolves to the {@link EmbeddedWallet}, or `null/undefined` per provider’s contract
    */
   async getEmbeddedWallet(params: GetEmbeddedWalletOptions) {
     const { walletId } = params;
@@ -147,19 +189,23 @@ export class WalletProvider {
   }
 
   /**
-   * Get an existing smart wallet with a provided signer
-   * @description Retrieves a smart wallet using a directly provided signer. This is useful when
-   * you already have a LocalAccount signer and want to access an existing smart wallet without
-   * going through the embedded wallet provider. Use this instead of getSmartWalletWithEmbeddedSigner
-   * when you have direct control over the signer.
-   * @param signer - Local account to use for signing transactions on the smart wallet
-   * @param getWalletParams - Wallet retrieval parameters
-   * @param getWalletParams.deploymentOwners - Array of original deployment owners for smart wallet address calculation. Required if walletAddress not provided. Must match the exact owners array used during wallet deployment.
-   * @param getWalletParams.signerOwnerIndex - Current index of the signer in the smart wallet's current owners array (used for transaction signing). Defaults to 0 if not specified. This may differ from the original deployment index if owners have been modified.
-   * @param getWalletParams.walletAddress - Optional explicit smart wallet address (skips address calculation)
-   * @param getWalletParams.nonce - Optional nonce used during smart wallet creation
-   * @returns Promise resolving to the smart wallet instance with the provided signer
-   * @throws Error if neither walletAddress nor deploymentOwners provided
+   * Gets a smart wallet using a provided signer
+   *
+   * @internal
+   * @remarks
+   * Use when you already control a `LocalAccount` signer
+   * Requires either:
+   * - `walletAddress`, or
+   * - `deploymentOwners` (+ optional `nonce`) to deterministically derive the address
+   *
+   * @param params Retrieval parameters
+   * @param params.signer Signer (local account)
+   * @param params.deploymentOwners Original deployment owners (required if `walletAddress` is not provided)
+   * @param params.signerOwnerIndex Index of `signer` within the **current** owners set (defaults to 0)
+   * @param params.walletAddress Explicit smart wallet address (skips calculation)
+   * @param params.nonce Optional nonce used during original creation
+   * @returns Promise that resolves to the {@link SmartWallet}
+   * @throws Error if neither `walletAddress` nor `deploymentOwners` is provided
    */
   async getSmartWallet(params: GetSmartWalletOptions) {
     const {

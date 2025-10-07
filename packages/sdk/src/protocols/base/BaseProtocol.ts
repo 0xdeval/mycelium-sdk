@@ -11,21 +11,36 @@ import type { SupportedChainId } from '@/constants/chains';
 import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { VaultInfo, VaultBalance, VaultTxnResult } from '@/types/protocols/general';
 
+/**
+ * Base Protocol
+ *
+ * @internal
+ * @abstract
+ * @category Protocols
+ * @remarks
+ * Abstract class defining the contract for protocol integrations (e.g. Beefy, Aave, Morpho)
+ * Provides lifecycle hooks (`init`) and required methods for vault discovery, deposit, withdrawal,
+ * and balance tracking
+ *
+ * Generic parameters allow protocol-specific typing for vault info, balances, and transaction results
+ */
 export abstract class BaseProtocol<
   TVaultInfo extends VaultInfo = VaultInfo,
   TVaultBalance extends VaultBalance = VaultBalance,
   TVaultTxnResult extends VaultTxnResult = VaultTxnResult,
 > {
-  /** The chain manager instance */
+  /** Chain manager instance injected during initialization */
   public chainManager: ChainManager | undefined;
 
   /**
-   * Initialize the protocol with all necessary parameters for it
+   * Initialize the protocol
+   * @param chainManager Chain manager for accessing RPC and bundler clients
    */
   abstract init(chainManager: ChainManager): Promise<void>;
 
   /**
-   * Check if the protocol is properly initialized
+   * Ensure the protocol has been initialized
+   * @throws Error if `init()` has not been called
    */
   protected ensureInitialized(): void {
     if (!this.chainManager) {
@@ -34,32 +49,45 @@ export abstract class BaseProtocol<
   }
 
   /**
-   * Get all vaults for the protocol that are available for a deposit operation
+   * Get all available vaults
+   * @returns List of vaults that support deposits
    */
   abstract getVaults(): Promise<TVaultInfo[]> | TVaultInfo[];
 
   /**
-   * Get the best vault for the protocol to deposit based on the given parameters
+   * Get the best vault for deposits
+   * @returns Single vault considered optimal for deposit
    */
   abstract getBestVault(): Promise<TVaultInfo> | TVaultInfo;
 
   /**
-   * Method defines and return a pool where a user could already have deposited funds previously
+   * Get a vault where funds may already be deposited
+   * @param smartWallet Wallet to check for existing deposits
+   * @returns Vault info if deposits exist, otherwise null
    */
   abstract fetchDepositedVaults(smartWallet: SmartWallet): Promise<TVaultInfo | null>;
 
   /**
    * Deposit funds into a vault
+   * @param amount Amount in human-readable format
+   * @param smartWallet Wallet executing the deposit
+   * @returns Result of the deposit transaction
    */
   abstract deposit(amount: string, smartWallet: SmartWallet): Promise<TVaultTxnResult>;
 
   /**
    * Withdraw funds from a vault
+   * @param amountInShares Amount of shares to withdraw
+   * @param smartWallet Wallet executing the withdrawal
+   * @returns Result of the withdrawal transaction
    */
   abstract withdraw(amountInShares: string, smartWallet: SmartWallet): Promise<TVaultTxnResult>;
 
   /**
-   * Get the balance of deposited funds to a vault
+   * Get deposited balance in a vault
+   * @param vaultInfo Vault to query
+   * @param walletAddress Wallet address holding the deposit
+   * @returns Balance of deposited funds
    */
   abstract getBalance(
     vaultInfo: TVaultInfo,
@@ -67,7 +95,13 @@ export abstract class BaseProtocol<
   ): Promise<TVaultBalance>;
 
   /**
-   * Approve a token to be spent by a spender
+   * Approve a token for protocol use
+   * @param tokenAddress Token address
+   * @param spenderAddress Spender address
+   * @param amount Allowance amount in wei
+   * @param chainId Target chain ID
+   * @param account Account authorizing the approval
+   * @returns Transaction hash
    */
   protected async approveToken(
     tokenAddress: Address,
@@ -98,7 +132,12 @@ export abstract class BaseProtocol<
   }
 
   /**
-   * Check the allowance of a token to be spent by a spender
+   * Check token allowance for a spender
+   * @param tokenAddress Token address
+   * @param spenderAddress Spender address
+   * @param walletAddress Wallet address granting allowance
+   * @param chainId Target chain ID
+   * @returns Current allowance amount
    */
   protected async checkAllowance(
     tokenAddress: Address,

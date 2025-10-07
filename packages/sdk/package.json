@@ -22,11 +22,16 @@
     "watch": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch --tsconfig tsconfig.build.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "docs": "typedoc"
+    "docs:public": "typedoc --options typedoc.public.json",
+    "docs:dev": "typedoc --options typedoc.dev.json",
+    "docs": "pnpm docs:public && pnpm docs:dev"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "i": "^0.3.7",
+    "npm": "^11.6.1",
     "typedoc": "^0.28.13",
+    "typedoc-github-theme": "^0.3.1",
     "typedoc-plugin-markdown": "^4.9.0",
     "vitest": "^3.2.4"
   },

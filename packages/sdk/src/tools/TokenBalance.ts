@@ -6,10 +6,13 @@ import { getTokenAddress, type TokenInfo } from '@/utils/tokens';
 import type { TokenBalance } from '@/types/token';
 
 /**
- * Fetch ETH balance across all supported chains
- * @param chainManager - The chain manager
- * @param walletAddress - The wallet address
- * @returns Promise resolving to array of ETH balances
+ * Fetches the ETH balance for a wallet across configured supported chain
+ *
+ * @internal
+ * @category Balances
+ * @param chainManager Chain manager instance
+ * @param walletAddress Target wallet address
+ * @returns Promise resolving to a {@link TokenBalance} object for ETH
  */
 export async function fetchETHBalance(
   chainManager: ChainManager,
@@ -37,7 +40,14 @@ export async function fetchETHBalance(
 }
 
 /**
- * Fetch total balance for this token across all supported chains
+ * Fetches the ERC20 token balance for a wallet across the configured supported chain
+ *
+ * @internal
+ * @category Balances
+ * @param chainManager Chain manager instance
+ * @param walletAddress Target wallet address
+ * @param token Token metadata including address and decimals
+ * @returns Promise resolving to a {@link TokenBalance} object for the token
  */
 export async function fetchERC20Balance(
   chainManager: ChainManager,
@@ -68,7 +78,19 @@ export async function fetchERC20Balance(
 }
 
 /**
- * Fetch balance for this token on a specific chain
+ * Fetches the ERC20 token balance for a wallet on a specific chain
+ *
+ * @internal
+ * @category Balances
+ * @remarks
+ * Falls back to native ETH balance if `token.symbol` is ETH
+ *
+ * @param token Token metadata
+ * @param chainId Chain ID to query
+ * @param walletAddress Target wallet address
+ * @param chainManager Chain manager instance
+ * @returns Promise resolving to raw bigint balance
+ * @throws Error if token is not supported on the given chain
  */
 async function fetchERC20BalanceForChain(
   token: TokenInfo,

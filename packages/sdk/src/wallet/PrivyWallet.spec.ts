@@ -111,7 +111,12 @@ describe('PrivyWallet', () => {
     const walletClient = await wallet.walletClient(unichain.id);
 
     expect(createWalletClient).toHaveBeenCalledOnce();
-    const callArgs = vi.mocked(createWalletClient).mock.calls[0][0];
+    const callArgs = vi.mocked(createWalletClient).mock.calls[0]?.[0];
+
+    if (!callArgs) {
+      throw new Error('createWalletClient was not called');
+    }
+
     expect(callArgs.account).toBe(mockLocalAccount);
     expect(callArgs.chain).toBe(mockChainManager.getChain(unichain.id));
     expect(walletClient).toBe(mockWalletClient);

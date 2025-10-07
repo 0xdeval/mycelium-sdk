@@ -3,19 +3,28 @@ import type { WebAuthnAccount } from 'viem/account-abstraction';
 import type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 
 /**
- * Base smart wallet provider interface
- * @description Abstract interface for smart wallet providers.
+ * Abstract base class for smart wallet providers
+ *
+ * @internal
+ * @category Wallet Providers
+ * @remarks
+ * Defines the interface for factories that create and manage {@link SmartWallet} instances
+ * Extended by implementations such as {@link DefaultSmartWalletProvider}
  */
 export abstract class SmartWalletProvider {
   /**
-   * Create a new smart wallet instance
-   * @description Creates a new smart wallet that will be deployed on first transaction.
-   * The wallet address is deterministically calculated from owners and nonce.
-   * @param params - Wallet creation parameters
-   * @param params.owners - Array of wallet owners (addresses or WebAuthn public keys)
-   * @param params.signer - Local account used for signing transactions
-   * @param params.nonce - Optional nonce for address generation (defaults to 0)
-   * @returns Promise resolving to a new SmartWallet instance
+   * Creates a new smart wallet instance that will be deployed on first transaction
+   *
+   * @internal
+   * @category Creation
+   * @remarks
+   * Address is calculated deterministically using owners and nonce
+   *
+   * @param params Wallet creation parameters
+   * @param params.owners Array of wallet owners (addresses or WebAuthn accounts)
+   * @param params.signer Local account used for signing
+   * @param params.nonce Optional nonce for address derivation, default 0
+   * @returns Promise resolving to a {@link SmartWallet} instance
    */
   abstract createWallet(params: {
     owners: Array<Address | WebAuthnAccount>;
@@ -24,14 +33,18 @@ export abstract class SmartWalletProvider {
   }): Promise<SmartWallet>;
 
   /**
-   * Get an existing smart wallet instance
-   * @description Creates a SmartWallet instance for an already deployed wallet.
-   * Use this when you know the wallet address and want to interact with it.
-   * @param params - Wallet retrieval parameters
-   * @param params.walletAddress - Address of the deployed smart wallet
-   * @param params.signer - Local account used for signing transactions
-   * @param params.ownerIndex - Index of the signer in the wallet's owner list (defaults to 0)
-   * @returns SmartWallet instance for the existing wallet
+   * Returns a smart wallet instance for an already deployed contract
+   *
+   * @internal
+   * @category Retrieval
+   * @remarks
+   * Use when the wallet address is already known
+   *
+   * @param params Wallet retrieval parameters
+   * @param params.walletAddress Deployed smart wallet address
+   * @param params.signer Local account to operate the wallet
+   * @param params.ownerIndex Optional index of signer in the owners list, default 0
+   * @returns A {@link SmartWallet} instance
    */
   abstract getWallet(params: {
     walletAddress: Address;
@@ -40,13 +53,17 @@ export abstract class SmartWalletProvider {
   }): SmartWallet;
 
   /**
-   * Get the predicted smart wallet address
-   * @description Calculates the deterministic address where a smart wallet would be deployed
-   * given the specified owners and nonce. Uses CREATE2 for address prediction.
-   * @param params - Address prediction parameters
-   * @param params.owners - Array of wallet owners (addresses or WebAuthn public keys)
-   * @param params.nonce - Nonce for address generation (defaults to 0)
-   * @returns Promise resolving to the predicted wallet address
+   * Predicts the deterministic address of a smart wallet
+   *
+   * @internal
+   * @category Addressing
+   * @remarks
+   * Uses CREATE2 with owners and nonce to calculate the wallet address
+   *
+   * @param params Prediction parameters
+   * @param params.owners Array of wallet owners (addresses or WebAuthn accounts)
+   * @param params.nonce Optional nonce, default 0
+   * @returns Promise resolving to the predicted {@link Address}
    */
   abstract getWalletAddress(params: {
     owners: Array<Address | WebAuthnAccount>;

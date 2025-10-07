@@ -4,11 +4,30 @@ import { ProtocolRouterBase } from '@/router/base/ProtocolRouterBase';
 import type { ChainManager } from '@/tools/ChainManager';
 import type { Protocol, ProtocolsRouterConfig } from '@/types/protocols/general';
 
+/**
+ * Protocol Router
+ *
+ * @internal
+ * @category Protocols
+ * @remarks
+ * Selects and recommends protocols for yield strategies based on router configuration,
+ * available protocols, and API key for paid protocols
+ */
 export class ProtocolRouter extends ProtocolRouterBase {
+  /**
+   * Initialize the protocol router
+   * @param config Router configuration including risk level, min APY, and optional API key
+   * @param chainManager Chain manager instance for network validation
+   */
   constructor(config: ProtocolsRouterConfig, chainManager: ChainManager) {
     super(config.riskLevel, chainManager, config.minApy, config.apiKey);
   }
-
+  /**
+   * Get all protocols available for the current configuration
+   * @description
+   * Includes all non-premium protocols and premium protocols if the API key is valid
+   * @returns Array of available protocol definitions
+   */
   getProtocols(): Protocol[] {
     const isKeyValid = this.apiKeyValidator.validate(this.apiKey);
 
@@ -28,10 +47,28 @@ export class ProtocolRouter extends ProtocolRouterBase {
     return allAvailableProtocols;
   }
 
+  /**
+   * Check if any protocol supports a given set of chains
+   * @param chainIds List of chain IDs to validate
+   * @returns True if at least one chain is supported by the router
+   */
   isProtocolSupportedChain(chainIds: SupportedChainId[]): boolean {
     return chainIds.some((chainId) => this.chainManager.getSupportedChain() === chainId);
   }
 
+  /**
+   * Recommend the best protocol for the current router configuration
+   * @description
+   * Filters available protocols by risk level and supported chains. More criteria will be added later on
+   *
+   *
+   * @remarks
+   * Currently returns the first match. Future improvements will add
+   * smarter sorting and pool-based APY checks
+   *
+   * @throws Error if no protocols are available for the current risk level
+   * @returns Protocol instance considered the best match
+   */
   recommend(): Protocol {
     const protocols = this.getProtocols();
 

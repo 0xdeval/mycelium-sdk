@@ -1,9 +1,9 @@
 import { isAddress } from 'viem';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ChainManager } from '@mycelium/sdk/tools/ChainManager.js';
+import type { ChainManager } from '@mycelium/sdk/tools/ChainManager';
 import { createMockChainManager } from '@mycelium/sdk/test/mocks/ChainManagerMock';
-import { createMockPrivyClient } from '@mycelium/sdk/test/mocks/PrivyClientMock.js';
+import { createMockPrivyClient } from '@mycelium/sdk/test/mocks/PrivyClientMock';
 import { getRandomAddress } from '@mycelium/sdk/test/utils';
 import { DefaultSmartWallet } from '@mycelium/sdk/wallet/DefaultSmartWallet';
 import { PrivyWallet } from '@mycelium/sdk/wallet/PrivyWallet';

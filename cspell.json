@@ -20,7 +20,9 @@
     "src/abi/",
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
-    ".gitignore"
+    ".gitignore",
+    "docs/**",
+    "packages/sdk/docs-dev/**"
   ],
   "caseSensitive": false,
   "words": [
