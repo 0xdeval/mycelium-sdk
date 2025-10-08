@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Box, Heading, VStack, Text, Button, Input, HStack, Spinner, Code } from '@chakra-ui/react';
+import { Box, Heading, VStack, Text, Button, Input, HStack, Spinner, Flex } from '@chakra-ui/react';
 import type { JSX } from '@emotion/react/jsx-runtime';
 import type { VaultBalance } from '@mycelium-sdk/core';
 
@@ -35,7 +35,8 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
       const data = await response.json();
 
       if (data.success) {
-        setVaultBalance(data.balance || { shares: '0', depositedAmount: '0', ppfs: '0' });
+        console.log('data: ', data);
+        setVaultBalance(data.balance || { shares: '0', depositedAmount: '0' });
       } else {
         setError(data.error);
       }
@@ -187,19 +188,25 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
         {/* Current Balance */}
         <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200">
           <Text fontWeight="bold" color="green.700" mb={2}>
-            Your Vault Balance
+            Address' vault balance
           </Text>
+
           {vaultBalance ? (
             <VStack gap={1} align="stretch">
-              <Text fontSize="lg" fontWeight="bold">
-                {vaultBalance.shares} vault tokens
+              <Text fontSize="lg">
+                Deposited amount: {vaultBalance.depositedAmount}{' '}
+                {vaultBalance.vaultInfo.depositTokenSymbol}
               </Text>
               <Text fontSize="sm" color="green.600">
-                Value: {vaultBalance.depositedAmount} USDC
+                Shares of deposited amount: {vaultBalance.shares}{' '}
+                {vaultBalance.vaultInfo.earnTokenSymbol}
               </Text>
             </VStack>
           ) : (
-            <Text color="green.600">Loading balance...</Text>
+            <Flex gap={2}>
+              <Spinner size="sm" />
+              <Text color="green.600">Loading your balance</Text>
+            </Flex>
           )}
           <Button size="sm" colorScheme="green" variant="outline" mt={2} onClick={loadVaultBalance}>
             Refresh Balance
@@ -269,16 +276,26 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
           </>
         )}
 
-        {/* Debug Info */}
-        <Box p={3} bg="gray.50" borderRadius="md">
-          <Text fontSize="xs" fontWeight="bold" mb={1} color="gray.600">
-            Debug Info:
-          </Text>
-          <Code fontSize="xs" wordBreak="break-all">
-            Wallet: {walletAddress}
-          </Code>
-          <br />
-        </Box>
+        {/* Advanced info */}
+        {vaultBalance && (
+          <Box p={3} bg="gray.50" borderRadius="md">
+            <Text fontSize="xs" fontWeight="bold" mb={1} color="gray.600">
+              Advanced info:
+            </Text>
+            <Flex fontSize="xs" gap={2} wordBreak="break-all">
+              Vault name: {vaultBalance?.vaultInfo.id}
+              <br />
+              Vault chain: {vaultBalance?.vaultInfo.chain}
+              <br />
+              Vault address: {vaultBalance?.vaultInfo.vaultAddress}
+              <br />
+              Vault deposit token: {vaultBalance?.vaultInfo.depositTokenAddress}
+              <br />
+              Vault earn token: {vaultBalance?.vaultInfo.earnTokenAddress}
+            </Flex>
+            <br />
+          </Box>
+        )}
       </VStack>
     </Box>
   );

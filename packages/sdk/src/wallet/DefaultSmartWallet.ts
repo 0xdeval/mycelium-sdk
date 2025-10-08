@@ -200,7 +200,7 @@ export class DefaultSmartWallet extends SmartWallet {
     const depositedVault = await this.protocolProvider.fetchDepositedVaults(this);
 
     if (!depositedVault) {
-      throw new Error('No vault found to get balance from');
+      return null;
     }
 
     const userAddress = await this.getAddress();

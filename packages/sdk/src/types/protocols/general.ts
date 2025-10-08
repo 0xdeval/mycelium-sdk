@@ -62,6 +62,8 @@ export interface VaultBalance {
   shares: string;
   /** amount of deposited tokens in a protocol vault (e.g. sUSDC)*/
   depositedAmount: string;
+  /** info about a protocol vault where a user deposited funds */
+  vaultInfo: VaultInfo;
 }
 
 /**

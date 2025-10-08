@@ -231,7 +231,7 @@ export class SparkProtocol extends BaseProtocol<
     });
 
     if (shares === 0n) {
-      return { shares: '0', depositedAmount: '0' };
+      return { shares: '0', depositedAmount: '0', vaultInfo };
     }
 
     const assets = await publicClient.readContract({
@@ -244,6 +244,7 @@ export class SparkProtocol extends BaseProtocol<
     return {
       shares: formatUnits(shares, vaultInfo.earnTokenDecimals),
       depositedAmount: formatUnits(assets, vaultInfo.depositTokenDecimals),
+      vaultInfo,
     };
   }
 }

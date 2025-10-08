@@ -6,6 +6,8 @@ export interface SparkVaultInfo extends VaultInfo {
   chain: string;
   earnTokenAddress: Address;
   earnTokenDecimals: number;
+  depositTokenSymbol: string;
+  earnTokenSymbol: string;
   metadata?: {
     apy?: number;
   };
@@ -37,4 +39,6 @@ export interface SparkVaultBalance {
    * To get the amount of earned tokens, you need to store all user's deposits and withdrawals
    * on your side and then subtract the amount of deposited tokens from the `depositedAmount` */
   depositedAmount: string;
+  /** detailed info about a Spark vault where a user deposited funds */
+  vaultInfo: SparkVaultInfo;
 }
