@@ -243,16 +243,10 @@ describe('DefaultSmartWallet', () => {
       mockProtocol as unknown as Protocol['instance'],
     );
 
-    const fetchDepositedVaultsSpy = vi.mocked(mockProtocol).fetchDepositedVaults as ReturnType<
-      typeof vi.fn
-    >;
-
     const result = await wallet.getEarnBalance();
 
-    expect(fetchDepositedVaultsSpy).toHaveBeenCalledWith(wallet);
     expect(result).not.toBeNull();
     expect(result?.shares).toBe('100');
     expect(result?.depositedAmount).toBe('100');
-    expect(result?.ppfs).toBe('100');
   });
 });

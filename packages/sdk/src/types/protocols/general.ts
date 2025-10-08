@@ -32,7 +32,11 @@ export interface ProtocolsRouterConfig {
 }
 
 /**
- * Must have fields for all protocols vaults
+ * @internal
+ * @category Types
+ * @description The info about a protocol vault
+ * @remarks
+ * Generic type that shows the whole list of optional and mandatory fields for a protocol vault
  */
 export interface VaultInfo {
   id: string;
@@ -46,13 +50,32 @@ export interface VaultInfo {
   metadata?: Record<string, unknown>;
 }
 
+/**
+ * @public
+ * @category Types
+ * @description The info about current user's balance in a protocol vault
+ * @remarks
+ * The generic type that shows fields that should be present in a protocol vault balance
+ */
 export interface VaultBalance {
+  /** amount of shares in a protocol vault based on a deposited amount */
   shares: string;
+  /** amount of deposited tokens in a protocol vault (e.g. sUSDC)*/
   depositedAmount: string;
 }
 
+/**
+ * @public
+ * @category Types
+ * @description The result fields of a protocol vault related transactions
+ * @remarks
+ * The generic type that shows fields that should be present for each protocol vault related transaction
+ */
 export interface VaultTxnResult {
+  /** hash of the operation */
   hash: string;
+  /** if an operation is successful or not */
   success: boolean;
+  /** error message if an operation is not successful */
   error?: string;
 }

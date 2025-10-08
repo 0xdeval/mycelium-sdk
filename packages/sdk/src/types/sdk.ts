@@ -3,6 +3,7 @@ import type { ProtocolsRouterConfig } from '@/types/protocols/general';
 
 /**
  * Mycelium SDK configuration
+ * @category Types
  * @description Configuration object for initializing the Mycelium SDK
  * @example
  * ```ts

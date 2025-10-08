@@ -29,7 +29,6 @@ export class SparkProtocol extends BaseProtocol<
   SparkVaultTxnResult
 > {
   private selectedChainId: SupportedChainId | undefined;
-  private vaultInfo: SparkVaultInfo | undefined;
   private allVaults: SparkVaultInfo[] = [];
 
   /**
@@ -95,22 +94,23 @@ export class SparkProtocol extends BaseProtocol<
     // Check if a user deposited previously to any vault of the protocol
     const depositedVault = await this.fetchDepositedVaults(smartWallet);
 
+    let vaultInfoToDeposit: SparkVaultInfo;
     logger.info('Previously deposited vault:', { depositedVault }, 'SparkProtocol');
     if (depositedVault) {
-      this.vaultInfo = depositedVault;
+      vaultInfoToDeposit = depositedVault;
     } else {
       // Find the best pool to deposit for a protocol
-      this.vaultInfo = this.getBestVault();
-      logger.info('Best vault that found:', { bestVault: this.vaultInfo }, 'SparkProtocol');
+      vaultInfoToDeposit = this.getBestVault();
+      logger.info('Best vault that found:', { bestVault: vaultInfoToDeposit }, 'SparkProtocol');
     }
 
     const owner = await smartWallet.getAddress();
-    const assets = parseUnits(amount, this.vaultInfo.depositTokenDecimals);
+    const assets = parseUnits(amount, vaultInfoToDeposit.depositTokenDecimals);
     logger.info('Raw deposit amount:', { amount, assets }, 'SparkProtocol');
 
     const allowance = await this.checkAllowance(
-      this.vaultInfo.depositTokenAddress,
-      this.vaultInfo.vaultAddress,
+      vaultInfoToDeposit.depositTokenAddress,
+      vaultInfoToDeposit.vaultAddress,
       owner,
       this.selectedChainId!,
     );
@@ -121,16 +121,16 @@ export class SparkProtocol extends BaseProtocol<
 
     if (allowance < assets) {
       ops.push({
-        to: this.vaultInfo.depositTokenAddress,
+        to: vaultInfoToDeposit.depositTokenAddress,
         data: encodeFunctionData({
           abi: erc20Abi,
           functionName: 'approve',
-          args: [this.vaultInfo.vaultAddress, assets],
+          args: [vaultInfoToDeposit.vaultAddress, assets],
         }),
       });
     }
     ops.push({
-      to: this.vaultInfo.vaultAddress,
+      to: vaultInfoToDeposit.vaultAddress,
       data: encodeFunctionData({
         abi: ERC4626_ABI,
         functionName: 'deposit',
@@ -153,9 +153,9 @@ export class SparkProtocol extends BaseProtocol<
     amountInUnderlying: string | undefined,
     smartWallet: SmartWallet,
   ): Promise<SparkVaultTxnResult> {
-    const vaultInfo = await this.fetchDepositedVaults(smartWallet);
+    const depositedVault = await this.fetchDepositedVaults(smartWallet);
 
-    if (!vaultInfo) {
+    if (!depositedVault) {
       throw new Error('No vault found to withdraw from');
     }
 
@@ -164,10 +164,10 @@ export class SparkProtocol extends BaseProtocol<
     let withdrawData: { to: Address; data: `0x${string}` };
 
     if (amountInUnderlying) {
-      const assets = parseUnits(amountInUnderlying, vaultInfo.depositTokenDecimals);
+      const assets = parseUnits(amountInUnderlying, depositedVault.depositTokenDecimals);
       logger.info('Withdraw amount:', { amountInUnderlying, assets }, 'SparkProtocol');
       withdrawData = {
-        to: vaultInfo.vaultAddress,
+        to: depositedVault.vaultAddress,
         data: encodeFunctionData({
           abi: ERC4626_ABI,
           functionName: 'withdraw',
@@ -175,10 +175,10 @@ export class SparkProtocol extends BaseProtocol<
         }),
       };
     } else {
-      const maxShares = await this.getMaxRedeemableShares(vaultInfo, owner);
+      const maxShares = await this.getMaxRedeemableShares(depositedVault, owner);
       logger.info('Withdrawing all funds:', { maxShares }, 'SparkProtocol');
       withdrawData = {
-        to: vaultInfo.vaultAddress,
+        to: depositedVault.vaultAddress,
         data: encodeFunctionData({
           abi: ERC4626_ABI,
           functionName: 'redeem',
@@ -215,7 +215,7 @@ export class SparkProtocol extends BaseProtocol<
   }
 
   /**
-   * Get vault balance for a wallet
+   * Get amount that a wallet has deposited in a vault
    * @param vaultInfo Vault information
    * @param walletAddress Wallet address to check
    * @returns Object containing shares and deposited amount

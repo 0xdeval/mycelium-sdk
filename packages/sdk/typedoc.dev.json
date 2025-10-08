@@ -9,5 +9,10 @@
   "excludeProtected": false,
   "categorizeByGroup": true,
   "includeVersion": true,
-  "plugin": ["typedoc-github-theme"]
+  "plugin": ["typedoc-github-theme"],
+  "gitRevision": "main",
+  "navigation": {
+    "includeGroups": false,
+    "includeCategories": true
+  }
 }

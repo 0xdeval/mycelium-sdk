@@ -1,5 +1,6 @@
 import type { WalletRecord } from '@/libs/WalletDatabase';
-import MyceliumSDK, {
+import {
+  MyceliumSDK,
   type SmartWallet,
   type VaultBalance,
   type VaultTxnResult,

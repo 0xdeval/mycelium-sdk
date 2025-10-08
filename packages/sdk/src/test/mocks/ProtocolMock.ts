@@ -7,7 +7,7 @@ import { mockVaultInfo } from '@/test/mocks/protocols/spark';
  * Mock Protocol for testing
  * @description Provides a mock implementation of Protocol for testing purposes
  */
-export const createMockProtocol = (): Protocol => {
+export const createMockProtocol = () => {
   const mockChainManager = createMockChainManager();
 
   return {
@@ -32,5 +32,5 @@ export const createMockProtocol = (): Protocol => {
       .fn()
       .mockResolvedValue('0x3c36293ab6884794bda1271b570ca9e9b68a406e93486359e7213a30f88c349b'),
     checkAllowance: vi.fn().mockResolvedValue(100n),
-  } as unknown as Protocol;
+  } as unknown as Protocol['instance'];
 };

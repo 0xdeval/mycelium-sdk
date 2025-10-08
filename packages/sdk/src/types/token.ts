@@ -1,7 +1,10 @@
 import type { SupportedChainId } from '@/constants/chains';
 
 /**
- * Detailed token balance information
+ * @internal
+ * @category Types
+ * @description Detailed token balance information
+ *
  */
 export interface TokenBalance {
   symbol: string;

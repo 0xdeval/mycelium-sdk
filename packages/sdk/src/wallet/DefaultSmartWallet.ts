@@ -197,11 +197,14 @@ export class DefaultSmartWallet extends SmartWallet {
    * @returns Vault balance or `null` if nothing deposited
    */
   async getEarnBalance(): Promise<VaultBalance | null> {
-    const vaultInfo = await this.protocolProvider.fetchDepositedVaults(this);
-    if (!vaultInfo) {
-      return null;
+    const depositedVault = await this.protocolProvider.fetchDepositedVaults(this);
+
+    if (!depositedVault) {
+      throw new Error('No vault found to get balance from');
     }
-    return this.protocolProvider.getBalance(vaultInfo, await this.getAddress());
+
+    const userAddress = await this.getAddress();
+    return this.protocolProvider.getBalance(depositedVault, userAddress);
   }
 
   /**

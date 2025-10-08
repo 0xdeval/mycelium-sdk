@@ -13,7 +13,7 @@ import type { WalletProvider } from '@/wallet/WalletProvider';
  * Public wallet namespace that exposes unified wallet operations
  *
  * @public
- * @category Wallets
+ * @category Wallets related operations
  * @remarks
  * This class is returned by {@link MyceliumSDK} and provides a simplified, stable
  * interface for common wallet flows. Advanced functionality can be accessed through
@@ -35,8 +35,7 @@ export class WalletNamespace {
   private provider: WalletProvider;
 
   /**
-   * Creates a wallet namespace
-   * @internal
+   * Creates a wallet namespace to manage embedded and smart wallets
    * @param provider Unified provider that composes embedded & smart providers
    */
   constructor(provider: WalletProvider) {
