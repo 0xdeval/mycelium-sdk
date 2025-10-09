@@ -22,6 +22,7 @@
     "pnpm-workspace.yaml",
     ".gitignore",
     "docs/**",
+    "**/abis/**",
     "packages/sdk/docs-dev/**"
   ],
   "caseSensitive": false,

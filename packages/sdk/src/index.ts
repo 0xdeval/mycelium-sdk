@@ -27,7 +27,7 @@ import { logger } from '@/tools/Logger';
  * Main SDK facade for integrating wallets and protocols.
  *
  * @public
- * @category Core
+ * @category Get started
  * @remarks
  * This class encapsulates:
  * - protocol selection and initialization (`Smart Router`),
@@ -204,5 +204,3 @@ export class MyceliumSDK {
     return new WalletNamespace(walletProvider);
   }
 }
-
-export default MyceliumSDK;

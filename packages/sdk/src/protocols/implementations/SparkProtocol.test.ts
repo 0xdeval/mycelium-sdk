@@ -61,7 +61,6 @@ describe('SparkProtocol', () => {
       expect(vaults).toHaveLength(1);
       expect(vaults[0]).toBeDefined();
       expect(vaults[0]?.id).toBe('sUSDC');
-      expect(vaults[0]?.metadata?.apy).toBe(0.048);
     });
   });
 
@@ -70,8 +69,10 @@ describe('SparkProtocol', () => {
       await sparkProtocol.init(mockChainManager);
     });
 
-    it('should return the only available vault', () => {
-      const bestVault = sparkProtocol.getBestVault();
+    it('should return the only available vault', async () => {
+      sparkProtocol.getAPY = vi.fn().mockResolvedValue(0.048);
+
+      const bestVault = await sparkProtocol.getBestVault();
 
       expect(bestVault.id).toBe('sUSDC');
       expect(bestVault.metadata?.apy).toBe(0.048);
@@ -82,7 +83,7 @@ describe('SparkProtocol', () => {
       const newProtocol = new SparkProtocol();
       newProtocol['allVaults'] = [];
 
-      expect(() => newProtocol.getBestVault()).toThrow('No vaults found');
+      await expect(newProtocol.getBestVault()).rejects.toThrow('No vaults found');
     });
   });
 
@@ -216,6 +217,8 @@ describe('SparkProtocol', () => {
         shares: '100',
         depositedAmount: '110',
       });
+
+      sparkProtocol.getAPY = vi.fn().mockResolvedValue(0.048);
 
       const vault = await sparkProtocol.fetchDepositedVaults(mockSmartWallet);
 

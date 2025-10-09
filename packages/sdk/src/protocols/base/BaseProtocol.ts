@@ -85,14 +85,11 @@ export abstract class BaseProtocol<
 
   /**
    * Get deposited balance in a vault
-   * @param vaultInfo Vault to query
-   * @param walletAddress Wallet address holding the deposit
+   * @param vaultInfo Vault info for a selected protocol
+   * @param walletAddress Wallet address to check the balance of
    * @returns Balance of deposited funds
    */
-  abstract getBalance(
-    vaultInfo: TVaultInfo,
-    walletAddress: Address, // chainId: SupportedChainId
-  ): Promise<TVaultBalance>;
+  abstract getBalance(vaultInfo: TVaultInfo, walletAddress: Address): Promise<TVaultBalance>;
 
   /**
    * Approve a token for protocol use

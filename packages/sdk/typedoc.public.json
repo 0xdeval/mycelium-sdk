@@ -7,7 +7,12 @@
   "excludePrivate": true,
   "excludeInternal": true,
   "excludeProtected": true,
-  "categorizeByGroup": true,
-  "includeVersion": true,
-  "plugin": ["typedoc-github-theme"]
+  "categorizeByGroup": false,
+  "includeVersion": false,
+  "plugin": ["typedoc-github-theme"],
+  "gitRevision": "main",
+  "navigation": {
+    "includeGroups": false,
+    "includeCategories": true
+  }
 }
