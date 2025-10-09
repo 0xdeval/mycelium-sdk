@@ -44,10 +44,12 @@ export interface VaultInfo {
   chainId?: number;
   depositTokenAddress: Address;
   depositTokenDecimals: number;
+  depositTokenSymbol?: string;
   vaultAddress: Address;
   earnTokenAddress?: Address;
   earnTokenDecimals?: number;
-  metadata?: Record<string, unknown>;
+  earnTokenSymbol?: string;
+  metadata?: Record<string, number | string>;
 }
 
 /**
