@@ -193,12 +193,10 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
           {vaultBalance ? (
             <VStack gap={1} align="stretch">
               <Text fontSize="lg">
-                Deposited amount:{' '}
-                {`${vaultBalance.depositedAmount} ${vaultBalance.vaultInfo.depositTokenSymbol}`}
+                {`Deposited amount: ${vaultBalance.depositedAmount} ${vaultBalance.vaultInfo.depositTokenSymbol}`}
               </Text>
               <Text fontSize="sm" color="green.600">
-                Shares of deposited amount:{' '}
-                {`${vaultBalance.shares} ${vaultBalance.vaultInfo.earnTokenSymbol}`}
+                {`Shares of deposited amount: ${vaultBalance.shares} ${vaultBalance.vaultInfo.earnTokenSymbol}`}
                 {vaultBalance.vaultInfo.earnTokenSymbol}
               </Text>
             </VStack>
