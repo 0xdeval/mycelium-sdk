@@ -74,8 +74,6 @@ describe('SparkProtocol', () => {
 
       const bestVault = await sparkProtocol.getBestVault();
 
-      // console.log('BB vault', bestVault);
-
       expect(bestVault.id).toBe('sUSDC');
       expect(bestVault.metadata?.apy).toBe(0.048);
     });

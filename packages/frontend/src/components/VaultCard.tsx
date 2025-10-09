@@ -35,7 +35,6 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
       const data = await response.json();
 
       if (data.success) {
-        console.log('data: ', data);
         setVaultBalance(data.balance || { shares: '0', depositedAmount: '0' });
       } else {
         setError(data.error);
@@ -188,17 +187,18 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
         {/* Current Balance */}
         <Box p={4} bg="green.50" borderRadius="md" border="1px" borderColor="green.200">
           <Text fontWeight="bold" color="green.700" mb={2}>
-            Address' vault balance
+            Address vault balance
           </Text>
 
           {vaultBalance ? (
             <VStack gap={1} align="stretch">
               <Text fontSize="lg">
-                Deposited amount: {vaultBalance.depositedAmount}{' '}
-                {vaultBalance.vaultInfo.depositTokenSymbol}
+                Deposited amount:{' '}
+                {`${vaultBalance.depositedAmount} ${vaultBalance.vaultInfo.depositTokenSymbol}`}
               </Text>
               <Text fontSize="sm" color="green.600">
-                Shares of deposited amount: {vaultBalance.shares}{' '}
+                Shares of deposited amount:{' '}
+                {`${vaultBalance.shares} ${vaultBalance.vaultInfo.earnTokenSymbol}`}
                 {vaultBalance.vaultInfo.earnTokenSymbol}
               </Text>
             </VStack>
