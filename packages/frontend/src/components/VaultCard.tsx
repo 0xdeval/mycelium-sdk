@@ -292,6 +292,8 @@ export default function VaultCard({ walletId, walletAddress }: VaultCardProps): 
               Vault deposit token: {vaultBalance?.vaultInfo.depositTokenAddress}
               <br />
               Vault earn token: {vaultBalance?.vaultInfo.earnTokenAddress}
+              <br />
+              Vault APY: {vaultBalance?.vaultInfo.metadata?.apy}
             </Flex>
             <br />
           </Box>

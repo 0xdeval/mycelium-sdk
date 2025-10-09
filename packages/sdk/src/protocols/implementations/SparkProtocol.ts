@@ -8,10 +8,22 @@ import type {
   SparkVaultBalance,
 } from '@/types/protocols/spark';
 
-import { type Address, encodeFunctionData, erc20Abi, formatUnits, parseUnits } from 'viem';
+import {
+  type Address,
+  encodeFunctionData,
+  erc20Abi,
+  formatUnits,
+  parseUnits,
+  type PublicClient,
+} from 'viem';
 
-import { ERC4626_ABI } from '@/abis/protocols/erc4626';
-import { SPARK_VAULT } from '@/protocols/constants/spark';
+import { SPARK_VAULT_ABI, SPARK_SSR_ORACLE_ABI } from '@/abis/protocols/spark';
+import {
+  RAY,
+  SECONDS_PER_YEAR,
+  SPARK_SSR_ORACLE_ADDRESS,
+  SPARK_VAULT,
+} from '@/protocols/constants/spark';
 import { logger } from '@/tools/Logger';
 
 /**
@@ -30,6 +42,7 @@ export class SparkProtocol extends BaseProtocol<
 > {
   private selectedChainId: SupportedChainId | undefined;
   private allVaults: SparkVaultInfo[] = [];
+  private publicClient: PublicClient | undefined;
 
   /**
    * Initialize the Spark protocol with the provided chain manager
@@ -39,7 +52,45 @@ export class SparkProtocol extends BaseProtocol<
     this.chainManager = chainManager;
     this.selectedChainId = chainManager.getSupportedChain();
 
+    this.publicClient = chainManager.getPublicClient(this.selectedChainId!);
+
     this.allVaults = this.getVaults();
+  }
+
+  /**
+   * Get the SSR (Sky Saving Rate) of the Spark protocol
+   * @remarks
+   * The parameter ius necessary to calculate the APY of a vault
+   * @returns
+   */
+  private async getSSR(): Promise<number> {
+    if (!this.publicClient) {
+      throw new Error('Public client not initialized');
+    }
+
+    const ssrRaw = await this.publicClient.readContract({
+      address: SPARK_SSR_ORACLE_ADDRESS,
+      abi: SPARK_SSR_ORACLE_ABI,
+      functionName: 'getSSR',
+    });
+
+    const ssr = Number(ssrRaw) / Number(RAY);
+    return ssr;
+  }
+
+  /**
+   * Get the APY of the Spark protocol
+   * @remarks
+   * Calculation based on the formula from the documentation:
+   * https://docs.spark.fi/dev/integration-guides/susds-lending-market#rates
+   * @returns The APY of the Spark protocol in percentage
+   */
+  async getAPY(): Promise<number> {
+    const ssr = await this.getSSR();
+
+    const apy = Math.exp(Math.log(ssr) * SECONDS_PER_YEAR) - 1;
+
+    return Number((apy * 100).toFixed(2));
   }
 
   /**
@@ -48,7 +99,6 @@ export class SparkProtocol extends BaseProtocol<
    * @returns The list of vaults
    */
   getVaults(): SparkVaultInfo[] {
-    // Constant array as all vaults are static
     return SPARK_VAULT;
   }
 
@@ -57,12 +107,19 @@ export class SparkProtocol extends BaseProtocol<
    * @returns The top-ranked Spark vault
    * @throws Error if no vaults found
    */
-  getBestVault(): SparkVaultInfo {
+  async getBestVault(): Promise<SparkVaultInfo> {
     if (this.allVaults.length === 0) {
       throw new Error('No vaults found');
     }
 
-    return this.allVaults[0]!;
+    // Currently, the vault is only one and relates to sUSDC
+    // More Spark vaults can be added in the future, but the APY calculation will remain the same
+    const selectedVault = this.allVaults[0]!;
+
+    // The APY for Spark vaults calculates the same for all vaults
+    selectedVault.metadata!.apy = await this.getAPY();
+
+    return selectedVault;
   }
 
   /**
@@ -71,17 +128,21 @@ export class SparkProtocol extends BaseProtocol<
    * @returns The vault with user deposits, or null if none found
    */
   async fetchDepositedVaults(smartWallet: SmartWallet): Promise<SparkVaultInfo | null> {
-    let depositedVaults: SparkVaultInfo | undefined = undefined;
+    let depositedVault: SparkVaultInfo | undefined = undefined;
     const userAddress = await smartWallet.getAddress();
     for (const vault of this.allVaults) {
       const balance = await this.getBalance(vault, userAddress);
       if (parseInt(balance.depositedAmount) > 0) {
-        depositedVaults = vault;
+        depositedVault = vault;
       }
     }
-    logger.info('Deposited vaults:', { depositedVaults }, 'SparkProtocol');
 
-    return depositedVaults || null;
+    if (depositedVault) {
+      depositedVault.metadata!.apy = await this.getAPY();
+    }
+    logger.info('Deposited vaults:', { depositedVault }, 'SparkProtocol');
+
+    return depositedVault || null;
   }
 
   /**
@@ -100,7 +161,7 @@ export class SparkProtocol extends BaseProtocol<
       vaultInfoToDeposit = depositedVault;
     } else {
       // Find the best pool to deposit for a protocol
-      vaultInfoToDeposit = this.getBestVault();
+      vaultInfoToDeposit = await this.getBestVault();
       logger.info('Best vault that found:', { bestVault: vaultInfoToDeposit }, 'SparkProtocol');
     }
 
@@ -132,7 +193,7 @@ export class SparkProtocol extends BaseProtocol<
     ops.push({
       to: vaultInfoToDeposit.vaultAddress,
       data: encodeFunctionData({
-        abi: ERC4626_ABI,
+        abi: SPARK_VAULT_ABI,
         functionName: 'deposit',
         args: [assets, owner] as const,
       }),
@@ -169,7 +230,7 @@ export class SparkProtocol extends BaseProtocol<
       withdrawData = {
         to: depositedVault.vaultAddress,
         data: encodeFunctionData({
-          abi: ERC4626_ABI,
+          abi: SPARK_VAULT_ABI,
           functionName: 'withdraw',
           args: [assets, owner, owner] as const,
         }),
@@ -180,7 +241,7 @@ export class SparkProtocol extends BaseProtocol<
       withdrawData = {
         to: depositedVault.vaultAddress,
         data: encodeFunctionData({
-          abi: ERC4626_ABI,
+          abi: SPARK_VAULT_ABI,
           functionName: 'redeem',
           args: [maxShares, owner, owner] as const,
         }),
@@ -202,11 +263,13 @@ export class SparkProtocol extends BaseProtocol<
     vaultInfo: SparkVaultInfo,
     walletAddress: Address,
   ): Promise<bigint> {
-    const publicClient = this.chainManager!.getPublicClient(this.selectedChainId!);
+    if (!this.publicClient) {
+      throw new Error('Public client not initialized');
+    }
 
-    const shares = await publicClient.readContract({
+    const shares = await this.publicClient.readContract({
       address: vaultInfo.vaultAddress,
-      abi: ERC4626_ABI,
+      abi: SPARK_VAULT_ABI,
       functionName: 'balanceOf',
       args: [walletAddress],
     });
@@ -221,11 +284,13 @@ export class SparkProtocol extends BaseProtocol<
    * @returns Object containing shares and deposited amount
    */
   async getBalance(vaultInfo: SparkVaultInfo, walletAddress: Address): Promise<SparkVaultBalance> {
-    const publicClient = this.chainManager!.getPublicClient(this.selectedChainId!);
+    if (!this.publicClient) {
+      throw new Error('Public client not initialized');
+    }
 
-    const shares = await publicClient.readContract({
+    const shares = await this.publicClient.readContract({
       address: vaultInfo.vaultAddress,
-      abi: ERC4626_ABI,
+      abi: SPARK_VAULT_ABI,
       functionName: 'balanceOf',
       args: [walletAddress],
     });
@@ -234,9 +299,9 @@ export class SparkProtocol extends BaseProtocol<
       return { shares: '0', depositedAmount: '0', vaultInfo };
     }
 
-    const assets = await publicClient.readContract({
+    const assets = await this.publicClient.readContract({
       address: vaultInfo.vaultAddress,
-      abi: ERC4626_ABI,
+      abi: SPARK_VAULT_ABI,
       functionName: 'convertToAssets',
       args: [shares],
     });

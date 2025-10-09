@@ -31,6 +31,7 @@ export default [
       'packages/frontend/.next/**',
       'docs/**',
       'packages/sdk/docs-dev/**',
+      '**/abis/**',
     ],
   },
 
