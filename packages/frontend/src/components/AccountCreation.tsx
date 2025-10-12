@@ -27,7 +27,6 @@ export const AccountCreation = ({
     }
 
     setIsLoading(true);
-    onError('');
 
     try {
       const response = await fetch(`/api/sdk/get-wallet/${userId}`);
