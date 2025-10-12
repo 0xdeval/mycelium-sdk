@@ -1,48 +1,48 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Container, Heading, SimpleGrid } from '@chakra-ui/react';
-import WalletCreator from '@/components/WalletCreator';
-import WalletInfo from '@/components/WalletInfo';
-import VaultCard from '@/components/VaultCard';
 import type { JSX } from '@emotion/react/jsx-runtime';
+import { AppContainer } from '@/components/Container';
+import { AccountCreation } from '@/components/AccountCreation';
+import { AccountContent } from '@/components/AccountContent';
+import { Toaster, toaster } from '@/components/ui/toaster';
 
 export default function Home(): JSX.Element {
+  const [userInput, setUserInput] = useState<string>('');
   const [walletId, setWalletId] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>('');
+
+  const handleWalletCreated = (id: string, address: string, userInput: string) => {
+    setWalletId(id);
+    setWalletAddress(address);
+    setUserInput(userInput);
+  };
+
+  const handleError = (err: string) => {
+    toaster.create({
+      title: 'Error during account creation',
+      description: err,
+      type: 'error',
+      duration: 5000,
+    });
+  };
 
   return (
-    <Box minH="100vh" p={8} bg="gray.50">
-      <Container maxW="6xl">
-        <Heading as="h1" size="2xl" textAlign="center" mb={8}>
-          Mycelium Wallet Creator
-        </Heading>
-
-        <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
-          <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
-            <WalletCreator
-              onWalletCreated={(id, address) => {
-                setWalletId(id);
-                setWalletAddress(address);
-                setError('');
-              }}
-              onError={(err) => setError(err)}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            />
-          </Box>
-
-          <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
-            <WalletInfo walletId={walletId} walletAddress={walletAddress} error={error} />
-          </Box>
-
-          <Box bg="white" p={4} borderRadius="lg" boxShadow="lg">
-            <VaultCard walletId={walletId} walletAddress={walletAddress} />
-          </Box>
-        </SimpleGrid>
-      </Container>
-    </Box>
+    <>
+      <Toaster />
+      <AppContainer>
+        {walletId && walletAddress && userInput ? (
+          <AccountContent userData={userInput} walletAddress={walletAddress} walletId={walletId} />
+        ) : (
+          <AccountCreation
+            onWalletCreated={handleWalletCreated}
+            onError={handleError}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+          />
+        )}
+      </AppContainer>
+    </>
   );
 }

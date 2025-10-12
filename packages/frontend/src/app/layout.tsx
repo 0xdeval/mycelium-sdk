@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { Provider } from '@/components/ui/provider';
 
 export const metadata: Metadata = {
-  title: 'Mycelium Wallet Creator',
-  description: 'Create and manage your Mycelium wallet',
+  title: 'Mycelium app demo',
+  description: 'Web3 yield gateway with Mycelium SDK',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
