@@ -5,10 +5,10 @@ import { Provider } from '@/components/ui/provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Mycelium app',
+  title: 'Mycelium - gateway to advanced Web3 yield',
   description: 'DeFi yield in your app in minutes',
   openGraph: {
-    title: 'Mycelium app',
+    title: 'Mycelium - gateway to advanced Web3 yield',
     description: 'DeFi yield in your app in minutes',
     images: ['/og-image.png'],
     type: 'website',
