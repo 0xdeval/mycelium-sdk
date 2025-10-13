@@ -116,7 +116,7 @@ export const AccountHeader = ({
               textUnderlineOffset: 2,
             }}
           >
-            {userData}
+            {userData.slice(0, 6)} {userData.length > 6 && '...'}
           </Link>
         }
         title="Account info"
@@ -125,6 +125,9 @@ export const AccountHeader = ({
 
       <Flex justify="space-between" align="center" gap={4}>
         <Text>
+          <Text as="span" fontWeight="medium" color="whiteAlpha.700">
+            Balance:{' '}
+          </Text>
           {isBalanceLoading ? (
             <Spinner size="sm" />
           ) : walletBalances ? (

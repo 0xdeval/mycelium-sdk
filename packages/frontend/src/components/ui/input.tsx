@@ -12,7 +12,7 @@ export const CustomInput = forwardRef<HTMLInputElement, InputProps & { isLoading
           {...rest}
           stroke="#FFFFFF 10%"
           type={props.type ?? 'text'}
-          placeholder={props.placeholder ?? 'Enter your email'}
+          placeholder={props.placeholder}
           bg={props.bg ?? 'whiteAlpha.50'}
           border={props.border ?? '1px solid'}
           borderColor={props.borderColor ?? 'whiteAlpha.100'}
@@ -37,7 +37,7 @@ export const CustomInput = forwardRef<HTMLInputElement, InputProps & { isLoading
           pr={props.isLoading ? 12 : 4}
           css={{
             '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
-              '-webkit-appearance': 'none',
+              WebkitAppearance: 'none',
               margin: 0,
             },
             '&[type=number]': {

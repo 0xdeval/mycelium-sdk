@@ -62,7 +62,7 @@ export const AccountCreation = ({
           <Fieldset.Content>
             <Field.Root>
               <Field.Label color="whiteAlpha.700" fontSize="sm" fontWeight="semi-bold" mb={2}>
-                Email
+                Email, name, whatever...
               </Field.Label>
               <CustomInput
                 type="text"
@@ -70,6 +70,7 @@ export const AccountCreation = ({
                 onChange={(e) => setUserId(e.target.value)}
                 disabled={isLoading}
                 isLoading={isLoading}
+                placeholder="e.g. mike@gmail.com"
               />
             </Field.Root>
           </Fieldset.Content>
