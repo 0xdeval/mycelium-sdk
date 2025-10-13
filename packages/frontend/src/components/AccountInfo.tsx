@@ -205,6 +205,7 @@ export const AccountInfo = ({
     </CustomButton>
   );
 
+  console.log('vault info', { vaultBalance, vaultInfoItems });
   return (
     <Flex
       flexDir="column"
@@ -215,7 +216,7 @@ export const AccountInfo = ({
       border="1px solid"
       borderColor="whiteAlpha.100"
       borderRadius="2xl"
-      w={{ base: 'full', md: '40%' }}
+      w={{ base: 'full', md: '60%', xl: '40%', '2xl': '30%' }}
       gap={8}
       pt={8}
       px={2}
@@ -231,7 +232,7 @@ export const AccountInfo = ({
             '$0'
           )}
         </Heading>
-        {vaultBalance && vaultInfoItems && (
+        {vaultBalance && vaultInfoItems.length > 0 && (
           <CustomPopover
             triggerComponent={triggerVaultInfoButton}
             title="Vault info"

@@ -93,7 +93,7 @@ export const AccountHeader = ({
       borderRadius="2xl"
       px={3}
       py={3}
-      w={{ base: 'full', md: '40%' }}
+      w={{ base: 'full', md: '60%', xl: '40%', '2xl': '30%' }}
     >
       <CustomPopover
         triggerComponent={
@@ -116,14 +116,14 @@ export const AccountHeader = ({
               textUnderlineOffset: 2,
             }}
           >
-            {userData.slice(0, 6)} {userData.length > 6 && '...'}
+            Account
           </Link>
         }
         title="Account info"
         body={<GroupedContent items={accountInfoItems} />}
       />
 
-      <Flex justify="space-between" align="center" gap={4}>
+      <Flex justify="space-between" align="center" gap={2}>
         <Text>
           <Text as="span" fontWeight="medium" color="whiteAlpha.700">
             Balance:{' '}
