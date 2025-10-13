@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { MyceliumService } from '@/libs/MyceliumService';
-import { WalletDatabase } from '@/libs/WalletDatabase';
+import { WalletsDatabase } from '@/libs/WalletsDatabase';
 
 export async function GET(
   request: NextRequest,
@@ -13,7 +13,7 @@ export async function GET(
       return NextResponse.json({ error: 'Wallet ID is required' }, { status: 400 });
     }
 
-    const walletDb = WalletDatabase.getInstance();
+    const walletDb = WalletsDatabase.getInstance();
     await walletDb.init();
 
     const myceliumService = MyceliumService.getInstance();

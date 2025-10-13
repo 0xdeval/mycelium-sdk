@@ -1,4 +1,4 @@
-import type { WalletRecord } from '@/libs/WalletDatabase';
+import type { WalletRecord } from '@/libs/WalletsDatabase';
 import {
   MyceliumSDK,
   type SmartWallet,

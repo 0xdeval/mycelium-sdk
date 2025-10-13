@@ -10,8 +10,8 @@ export interface WalletRecord {
 
 type WalletMap = Record<string, WalletRecord>;
 
-export class WalletDatabase {
-  private static instance: WalletDatabase;
+export class WalletsDatabase {
+  private static instance: WalletsDatabase;
   private initialized = false;
   private filePath: string;
   private cache: WalletMap = {};
@@ -22,11 +22,11 @@ export class WalletDatabase {
     this.filePath = path.join(process.cwd(), 'wallets.json');
   }
 
-  static getInstance(): WalletDatabase {
-    if (!WalletDatabase.instance) {
-      WalletDatabase.instance = new WalletDatabase();
+  static getInstance(): WalletsDatabase {
+    if (!WalletsDatabase.instance) {
+      WalletsDatabase.instance = new WalletsDatabase();
     }
-    return WalletDatabase.instance;
+    return WalletsDatabase.instance;
   }
 
   async init(): Promise<void> {
@@ -139,4 +139,4 @@ export class WalletDatabase {
   }
 }
 
-export const walletDB = WalletDatabase.getInstance();
+export const walletDB = WalletsDatabase.getInstance();
