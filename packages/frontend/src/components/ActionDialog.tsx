@@ -11,7 +11,7 @@ interface ActionDialogProps {
   setAmount: (amount: string) => void;
   title: string;
   description: string;
-  balance: string | undefined;
+  balance: string | number | undefined;
   buttonText: string;
   type: 'invest' | 'withdraw-funds';
   handleAction: () => Promise<void>;
@@ -43,7 +43,6 @@ export const ActionDialog = ({
     setIsActionExecuting(false);
   };
 
-  console.log('Operation progress:', isOperationSuccess, isActionExecuting);
   return (
     <CustomDialog
       onClose={onClose}

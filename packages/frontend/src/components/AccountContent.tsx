@@ -57,6 +57,7 @@ export const AccountContent = ({ userData, walletAddress, walletId }: AccountCon
       />
 
       <AccountInfo
+        walletBalances={walletBalances}
         isBalanceLoading={isBalanceLoading}
         walletAddress={walletAddress}
         walletId={walletId}

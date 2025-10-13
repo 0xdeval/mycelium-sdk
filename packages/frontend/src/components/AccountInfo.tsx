@@ -1,22 +1,25 @@
 import { Flex, Heading, Spinner } from '@chakra-ui/react';
 import { CustomButton } from '@/components/ui/button';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { VaultBalance } from '@mycelium-sdk/core';
 import { CustomPopover } from '@/components/ui/popover';
 import { GroupedContent } from '@/components/GroupedContent';
 import { ActionDialog } from '@/components/ActionDialog';
 import { formatBalance } from '@/utils';
 import { toaster } from '@/components/ui/toaster';
+import type { WalletData } from '@/types/wallet';
 
 export const AccountInfo = ({
   isBalanceLoading,
   walletAddress,
   walletId,
+  walletBalances,
   handleUpdateWalletBalance,
 }: {
   isBalanceLoading: boolean;
   walletAddress: string;
   walletId: string;
+  walletBalances: WalletData | null;
   handleUpdateWalletBalance: () => Promise<void>;
 }) => {
   const [vaultBalance, setVaultBalance] = useState<VaultBalance | null>(null);
@@ -30,6 +33,11 @@ export const AccountInfo = ({
     hash?: string;
   } | null>(null);
   const [vaultInfoItems, setVaultInfoItems] = useState<{ label: string; data: string }[]>([]);
+
+  const usdcBalance = useMemo(() => {
+    const balance = walletBalances?.balances.find((balance) => balance.symbol === 'USDC')?.balance;
+    return balance ? balance.toString() : '0';
+  }, [walletBalances]);
 
   useEffect(() => {
     if (vaultBalance && vaultBalance?.vaultInfo) {
@@ -91,6 +99,19 @@ export const AccountInfo = ({
 
     setDepositSuccess(null);
 
+    const usdcUserBalance =
+      walletBalances?.balances.find((balance) => balance.symbol === 'USDC')?.balance || 0;
+
+    if (parseFloat(depositAmount) > usdcUserBalance) {
+      toaster.create({
+        title: 'Wrong amount to deposit',
+        description: "You don't have enough USDC to deposit",
+        type: 'error',
+        duration: 5000,
+      });
+      return;
+    }
+
     try {
       const response = await fetch(`/api/sdk/vault-deposit`, {
         method: 'POST',
@@ -132,6 +153,17 @@ export const AccountInfo = ({
     }
 
     setWithdrawSuccess(null);
+
+    const vaultUserBalance = vaultBalance?.depositedAmount || '0';
+    if (parseFloat(withdrawAmount) > parseFloat(vaultUserBalance)) {
+      toaster.create({
+        title: 'Wrong amount to withdraw',
+        description: 'The amount you are trying to withdraw is greater than the deposited amount',
+        type: 'error',
+        duration: 5000,
+      });
+      return;
+    }
 
     try {
       const response = await fetch(`/api/sdk/vault-withdraw`, {
@@ -205,7 +237,6 @@ export const AccountInfo = ({
     </CustomButton>
   );
 
-  console.log('vault info', { vaultBalance, vaultInfoItems });
   return (
     <Flex
       flexDir="column"
@@ -242,7 +273,7 @@ export const AccountInfo = ({
       </Flex>
       <Flex gap={2} py={4} px={1} w="full" flexWrap={'wrap'}>
         <ActionDialog
-          balance={vaultBalance?.depositedAmount}
+          balance={usdcBalance}
           handleAction={handleDeposit}
           isBalanceLoading={isBalanceLoading}
           amount={depositAmount}
