@@ -1,4 +1,4 @@
-import { rpcCall } from '@/utils';
+import { rpcCall } from '../utils';
 
 export const getEth = async ({ to, amountEth }: { to: string; amountEth: string }) => {
   try {

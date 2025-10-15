@@ -1,6 +1,7 @@
-# Blockchain service
+## Blockchain service
 
-A local blockchain service with Express API for testing and development
+A local blockchain Express service fro a local development. Created to work with an Anvil Fork and Pimlico bundler. Shouldn't be used for a production app.
+A helper service for Mycelium demo app in `packages/frontend`
 
 ## Quick start
 
@@ -9,7 +10,25 @@ A local blockchain service with Express API for testing and development
 - [Anvil](https://book.getfoundry.sh/anvil/): 1.2.3+
 - pnpm: 8.15.4+
 - node: v24.7.0+
+- You have a URL for your Fork blockchain
+- You have a URL for your local bundler
 - Environment variables configured
+
+### Local chain fork
+
+To run your own fork,just install [Anvil](https://book.getfoundry.sh/anvil/): 1.2.3+ and run the command:
+`anvil`
+
+This will automatically run a fork of a mainnet and provides you test addresses to use. The default Fork RPC URL: `http://localhost:8545`
+You can use this URL for Blockchain service as well as in Mycelium demo app in `packages/frontend`
+
+### Local bundler
+
+To run a local bundler for smart account, simply use [Pimlico Alto open source bundler](https://github.com/pimlicolabs/alto).
+Check its [README.md](https://github.com/pimlicolabs/alto/blob/main/README.md) file to get started
+
+> You can also run Anvil Fork along with Alto bundler by using the script from Alto repo.
+> To get in fo about this, check a different [README.md](https://github.com/pimlicolabs/alto/blob/main/scripts/README.md) file from the Alto repo
 
 ### Envs
 
@@ -17,7 +36,6 @@ Create a `.env` file in the `packages/blockchain` directory:
 
 ```bash
 # Required
-MAINNET_RPC="<public or private rpc>"
 FORK_RPC_URL="<your mainnet fork url>"
 BUNDLER_URL="<your bundler url for fork>"
 
@@ -40,9 +58,15 @@ cp .env.example .env
 bash ./scripts/run.sh
 ```
 
-This will start:
+This will start the express service on port 3001
 
-- **Express API**: Faucet service on port 3001
+### Vercel deployment
+
+If you want to use service publicly with `packages/frontend` you need to deploy it on Vercel. You can use the following steps to make this:
+
+- Go to `packages/blockchain`
+- Make sure that vercel install: `vercel -v`
+- Deploy the service: `pnpm run deploy`
 
 ## 🎯 API endpoints
 
@@ -116,26 +140,11 @@ curl -X POST http://localhost:3001/faucet-usdc \
 
 | Variable                    | Default | Description                      |
 | --------------------------- | ------- | -------------------------------- |
-| `MAINNET_RPC`               | -       | Mainnet RPC URL (required)       |
 | `ANVIL_PORT`                | 8545    | Anvil RPC port                   |
 | `ANVIL_CHAIN_ID`            | 1       | Chain ID for Anvil               |
 | `ANVIL_BLOCK_TIME`          | 1       | Block time in seconds            |
 | `ANVIL_DEFAULT_BALANCE_ETH` | 100     | Default ETH balance for accounts |
 | `EXPRESS_PORT`              | 3001    | Express API port                 |
-
-### Anvil features
-
-- **Forking**: Uses mainnet fork for real contract interactions
-- **Auto-impersonation**: Automatically impersonates accounts
-- **Free gas**: Zero gas prices for testing
-- **Fast blocks**: 1-second block time
-
-## 🛑 Stopping the service
-
-Press `Ctrl+C` in the terminal to stop both Anvil and Express services. The script will automatically:
-
-- Kill all processes
-- Clean up log files (`.anvil.out`, `.express.out`)
 
 ## 📝 Logs
 
@@ -148,9 +157,3 @@ tail -f .anvil.out
 # Express logs
 tail -f .express.out
 ```
-
-## 🔗 Useful URLs
-
-- **Anvil RPC**: `http://localhost:8545`
-- **Express API**: `http://localhost:3001`
-- **Anvil Explorer**: `http://localhost:8545` (if available)

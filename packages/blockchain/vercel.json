@@ -1,0 +1,4 @@
+{
+  "version": 2,
+  "rewrites": [{ "source": "/(health|faucet|faucet-usdc|drop-funds)", "destination": "/api/index" }]
+}

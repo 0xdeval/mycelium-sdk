@@ -18,14 +18,19 @@ export class WalletsDatabase {
 
   private lock: Promise<void> = Promise.resolve();
 
+  private DEFAULT_FILE_PATH = process.env.VERCEL
+    ? '/tmp/wallets.json'
+    : path.join(process.cwd(), 'wallets.json');
+
   private constructor() {
-    this.filePath = path.join(process.cwd(), 'wallets.json');
+    this.filePath = this.DEFAULT_FILE_PATH;
   }
 
   static getInstance(): WalletsDatabase {
     if (!WalletsDatabase.instance) {
       WalletsDatabase.instance = new WalletsDatabase();
     }
+
     return WalletsDatabase.instance;
   }
 

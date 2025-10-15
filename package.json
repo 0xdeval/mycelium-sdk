@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "spell": "cspell --no-progress --no-summary '**/*'"
+    "spell": "cspell --no-progress --no-summary '**/*'",
+    "deploy": "vercel deploy"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",

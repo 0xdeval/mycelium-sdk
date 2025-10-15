@@ -1,6 +1,6 @@
-import type { FaucetRequestBody, FaucetResponse } from '@/types/faucet';
+import type { FaucetRequestBody, FaucetResponse } from '../types/faucet';
 import type { Request, Response } from 'express';
-import { getUsdc } from '@/methods/getUsdc';
+import { getUsdc } from '../methods/getUsdc';
 
 export const usdcFaucetImpersonate = async (
   req: Request<{}, {}, FaucetRequestBody>,

@@ -1,4 +1,4 @@
-import { rpcCall } from '@/utils';
+import { rpcCall } from '../utils';
 
 export const getUsdc = async ({ to, amountUsdc }: { to: string; amountUsdc: string }) => {
   const richAddress = '0x0b0a5886664376f59c351ba3f598c8a8b4d0a6f3';

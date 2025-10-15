@@ -1,6 +1,6 @@
-import type { FaucetRequestBody, FaucetResponse } from '@/types/faucet';
+import type { FaucetRequestBody, FaucetResponse } from '../types/faucet';
 import type { Request, Response } from 'express';
-import { getEth } from '@/methods/getEth';
+import { getEth } from '../methods/getEth';
 
 export const faucetEth = async (
   req: Request<{}, {}, FaucetRequestBody>,
