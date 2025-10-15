@@ -46,7 +46,9 @@
     "accross",
     "xhash",
     "xencodeddata",
-    "sUSDC"
+    "sUSDC",
+    "Pimlico",
+    "Vercel"
   ],
   "enableFiletypes": ["!binary"],
   "overrides": [

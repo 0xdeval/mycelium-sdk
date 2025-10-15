@@ -1,7 +1,7 @@
-import type { DropFundsResponse, FaucetRequestBody } from '@/types/faucet';
+import type { DropFundsResponse, FaucetRequestBody } from '../types/faucet';
 import type { Request, Response } from 'express';
-import { getEth } from '@/methods/getEth';
-import { getUsdc } from '@/methods/getUsdc';
+import { getEth } from '../methods/getEth';
+import { getUsdc } from '../methods/getUsdc';
 
 export const dropFunds = async (
   req: Request<{}, {}, FaucetRequestBody>,

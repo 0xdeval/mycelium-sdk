@@ -1,0 +1,2 @@
+export const BLOCKCHAIN_SERVICE_HOSTNAME =
+  process.env.NEXT_PUBLIC_BLOCKCHAIN_SERVICE_HOSTNAME || 'http://localhost:3001';

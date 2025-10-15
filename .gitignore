@@ -39,3 +39,4 @@ bun.lock
 *.out
 
 .turbo
+.vercel

@@ -5,6 +5,7 @@ import type { WalletData } from '@/types/wallet';
 import { GroupedContent } from '@/components/GroupedContent';
 import { toaster } from '@/components/ui/toaster';
 import { formatBalance } from '@/utils';
+import { BLOCKCHAIN_SERVICE_HOSTNAME } from '@/constants';
 
 interface AccountHeaderProps {
   userData: string;
@@ -38,7 +39,7 @@ export const AccountHeader = ({
     setIsBalanceLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:3001/drop-funds`, {
+      const response = await fetch(`${BLOCKCHAIN_SERVICE_HOSTNAME}/drop-funds`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

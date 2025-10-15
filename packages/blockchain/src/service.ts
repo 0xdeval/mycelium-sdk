@@ -1,9 +1,10 @@
 import express from 'express';
-import { faucetEth } from '@/controllers/faucetEth';
-import { usdcFaucetImpersonate } from '@/controllers/faucetUSDC';
+import { faucetEth } from './controllers/faucetEth';
+import { usdcFaucetImpersonate } from './controllers/faucetUSDC';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { dropFunds } from './controllers/dropFunds';
+import { health } from './controllers/health';
 
 dotenv.config();
 
@@ -28,9 +29,14 @@ app.use(
 app.post('/faucet', faucetEth);
 app.post('/faucet-usdc', usdcFaucetImpersonate);
 app.post('/drop-funds', dropFunds);
+app.get('/health', health);
 
-app.listen(port, () => {
-  console.log(`🚀 Express server running on port ${port}`);
-  console.log(`💰 ETH Faucet: POST /faucet`);
-  console.log(`💵 USDC Faucet: POST /faucet-usdc`);
-});
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`🚀 Express server running on port ${port}`);
+    console.log(`💰 ETH Faucet: POST /faucet`);
+    console.log(`💵 USDC Faucet: POST /faucet-usdc`);
+  });
+}
+
+export default app;
