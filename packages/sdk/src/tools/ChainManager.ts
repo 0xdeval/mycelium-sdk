@@ -191,6 +191,7 @@ export class ChainManager {
     return client;
   }
 
+  // TODO: Refactor this code. ChainManager should work with string, not array
   /**
    * Returns a supported chain that was initiated in SDK
    *
@@ -211,6 +212,23 @@ export class ChainManager {
       throw new Error(`Chain not found for name: ${name}`);
     }
     return chain.id;
+  }
+
+  /**
+   * Returns the name of the chain for the given chain ID
+   *
+   * @internal
+   * @category Info
+   * @param chainId Target chain ID
+   * @returns Chain name
+   * @throws Error if chain is not found
+   */
+  getChainNameById(chainId: SupportedChainId): string {
+    const chain = this.chainNames[chainId];
+    if (!chain) {
+      throw new Error(`Chain not found for ID: ${chainId}`);
+    }
+    return chain.name;
   }
 
   /**

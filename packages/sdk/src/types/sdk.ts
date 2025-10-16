@@ -32,6 +32,10 @@ import type { ProtocolsRouterConfig } from '@/types/protocols/general';
  *   protocolsRouterConfig: {
  *     riskLevel: 'low',
  *   },
+ *   coinbaseCDPConfig: {
+ *     apiKeyId: process.env.NEXT_PUBLIC_COINBASE_CDP_API_KEY_ID!,
+ *     apiKeySecret: process.env.NEXT_PUBLIC_COINBASE_CDP_API_KEY_SECRET!,
+ *   },
  * }
  * ```
  */
@@ -54,6 +58,30 @@ export interface MyceliumSDKConfig {
    * If an integrator is not provided any requirements, `low` risk level protocols will be used by default
    */
   protocolsRouterConfig?: ProtocolsRouterConfig;
+  /**
+   * Coinbase CDP configuration
+   * @remarks
+   * The configuration is used to interact with Coinbase CDP API
+   * If the configuration is not provided, the Coinbase CDP functionality will be disabled.
+   * Calling all Coinbase CDP related methods will throw an error
+   * Currently used for on/off ramp functionality for a wallet
+   */
+  coinbaseCDPConfig?: CoinbaseCDPConfig;
+}
+
+/**
+ * Coinbase CDP configuration
+ * @description Configuration for Coinbase CDP API
+ * @url https://docs.cdp.coinbase.com/api-reference/v2/introduction
+ */
+export interface CoinbaseCDPConfig {
+  /**
+   * Coinbase CDP API key ID   */
+  apiKeyId: string;
+  /**
+   * Coinbase CDP API key secret
+   */
+  apiKeySecret: string;
 }
 
 /**

@@ -13,12 +13,12 @@ import type { WalletProvider } from '@/wallet/WalletProvider';
  * Public wallet namespace that exposes unified wallet operations
  *
  * @public
- * @category Wallets related operations
+ * @category Wallets creation and retrieval
  * @remarks
- * This class is returned by {@link MyceliumSDK} and provides a simplified, stable
- * interface for common wallet flows. Advanced functionality can be accessed through
+ * This class is returned by {@link MyceliumSDK} and provides a simplified
+ * interface for wallet creation and retrieval. Advanced functionality can be accessed through
  * the underlying providers via the getters {@link embeddedWalletProvider} and
- * {@link smartWalletProvider}.
+ * {@link smartWalletProvider}
  *
  * Typical flows:
  * - Create embedded wallet only: {@link createEmbeddedWallet}

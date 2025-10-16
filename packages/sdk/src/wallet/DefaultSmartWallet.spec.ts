@@ -12,6 +12,7 @@ import { DefaultSmartWallet } from '@mycelium/sdk/wallet/DefaultSmartWallet';
 import { createMockProtocol } from '@mycelium/sdk/test/mocks/ProtocolMock';
 import type { Protocol } from '@mycelium/sdk/types/protocols/general';
 import type { TransactionData } from '@mycelium/sdk/types/transaction';
+import { createMockCoinbaseCDP } from '@mycelium/sdk/test/mocks/CoinbaseCDPMock';
 
 vi.mock('viem/account-abstraction', () => ({
   toCoinbaseSmartAccount: vi.fn(),
@@ -24,6 +25,7 @@ const mockSigner: LocalAccount = {
 } as unknown as LocalAccount;
 const mockChainManager = createMockChainManager() as unknown as ChainManager;
 const mockProtocol = createMockProtocol();
+const mockCoinbaseCDP = createMockCoinbaseCDP();
 
 describe('DefaultSmartWallet', () => {
   it('should create a smart wallet instance', () => {
@@ -32,6 +34,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
     expect(wallet).toBeInstanceOf(DefaultSmartWallet);
   });
@@ -42,6 +45,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
     expect(wallet.signer).toEqual(mockSigner);
   });
@@ -53,6 +57,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
     const mockAddress = getRandomAddress();
     const publicClient = vi.mocked(mockChainManager.getPublicClient(baseSepolia.id));
@@ -76,6 +81,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
       deploymentAddress,
     );
     const address = await wallet.getAddress();
@@ -91,6 +97,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
       deploymentAddress,
       signerOwnerIndex,
       nonce,
@@ -115,6 +122,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
     const chainId = unichain.id;
     const recipientAddress = getRandomAddress();
@@ -158,6 +166,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
     const chainId = unichain.id;
     const recipientAddress = getRandomAddress();
@@ -203,6 +212,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
 
     const depositSpy = vi.mocked(mockProtocol).deposit as ReturnType<typeof vi.fn>;
@@ -222,6 +232,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
 
     const withdrawSpy = vi.mocked(mockProtocol).withdraw as ReturnType<typeof vi.fn>;
@@ -241,6 +252,7 @@ describe('DefaultSmartWallet', () => {
       mockSigner,
       mockChainManager,
       mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
     );
 
     const result = await wallet.getEarnBalance();

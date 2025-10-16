@@ -22,6 +22,7 @@ import { PrivyClient } from '@privy-io/server-auth';
 import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
+import { CoinbaseCDP } from './tools/CoinbaseCDP';
 
 /**
  * Main SDK facade for integrating wallets and protocols.
@@ -84,6 +85,15 @@ export class MyceliumSDK {
   private protocol: Protocol;
 
   /**
+   * Coinbase CDP instance to Coinbase related and onchain operations using Coinbase CDP API
+   * @remarks
+   * If the configuration is not provided, the Coinbase CDP functionality will be disabled.
+   * Calling the respective method will throw an error.
+   * @internal
+   */
+  private coinbaseCDP: CoinbaseCDP | null = null;
+
+  /**
    * Creates a new SDK instance
    *
    * @param config SDK configuration (networks, wallets, protocol router settings)
@@ -103,6 +113,14 @@ export class MyceliumSDK {
       logger.warn(
         'No chain config provided, using default public RPC and Bundler URLs',
         'MyceliumSDK',
+      );
+    }
+
+    if (config.coinbaseCDPConfig) {
+      this.coinbaseCDP = new CoinbaseCDP(
+        config.coinbaseCDPConfig.apiKeyId,
+        config.coinbaseCDPConfig.apiKeySecret,
+        this.chainManager,
       );
     }
 
@@ -177,7 +195,11 @@ export class MyceliumSDK {
     }
 
     if (!config.smartWalletConfig || config.smartWalletConfig.provider.type === 'default') {
-      this.smartWalletProvider = new DefaultSmartWalletProvider(this.chainManager, this.protocol);
+      this.smartWalletProvider = new DefaultSmartWalletProvider(
+        this.chainManager,
+        this.protocol,
+        this.coinbaseCDP,
+      );
     } else {
       throw new Error(
         `Unsupported smart wallet provider: ${config.smartWalletConfig.provider.type}`,
