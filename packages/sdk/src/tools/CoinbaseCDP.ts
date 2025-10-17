@@ -54,7 +54,7 @@ export class CoinbaseCDP {
     }
 
     const chainId = this.chainManager.getSupportedChain();
-    const chainName = chainById[chainId]?.name;
+    const chainName = chainById[chainId]?.name.toLowerCase();
 
     const authJwtToken = await this.auth(this.onRampUrlAuthParams);
 

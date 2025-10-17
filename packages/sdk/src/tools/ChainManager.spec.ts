@@ -1,12 +1,54 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('viem', async () => {
+  const actual = await vi.importActual<any>('viem');
+  return {
+    ...actual,
+    http: vi.fn((url: string) => ({ __transport: 'http', url })),
+    createPublicClient: vi.fn(() => ({ __tag: 'PublicClient' })),
+  };
+});
+
+vi.mock('viem/account-abstraction', async () => {
+  const actual = await vi.importActual<any>('viem/account-abstraction');
+  return {
+    ...actual,
+    createBundlerClient: vi.fn(() => ({ __tag: 'BundlerClient' })),
+  };
+});
+
+vi.mock('@/utils/chains', () => ({
+  chainById: {
+    8453: {
+      id: 8453,
+      name: 'Base',
+    },
+  },
+}));
+
+vi.mock('@/constants/chains', () => ({
+  CHAINS_MAP: {
+    Base: { id: 8453 },
+  },
+  SUPPORTED_CHAIN_IDS: [8453],
+}));
+
+vi.mock('@/tools/Logger', () => ({
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
+}));
+
 import { ChainManager } from '@mycelium/sdk/tools/ChainManager';
 import type { ChainConfig } from '@mycelium/sdk/types/chain';
+import { createPublicClient, http } from 'viem';
+import { createBundlerClient } from 'viem/account-abstraction';
 
 describe('ChainManager', () => {
   let mockChainConfig: ChainConfig;
   let chainManager: ChainManager;
 
   beforeEach(() => {
+    vi.clearAllMocks();
+
     mockChainConfig = {
       chainId: 8453,
       rpcUrl: 'https://base-rpc-url.com',
@@ -14,12 +56,12 @@ describe('ChainManager', () => {
     };
 
     chainManager = new ChainManager(mockChainConfig);
-    vi.clearAllMocks();
   });
 
   describe('constructor', () => {
     it('should initialize with chain config', () => {
       expect(chainManager).toBeInstanceOf(ChainManager);
+      expect(createPublicClient).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -35,15 +77,14 @@ describe('ChainManager', () => {
 
     it('should return bundler client for valid chain ID', () => {
       const client = chainManager.getBundlerClient(8453, mockAccount);
-
       expect(client).toBeDefined();
+
+      expect(http).toHaveBeenCalledWith('https://base-bundler-url.com');
+      expect(createBundlerClient).toHaveBeenCalledTimes(1);
     });
 
     it('should throw error when bundler URL is not a url', () => {
-      const configWithoutBundler = {
-        ...mockChainConfig,
-        bundlerUrl: 'randomUrl',
-      };
+      const configWithoutBundler = { ...mockChainConfig, bundlerUrl: 'randomUrl' };
       const managerWithoutBundler = new ChainManager(configWithoutBundler);
 
       expect(() => managerWithoutBundler.getBundlerClient(8453, mockAccount)).toThrow(
@@ -103,7 +144,7 @@ describe('ChainManager', () => {
 
   describe('createPublicClient', () => {
     it('should create public client with correct configuration', () => {
-      expect(chainManager).toBeDefined();
+      expect(createPublicClient).toHaveBeenCalled();
     });
   });
 

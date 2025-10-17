@@ -13,11 +13,11 @@ import { createMockProtocol } from '@mycelium/sdk/test/mocks/ProtocolMock';
 import type { Protocol } from '@mycelium/sdk/types/protocols/general';
 import type { TransactionData } from '@mycelium/sdk/types/transaction';
 import { createMockCoinbaseCDP } from '@mycelium/sdk/test/mocks/CoinbaseCDPMock';
+import type { CoinbaseCDP } from '@mycelium/sdk/tools/CoinbaseCDP';
 
 vi.mock('viem/account-abstraction', () => ({
   toCoinbaseSmartAccount: vi.fn(),
 }));
-
 const mockOwners: Address[] = ['0x123', '0x456'];
 const mockSigner: LocalAccount = {
   address: '0x123',
@@ -25,7 +25,7 @@ const mockSigner: LocalAccount = {
 } as unknown as LocalAccount;
 const mockChainManager = createMockChainManager() as unknown as ChainManager;
 const mockProtocol = createMockProtocol();
-const mockCoinbaseCDP = createMockCoinbaseCDP();
+const mockCoinbaseCDP: CoinbaseCDP = createMockCoinbaseCDP();
 
 describe('DefaultSmartWallet', () => {
   it('should create a smart wallet instance', () => {
