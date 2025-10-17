@@ -4,6 +4,7 @@ import type { CoinbaseCDPAuthParams, OnRampUrlResponse, CoinbaseCDPError } from 
 import type { Address } from 'viem';
 import type { ChainManager } from './ChainManager';
 import { checkValidUrl } from '@/utils/urls';
+import { chainById } from '@/utils/chains';
 
 export class CoinbaseCDP {
   private readonly apiKeyId: string;
@@ -46,20 +47,14 @@ export class CoinbaseCDP {
     purchaseCurrency: string = 'USDC',
     paymentCurrency: string = 'USD',
     paymentMethod: string = 'CARD',
-    chain?: string,
     country?: string,
   ): Promise<OnRampUrlResponse> {
     if (!checkValidUrl(redirectUrl)) {
       throw new Error('Redirect URL is not a valid URL');
     }
-    let chainName: string;
-    if (!chain) {
-      // TODO: Refactor. ChainManager should return a chain name in one method
-      const chainId = this.chainManager.getSupportedChain();
-      chainName = this.chainManager.getChainNameById(chainId);
-    } else {
-      chainName = chain;
-    }
+
+    const chainId = this.chainManager.getSupportedChain();
+    const chainName = chainById[chainId]?.name;
 
     const authJwtToken = await this.auth(this.onRampUrlAuthParams);
 

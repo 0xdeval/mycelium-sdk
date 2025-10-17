@@ -69,7 +69,7 @@ export class PrivyWallet extends EmbeddedWallet {
     const account = await createViemAccount({
       walletId: this.walletId,
       address: this.address,
-      // TODO: Fix this type error
+
       privy: this.privyClient as unknown as GetViemAccountInputType['privy'],
     });
     return account;

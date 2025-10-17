@@ -374,7 +374,6 @@ export class DefaultSmartWallet extends SmartWallet {
       purchaseCurrency,
       paymentCurrency,
       paymentMethod,
-      chain,
       country,
     );
 

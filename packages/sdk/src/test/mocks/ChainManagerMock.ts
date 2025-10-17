@@ -35,8 +35,5 @@ export const createMockChainManager = (): ChainManager => {
       rpcUrls: { default: { http: ['https://mock-rpc-url.com'] } },
     }),
     getSupportedChain: vi.fn().mockReturnValue(8453 as SupportedChainId),
-    getChainIdByName: vi.fn().mockReturnValue(8453 as SupportedChainId),
-    getSupportedChainNames: vi.fn().mockReturnValue(['base', 'ethereum']),
-    isChainSupported: vi.fn().mockReturnValue(true),
   } as unknown as ChainManager;
 };

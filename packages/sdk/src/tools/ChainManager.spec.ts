@@ -101,49 +101,6 @@ describe('ChainManager', () => {
     });
   });
 
-  describe('getChainIdByName', () => {
-    it('should return chain ID for valid chain name', () => {
-      const chainId = chainManager.getChainIdByName('base');
-      expect(chainId).toBeDefined();
-    });
-
-    it('should handle ethereum special case', () => {
-      const managerWithEthereum = new ChainManager({
-        ...mockChainConfig,
-        chainId: 1,
-      });
-
-      const chainId = managerWithEthereum.getChainIdByName('ethereum');
-      expect(chainId).toBeDefined();
-    });
-
-    it('should throw error for invalid chain name', () => {
-      expect(() => chainManager.getChainIdByName('invalid-chain')).toThrow(
-        'Chain not found for name: invalid-chain',
-      );
-    });
-  });
-
-  describe('getSupportedChainNames', () => {
-    it('should return array of supported chain names', () => {
-      const names = chainManager.getSupportedChainNames();
-      expect(Array.isArray(names)).toBe(true);
-      expect(names.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe('isChainSupported', () => {
-    it('should return true for supported chain name', () => {
-      const isSupported = chainManager.isChainSupported('base');
-      expect(isSupported).toBe(true);
-    });
-
-    it('should return false for unsupported chain name', () => {
-      const isSupported = chainManager.isChainSupported('unsupported-chain');
-      expect(isSupported).toBe(false);
-    });
-  });
-
   describe('createPublicClient', () => {
     it('should create public client with correct configuration', () => {
       expect(chainManager).toBeDefined();

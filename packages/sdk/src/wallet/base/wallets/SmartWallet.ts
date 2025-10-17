@@ -86,7 +86,7 @@ export abstract class SmartWallet {
     amount: number,
     asset: AssetIdentifier,
     recipientAddress: Address,
-  ): Promise<TransactionData>; // TODO: Add a correct type
+  ): Promise<TransactionData>;
 
   /**
    * Deposits funds into a selected protocol vault to start earning yield
