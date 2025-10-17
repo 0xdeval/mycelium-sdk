@@ -95,7 +95,7 @@ export class SparkProtocol extends BaseProtocol<
 
   /**
    *
-   * @description Get all vault info from a Spark protocol
+   *  Get all vault info from a Spark protocol
    * @returns The list of vaults
    */
   getVaults(): SparkVaultInfo[] {

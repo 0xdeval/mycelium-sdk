@@ -5,7 +5,7 @@ import { mockVaultInfo } from '@/test/mocks/protocols/spark';
 
 /**
  * Mock Protocol for testing
- * @description Provides a mock implementation of Protocol for testing purposes
+ *  Provides a mock implementation of Protocol for testing purposes
  */
 export const createMockProtocol = () => {
   const mockChainManager = createMockChainManager();

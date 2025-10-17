@@ -22,11 +22,10 @@ import type { VaultBalance, VaultTxnResult, Protocol } from '@/types/protocols/g
 import type { CoinbaseCDP } from '@/tools/CoinbaseCDP';
 
 /**
- * Default ERC-4337 smart wallet implementation (internal)
+ * Default ERC-4337 smart wallet implementation. Implements main methods that a user can use to interact with DeFi protocols and use all related functionalities
  *
  * @public
  * @category Wallets operations
- * @description Smart Account class implements main methods that a user can use to interact with DeFi protocols and use all related functionalities
  * @remarks
  * Backed by Coinbase Smart Account and compatible with ERC-4337 UserOperations
  * Supports multi-owner wallets (EVM addresses or WebAuthn owners), gas-sponsored flows,
@@ -87,7 +86,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * Returns the signer account for this smart wallet
    *
    * @public
-   * @category Address
+   * @category Account
    * @remarks
    * Used to authorize UserOperations and on-chain transactions
    */
@@ -99,8 +98,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * Resolves the smart wallet address
    *
    * @public
-   * @category Address
-   * @description Resolves the smart wallet address
+   * @category Account
    * @remarks
    * If `deploymentAddress` is known, returns it. Otherwise derives a deterministic address
    * via the factory (`getAddress`) using owners and `nonce` (CREATE2-style)
@@ -143,7 +141,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * Builds a Coinbase Smart Account for a specific chain
    *
    * @internal
-   * @category Accounts
+   * @category Account
    * @param chainId Target chain ID
    * @returns Viem Coinbase Smart Account for the given chain
    */
@@ -161,11 +159,10 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Fetches balances (ETH + ERC-20) across supported chains
+   * Fetches balances (ETH + ERC-20) for a smart account across supported chains
    *
    * @public
-   * @category Address
-   * @description Fetches balances (ETH + ERC-20) for a smart account across supported chains
+   * @category Account
    * @returns Promise resolving to a list of {@link TokenBalance}
    */
   async getBalance(): Promise<TokenBalance[]> {
@@ -180,11 +177,9 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Deposits into the selected protocol’s vault
-   *
+   * Deposits into the selected protocol’s vault to start earning yield
    * @public
    * @category Earn
-   * @description Method to deposit funds into the selected protocol’s vault
    * @remarks
    * The protocol is selected on the SDK initialization step
    * @param amount Human-readable amount string
@@ -200,10 +195,10 @@ export class DefaultSmartWallet extends SmartWallet {
 
   /**
    * Reads current deposit balance from the selected protocol’s vault
+   * Method to read the current deposit balance from the selected protocol’s vault for a smart account
    *
    * @public
    * @category Earn
-   * @description Method to read the current deposit balance from the selected protocol’s vault for a smart account
    * @returns Vault balance or `null` if nothing deposited
    */
   async getEarnBalance(): Promise<VaultBalance | null> {
@@ -219,10 +214,8 @@ export class DefaultSmartWallet extends SmartWallet {
 
   /**
    * Withdraws from the selected protocol’s vault
-   *
    * @public
    * @category Earn
-   * @description Method to withdraw funds from the selected protocol’s vault
    * @param amount Human-readable amount string
    * @returns Transaction result for the withdrawal
    * @throws Error if the withdrawal fails
@@ -235,12 +228,11 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Sends a single transaction via ERC-4337 (gas-sponsored)
+   * Builds a UserOperation and submits via the bundler, then waits for inclusion
+
    *
    * @public
    * @category Transactions
-   * @description
-   * Builds a UserOperation and submits via the bundler, then waits for inclusion
    *
    * @param transactionData Transaction details (`to`, `value`, `data`)
    * @param chainId Target chain ID
@@ -282,12 +274,10 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Sends a batch of transactions via ERC-4337 (gas-sponsored)
+   * Builds a UserOperation from several onchain transactions and submits via the bundler, then waits for inclusion
    *
    * @public
    * @category Transactions
-   * @description
-   * Builds a UserOperation from several onchain transactions and submits via the bundler, then waits for inclusion
    *
    * @param transactionData An array of calls to execute
    * @param chainId Target chain ID
@@ -329,12 +319,10 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Funds the wallet with USDC or any other tokens via Coinbase CDP on-ramp service
+   * Funds the smart wallet with the specified amount of the specified token via Coinbase CDP on-ramp service
    *
    * @public
    * @category On-Ramp
-   * @description
-   * Funds the smart wallet with the specified amount of the specified token via Coinbase CDP on-ramp service
    *
    * @remarks
    * If Coinbase CDP is not initialized, the method will throw an error
@@ -381,11 +369,10 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Builds transaction data to send ETH or ERC-20 tokens
+   * Send tokens from a smart account to another address
    *
    * @public
    * @category Transactions
-   * @description Send tokens from a smart account to another address
    *
    * @param amount Human-readable amount (e.g., `1.5`)
    * @param asset Asset symbol (e.g., `"usdc"`, `"eth"`) or token address

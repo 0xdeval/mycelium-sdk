@@ -9,6 +9,9 @@
 
 export * from '@/public/types';
 
+/** @internal */
+export { DefaultSmartWallet } from '@/wallet/DefaultSmartWallet';
+
 import { ChainManager } from '@/tools/ChainManager';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
 import { WalletNamespace } from '@/wallet/WalletNamespace';
@@ -45,7 +48,8 @@ import { CoinbaseCDP } from './tools/CoinbaseCDP';
  * const config: MyceliumSDKConfig = {
  *   walletsConfig: { /* ... *\/ },
  *   protocolsRouterConfig: { /* ... *\/ },
- *   chain: { /* ... *\/ }
+ *   chain: { /* ... *\/ },
+ *   coinbaseCDPConfig: { /* ... *\/ }
  * };
  *
  * const sdk = new MyceliumSDK(config);

@@ -5,7 +5,7 @@ import type { SupportedChainId } from '@/constants/chains';
 
 /**
  * Mock Chain Manager for testing
- * @description Provides a mock implementation of ChainManager for testing purposes
+ *  Provides a mock implementation of ChainManager for testing purposes
  */
 export const createMockChainManager = (): ChainManager => {
   const mockPublicClient = {

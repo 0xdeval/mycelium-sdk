@@ -5,7 +5,7 @@ import { getRandomAddress } from '@/test/utils';
 
 /**
  * Mock Privy Client for testing
- * @description Provides a mock implementation of PrivyClient for testing purposes
+ *  Provides a mock implementation of PrivyClient for testing purposes
  */
 export class MockPrivyClient {
   public walletApi = {
