@@ -20,6 +20,7 @@ import { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult, Protocol } from '@/types/protocols/general';
 import type { CoinbaseCDP } from '@/tools/CoinbaseCDP';
+import type { OnRampUrlResponse, RampConfigResponse } from '@/types/ramp';
 
 /**
  * Default ERC-4337 smart wallet implementation. Implements main methods that a user can use to interact with DeFi protocols and use all related functionalities
@@ -322,21 +323,21 @@ export class DefaultSmartWallet extends SmartWallet {
    * Funds the smart wallet with the specified amount of the specified token via Coinbase CDP on-ramp service
    *
    * @public
-   * @category On-Ramp
+   * @category Ramp
    *
    * @remarks
-   * If Coinbase CDP is not initialized, the method will throw an error
+   * If Coinbase CDP is not initialized, the method will throw an error. For more details, visit @see {@link https://docs.cdp.coinbase.com/api-reference/v2/rest-api/onramp/create-an-onramp-session}
    *
    * @param amount Amount of token that a user wants to purchase and top up his account with (e.g., `"100"`, `"1.5"`)
    * @param redirectUrl URL to redirect to after the on-ramp is complete. It's required to be a valid URL
-   * @param purchaseCurrency Purchase currency (e.g., `"USDC"`, `"ETH"`). To get the ful list, visit ""
-   * @param paymentCurrency Payment currency (e.g., `"USD"`, `"EUR"`). To get the ful list, visit ""
-   * @param paymentMethod Payment method (e.g., `"CARD"`). To get the ful list, visit ""
+   * @param purchaseCurrency Purchase currency (e.g., `"USDC"`, `"ETH"`)
+   * @param paymentCurrency Payment currency (e.g., `"USD"`, `"EUR"`)
+   * @param paymentMethod Payment method (e.g., `"CARD"`)
    * @param chain Chain name (e.g., `"base"`)
    * @param country Country code (e.g., `"US"`)
    *
    *
-   * @returns A URL string to the on-ramp service
+   * @returns @see {@link OnRampUrlResponse}
    */
   async topUp(
     amount: string,
@@ -344,9 +345,8 @@ export class DefaultSmartWallet extends SmartWallet {
     purchaseCurrency?: string,
     paymentCurrency?: string,
     paymentMethod?: string,
-    chain?: string,
     country?: string,
-  ) {
+  ): Promise<OnRampUrlResponse> {
     if (!this.coinbaseCDP) {
       throw new Error(
         'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
@@ -366,6 +366,90 @@ export class DefaultSmartWallet extends SmartWallet {
     );
 
     return onRampLink;
+  }
+
+  /**
+   * Return all supported countries and payment methods for on-ramp by Coinbase CDP
+   * @category Ramp
+   *
+   * @returns @see {@link RampConfigResponse} with supported countries and payment methods for on-ramp
+   * @throws If API returned an error
+   */
+  async topUpOptions(): Promise<RampConfigResponse> {
+    if (!this.coinbaseCDP) {
+      throw new Error(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    }
+
+    const onRampConfig = await this.coinbaseCDP.getOnRampConfig();
+    return onRampConfig;
+  }
+
+  /**
+   * Cashout token from smart wallet to fiat currency via Coinbase CDP off-ramp service
+   *
+   * @public
+   * @category Ramp
+   *
+   * @remarks
+   * If Coinbase CDP is not initialized, the method will throw an error. For more details, visit @see {@link https://docs.cdp.coinbase.com/api-reference/rest-api/onramp-offramp/create-sell-quote}
+   *
+   * @param country Country code (e.g., `"US"`)
+   * @param paymentMethod Payment method (e.g., `"CARD"`). To get the ful list, visit ""
+   * @param redirectUrl URL to redirect to after the off-ramp is complete. It's required to be a valid URL
+   * @param sellAmount Amount of token that a user wants to sell (e.g., `"100"`, `"1.5"`)
+   * @param cashoutCurrency Cashout currency (e.g., `"USD"`, `"EUR"`). To get the ful list, visit ""
+   * @param sellCurrency Sell currency (e.g., `"USDC"`, `"ETH"`). To get the ful list, visit ""
+   *
+   *
+   * @returns @see {@link OffRampUrlResponse}
+   */
+  async cashOut(
+    country: string,
+    paymentMethod: string,
+    redirectUrl: string,
+    sellAmount: string,
+    cashoutCurrency?: string,
+    sellCurrency?: string,
+  ) {
+    if (!this.coinbaseCDP) {
+      throw new Error(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    }
+
+    const address = await this.getAddress();
+
+    const offRampLink = await this.coinbaseCDP.getOffRampLink(
+      address,
+      country,
+      paymentMethod,
+      redirectUrl,
+      sellAmount,
+      cashoutCurrency,
+      sellCurrency,
+    );
+
+    return offRampLink;
+  }
+
+  /**
+   * Return all supported countries and payment methods for off-ramp by Coinbase CDP
+   * @category Ramp
+   *
+   * @returns @see {@link RampConfigResponse} with supported countries and payment methods for off-ramp
+   * @throws If API returned an error
+   */
+  async cashOutOptions(): Promise<RampConfigResponse> {
+    if (!this.coinbaseCDP) {
+      throw new Error(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    }
+
+    const offRampConfig = await this.coinbaseCDP.getOffRampConfig();
+    return offRampConfig;
   }
 
   /**

@@ -1,4 +1,4 @@
-import type { CoinbaseCDPError, OnRampUrlResponse } from '@/types/ramp';
+import type { CoinbaseCDPError, OnRampUrlResponse, RampConfigResponse } from '@/types/ramp';
 
 export const onRampResponseMock: OnRampUrlResponse = {
   quote: {
@@ -33,4 +33,33 @@ export const coinbaseCDPErrorMock: CoinbaseCDPError = {
   errorLink: 'https://docs.cdp.coinbase.com/api-reference/v2/errors#invalid_request',
   errorMessage: 'InvalidRequest: payment method APPLE_PAY is not supported by country PT',
   errorType: 'invalid_request',
+};
+
+export const onRampConfigResponseMock: RampConfigResponse = {
+  countries: [
+    {
+      id: 'AD',
+      subdivisions: [],
+      payment_methods: [
+        {
+          id: 'CARD',
+        },
+        {
+          id: 'CRYPTO_ACCOUNT',
+        },
+        {
+          id: 'FIAT_WALLET',
+        },
+      ],
+    },
+    {
+      id: 'AE',
+      subdivisions: [],
+      payment_methods: [
+        {
+          id: 'CRYPTO_ACCOUNT',
+        },
+      ],
+    },
+  ],
 };

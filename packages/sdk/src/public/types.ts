@@ -7,3 +7,4 @@ export type { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 export type { WalletNamespace } from '@/wallet/WalletNamespace';
 export type { EmbeddedWallet } from '@/wallet/base/wallets/EmbeddedWallet';
 export type { MyceliumSDKConfig } from '@/types/sdk';
+export type { OnRampUrlResponse, OffRampUrlResponse, RampConfigResponse } from '@/types/ramp';

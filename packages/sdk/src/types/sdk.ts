@@ -46,6 +46,13 @@ export interface MyceliumSDKConfig {
    * Settings for embedded wallets and smart account providers. Currently support only Privy provider with their API keys
    * */
   walletsConfig: WalletConfig;
+
+  /**
+   * Unique identifier for the SDK integrator
+   * @remarks
+   * Used for Coinbase CDP API, and internally for tracking the usage of the SDK
+   */
+  integratorId: string;
   /**
    * Chains to use for the SDK
    * @remarks

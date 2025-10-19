@@ -49,7 +49,8 @@ import { CoinbaseCDP } from './tools/CoinbaseCDP';
  *   walletsConfig: { /* ... *\/ },
  *   protocolsRouterConfig: { /* ... *\/ },
  *   chain: { /* ... *\/ },
- *   coinbaseCDPConfig: { /* ... *\/ }
+ *   coinbaseCDPConfig: { /* ... *\/ },
+ *   integratorId: 'MyceliumApp',
  * };
  *
  * const sdk = new MyceliumSDK(config);
@@ -124,6 +125,7 @@ export class MyceliumSDK {
       this.coinbaseCDP = new CoinbaseCDP(
         config.coinbaseCDPConfig.apiKeyId,
         config.coinbaseCDPConfig.apiKeySecret,
+        config.integratorId,
         this.chainManager,
       );
     }

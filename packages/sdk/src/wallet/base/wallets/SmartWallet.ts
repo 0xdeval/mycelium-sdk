@@ -5,6 +5,7 @@ import type { TokenBalance } from '@/types/token';
 import type { AssetIdentifier } from '@/utils/assets';
 import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult } from '@/types/protocols/general';
+import type { OffRampUrlResponse, OnRampUrlResponse, RampConfigResponse } from '@/types/ramp';
 
 /**
  * Abstract base class for smart wallet implementations
@@ -116,4 +117,76 @@ export abstract class SmartWallet {
    * @returns Promise resolving to a {@link VaultTxnResult}
    */
   abstract withdraw(amount: string): Promise<VaultTxnResult>;
+
+  /**
+   * Funds the smart wallet with the specified amount of the specified token via Coinbase CDP on-ramp service
+   *
+   * @internal
+   * @category Ramp
+   *
+   * @remarks
+   * If Coinbase CDP is not initialized, the method will throw an error
+   *
+   * @param amount Amount of token that a user wants to purchase and top up his account with (e.g., `"100"`, `"1.5"`)
+   * @param redirectUrl URL to redirect to after the on-ramp is complete. It's required to be a valid URL
+   * @param purchaseCurrency Purchase currency (e.g., `"USDC"`, `"ETH"`). To get the ful list, visit ""
+   * @param paymentCurrency Payment currency (e.g., `"USD"`, `"EUR"`). To get the ful list, visit ""
+   * @param paymentMethod Payment method (e.g., `"CARD"`). To get the ful list, visit ""
+   * @param chain Chain name (e.g., `"base"`)
+   * @param country Country code (e.g., `"US"`)
+   *
+   *
+   * @returns A URL string to the on-ramp service
+   */
+  abstract topUp(
+    amount: string,
+    redirectUrl: string,
+    purchaseCurrency?: string,
+    paymentCurrency?: string,
+    paymentMethod?: string,
+    country?: string,
+  ): Promise<OnRampUrlResponse>;
+
+  /**
+   * @internal
+   * Return all supported countries and payment methods for on-ramp by Coinbase CDP
+   * @category Ramp
+   *
+   * @returns RampConfigResponse with supported countries and payment methods for on-ramp
+   * @throws If API returned an error
+   */
+  abstract topUpOptions(): Promise<RampConfigResponse>;
+
+  /**
+   * @internal
+   * Cash out funds from the smart wallet to a specified currency via Coinbase CDP off-ramp service
+   * @category Ramp
+   *
+   * @param country
+   * @param paymentMethod
+   * @param redirectUrl
+   * @param sellAmount
+   * @param cashoutCurrency
+   * @param sellCurrency
+   * @returns A URL string to the off-ramp service
+   *
+   */
+  abstract cashOut(
+    country: string,
+    paymentMethod: string,
+    redirectUrl: string,
+    sellAmount: string,
+    cashoutCurrency?: string,
+    sellCurrency?: string,
+  ): Promise<OffRampUrlResponse>;
+
+  /**
+   * @internal
+   * Return all supported countries and payment methods for off-ramp by Coinbase CDP
+   * @category Ramp
+   *
+   * @returns RampConfigResponse with supported countries and payment methods for off-ramp
+   * @throws If API returned an error
+   */
+  abstract cashOutOptions(): Promise<RampConfigResponse>;
 }

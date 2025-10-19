@@ -48,7 +48,9 @@
     "xencodeddata",
     "sUSDC",
     "Pimlico",
-    "Vercel"
+    "Vercel",
+    "cashout",
+    "offramp"
   ],
   "enableFiletypes": ["!binary"],
   "overrides": [

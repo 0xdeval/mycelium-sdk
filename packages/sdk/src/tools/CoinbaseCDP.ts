@@ -1,8 +1,14 @@
 import { generateJwt } from '@coinbase/cdp-sdk/auth';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
-import type { CoinbaseCDPAuthParams, OnRampUrlResponse, CoinbaseCDPError } from '@/types/ramp';
+import type {
+  CoinbaseCDPAuthParams,
+  OnRampUrlResponse,
+  CoinbaseCDPError,
+  RampConfigResponse,
+  OffRampUrlResponse,
+} from '@/types/ramp';
 import type { Address } from 'viem';
-import type { ChainManager } from './ChainManager';
+import type { ChainManager } from '@/tools/ChainManager';
 import { checkValidUrl } from '@/utils/urls';
 import { chainById } from '@/utils/chains';
 
@@ -10,8 +16,10 @@ export class CoinbaseCDP {
   private readonly apiKeyId: string;
   private readonly apiKeySecret: string;
   private readonly chainManager: ChainManager;
+  private readonly integratorId: string;
 
-  private readonly coinbaseCdpHostname: string = 'https://api.cdp.coinbase.com';
+  private readonly coinbaseCdpV2Hostname: string = 'https://api.cdp.coinbase.com';
+  private readonly coinbaseCdpV1Hostname: string = 'https://api.developer.coinbase.com';
 
   private readonly onRampUrlAuthParams: CoinbaseCDPAuthParams = {
     requestMethod: 'POST',
@@ -20,16 +28,54 @@ export class CoinbaseCDP {
     expiresIn: 120,
   };
 
-  private readonly client: AxiosInstance = axios.create({
-    baseURL: this.coinbaseCdpHostname,
-  });
+  private readonly onRampConfigAuthParams: CoinbaseCDPAuthParams = {
+    requestMethod: 'GET',
+    requestHost: 'api.developer.coinbase.com',
+    requestPath: '/onramp/v1/buy/config',
+    expiresIn: 120,
+  };
 
-  constructor(apiKeyId: string, apiKeySecret: string, chainManager: ChainManager) {
+  private readonly offRampUrlAuthParams: CoinbaseCDPAuthParams = {
+    requestMethod: 'POST',
+    requestHost: 'api.developer.coinbase.com',
+    requestPath: '/onramp/v1/sell/quote',
+    expiresIn: 120,
+  };
+
+  private readonly offRampConfigAuthParams: CoinbaseCDPAuthParams = {
+    requestMethod: 'GET',
+    requestHost: 'api.developer.coinbase.com',
+    requestPath: '/onramp/v1/sell/config',
+    expiresIn: 120,
+  };
+
+  private readonly clientV2: AxiosInstance = axios.create({
+    baseURL: this.coinbaseCdpV2Hostname,
+  });
+  private readonly clientV1: AxiosInstance = axios.create({
+    baseURL: this.coinbaseCdpV1Hostname,
+  });
+  constructor(
+    apiKeyId: string,
+    apiKeySecret: string,
+    integratorId: string,
+    chainManager: ChainManager,
+  ) {
     this.apiKeyId = apiKeyId;
     this.apiKeySecret = apiKeySecret;
     this.chainManager = chainManager;
+    this.integratorId = integratorId;
   }
 
+  /**
+   * @internal
+   * Generate a JWT token for a provided API endpoint and hostname to make a request after
+   * @category Ramp
+   *
+   * @param authParams Authentication parameters
+   * @returns JWT token
+   * @throws Error if the JWT token generation fails
+   */
   async auth(authParams: CoinbaseCDPAuthParams): Promise<string> {
     const jwtToken = await generateJwt({
       apiKeyId: this.apiKeyId,
@@ -40,6 +86,22 @@ export class CoinbaseCDP {
     return jwtToken;
   }
 
+  /**
+   * @internal
+   * Return a on-ramp URL for the given parameters via Coinbase CDP V2 API
+   * @category Ramp
+   *
+   * @param receiverAddress
+   * @param redirectUrl
+   * @param amount
+   * @param purchaseCurrency
+   * @param paymentCurrency
+   * @param paymentMethod
+   * @param country
+   * @returns OnRampUrlResponse
+   * @throws Error if redirect URL is not a valid URL
+   * @throws CoinbaseCDPError if the request fails
+   */
   async getOnRampLink(
     receiverAddress: Address,
     redirectUrl: string,
@@ -58,7 +120,7 @@ export class CoinbaseCDP {
 
     const authJwtToken = await this.auth(this.onRampUrlAuthParams);
 
-    const response: AxiosResponse<OnRampUrlResponse | CoinbaseCDPError> = await this.client.post(
+    const response: AxiosResponse<OnRampUrlResponse | CoinbaseCDPError> = await this.clientV2.post(
       this.onRampUrlAuthParams.requestPath,
       {
         destinationAddress: receiverAddress,
@@ -84,5 +146,123 @@ export class CoinbaseCDP {
     const onRampResponse = response.data as OnRampUrlResponse;
 
     return onRampResponse;
+  }
+
+  /**
+   * @internal
+   * Current method return all supported countries and payment methods for on-ramp by Coinbase CDP
+   * @category Ramp
+   *
+   * @returns Config with supported countries and payment methods for on-ramp
+   * @throws If API returned an error
+   */
+  async getOnRampConfig(): Promise<RampConfigResponse> {
+    const authJwtToken = await this.auth(this.onRampConfigAuthParams);
+
+    const response: AxiosResponse<RampConfigResponse | CoinbaseCDPError> = await this.clientV1.get(
+      this.onRampConfigAuthParams.requestPath,
+      {
+        headers: { Authorization: `Bearer ${authJwtToken}` },
+      },
+    );
+
+    if (response.status !== 200) {
+      const error = response.data as CoinbaseCDPError;
+      throw error;
+    }
+
+    const onRampConfigResponse = response.data as RampConfigResponse;
+    return onRampConfigResponse;
+  }
+
+  /**
+   * @internal
+   * Return a off-ramp URL for the given parameters via Coinbase CDP V1 API
+   * @remarks
+   * Use an integratorId as a partnerUserId  in Coinbase CDP API
+   * @category Ramp
+   *
+   * @param address
+   * @param country
+   * @param paymentMethod
+   * @param redirectUrl
+   * @param sellAmount
+   * @param cashoutCurrency
+   * @param sellCurrency
+   * @returns OffRampUrlResponse
+   * @throws Error if redirect URL is not a valid URL
+   * @throws CoinbaseCDPError if the request fails
+   */
+  async getOffRampLink(
+    address: Address,
+    country: string,
+    paymentMethod: string,
+    redirectUrl: string,
+    sellAmount: string,
+    cashoutCurrency: string = 'USD',
+    sellCurrency: string = 'USDC',
+  ): Promise<OffRampUrlResponse> {
+    if (!checkValidUrl(redirectUrl)) {
+      throw new Error('Redirect URL is not a valid URL');
+    }
+
+    const chainId = this.chainManager.getSupportedChain();
+    const chainName = chainById[chainId]?.name.toLowerCase();
+
+    const authJwtToken = await this.auth(this.offRampUrlAuthParams);
+
+    const response: AxiosResponse<OffRampUrlResponse | CoinbaseCDPError> = await this.clientV1.post(
+      this.offRampUrlAuthParams.requestPath,
+      {
+        sourceAddress: address,
+        country,
+        paymentMethod,
+        partnerUserId: this.integratorId,
+        redirectUrl,
+        sellAmount,
+        sellNetwork: chainName,
+        cashoutCurrency,
+        sellCurrency,
+      },
+      {
+        method: this.offRampUrlAuthParams.requestMethod,
+        headers: { Authorization: `Bearer ${authJwtToken}`, 'Content-Type': 'application/json' },
+      },
+    );
+
+    if (response.status !== 200 && response.status !== 201) {
+      const error = response.data as CoinbaseCDPError;
+      throw error;
+    }
+
+    const offRampResponse = response.data as OffRampUrlResponse;
+
+    return offRampResponse;
+  }
+
+  /**
+   * @internal
+   * Current method return all supported countries and payment methods for off-ramp by Coinbase CDP
+   * @category Ramp
+   * @returns Config with supported countries and payment methods for off-ramp
+   * @throws If API returned an error
+   */
+  async getOffRampConfig(): Promise<RampConfigResponse> {
+    const authJwtToken = await this.auth(this.offRampConfigAuthParams);
+
+    const response: AxiosResponse<RampConfigResponse | CoinbaseCDPError> = await this.clientV1.get(
+      this.offRampConfigAuthParams.requestPath,
+      {
+        headers: { Authorization: `Bearer ${authJwtToken}` },
+      },
+    );
+
+    if (response.status !== 200) {
+      const error = response.data as CoinbaseCDPError;
+      throw error;
+    }
+
+    const offRampConfigResponse = response.data as RampConfigResponse;
+    return offRampConfigResponse;
   }
 }

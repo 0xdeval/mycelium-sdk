@@ -1,6 +1,7 @@
 import type { WalletRecord } from '@/libs/WalletsDatabase';
 import {
   MyceliumSDK,
+  type OnRampUrlResponse,
   type SmartWallet,
   type VaultBalance,
   type VaultTxnResult,
@@ -27,6 +28,7 @@ export class MyceliumService {
 
     try {
       this.sdk = new MyceliumSDK({
+        integratorId: process.env.NEXT_PUBLIC_INTEGRATOR_ID!,
         walletsConfig: {
           embeddedWalletConfig: {
             provider: {
@@ -108,6 +110,22 @@ export class MyceliumService {
         formattedBalance: token.totalFormattedBalance,
       };
     });
+  }
+
+  async getOnRampLink(walletId: string): Promise<OnRampUrlResponse> {
+    if (!this.sdk) {
+      throw new Error('SDK not initialized');
+    }
+
+    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+      walletId,
+    });
+
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/onramp-success`;
+
+    const onRampQuote: OnRampUrlResponse = await wallet.topUp('100', redirectUrl, 'USDC', 'USD');
+
+    return onRampQuote;
   }
 
   async earn(walletId: string, amount: string): Promise<VaultTxnResult> {

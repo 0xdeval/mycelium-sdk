@@ -57,7 +57,12 @@ describe('CoinbaseCDP (implementation)', () => {
   describe('auth', () => {
     it('calls generateJwt with correct params and returns token', async () => {
       const { generateJwt } = await import('@coinbase/cdp-sdk/auth');
-      const cdp = new CoinbaseCDP('test-api-key-id', 'test-api-key-secret', chainManager);
+      const cdp = new CoinbaseCDP(
+        'test-api-key-id',
+        'test-api-key-secret',
+        'test-integrator-id',
+        chainManager,
+      );
 
       const token = await cdp.auth({
         requestMethod: 'POST',
@@ -87,7 +92,7 @@ describe('CoinbaseCDP (implementation)', () => {
       const post = await getAxiosPostMock();
       post.mockResolvedValueOnce({ status: 200, data: onRampResponseMock });
 
-      const cdp = new CoinbaseCDP('k', 's', chainManager);
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
       const res = await cdp.getOnRampLink(addr, redirectUrl, amount);
 
       expect(res).toEqual(onRampResponseMock);
@@ -99,7 +104,7 @@ describe('CoinbaseCDP (implementation)', () => {
       const post = await getAxiosPostMock();
       post.mockResolvedValueOnce({ status: 200, data: onRampResponseMock });
 
-      const cdp = new CoinbaseCDP('k', 's', chainManager);
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
       await cdp.getOnRampLink(addr, redirectUrl, amount, 'USDC', 'USD', 'CARD', 'US');
 
       expect(post).toHaveBeenCalledWith(
@@ -128,7 +133,7 @@ describe('CoinbaseCDP (implementation)', () => {
       const post = await getAxiosPostMock();
       post.mockResolvedValueOnce({ status: 201, data: onRampResponseMock });
 
-      const cdp = new CoinbaseCDP('k', 's', chainManager);
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
       const res = await cdp.getOnRampLink(addr as any, redirectUrl, amount);
       expect(res).toEqual(onRampResponseMock);
     });
@@ -142,7 +147,7 @@ describe('CoinbaseCDP (implementation)', () => {
         vi.mocked(urls.checkValidUrl).mockReturnValueOnce(false);
       }
 
-      const cdp = new CoinbaseCDP('k', 's', chainManager);
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
       await expect(cdp.getOnRampLink(addr as any, 'invalid-url', amount)).rejects.toThrow(
         'Redirect URL is not a valid URL',
       );
@@ -152,7 +157,7 @@ describe('CoinbaseCDP (implementation)', () => {
       const post = await getAxiosPostMock();
       post.mockRejectedValueOnce(new Error('Network error'));
 
-      const cdp = new CoinbaseCDP('k', 's', chainManager);
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
       await expect(cdp.getOnRampLink(addr as any, redirectUrl, amount)).rejects.toThrow(
         'Network error',
       );
@@ -162,7 +167,7 @@ describe('CoinbaseCDP (implementation)', () => {
       const post = await getAxiosPostMock();
       post.mockResolvedValueOnce({ status: 400, data: coinbaseCDPErrorMock });
 
-      const cdp = new CoinbaseCDP('k', 's', chainManager);
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
       await expect(cdp.getOnRampLink(addr as any, redirectUrl, amount)).rejects.toThrow();
     });
   });
