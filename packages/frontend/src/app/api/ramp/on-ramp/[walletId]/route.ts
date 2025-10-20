@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { MyceliumService } from '@/libs/MyceliumService';
-import type { OnRampUrlResponse } from '@mycelium-sdk/core';
+import type { TopUpUrlResponse } from '@mycelium-sdk/core';
 
-export async function GET(
+export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ walletId: string }> },
 ) {
@@ -17,19 +17,19 @@ export async function GET(
     await myceliumService.init();
 
     try {
-      const onRampLink: OnRampUrlResponse = await myceliumService.getOnRampLink(walletId);
+      const topUpLink: TopUpUrlResponse = await myceliumService.getTopUpLink(walletId);
       return NextResponse.json({
         success: true,
-        onRampLink,
+        data: topUpLink,
       });
     } catch (error) {
       return NextResponse.json({
         success: false,
-        error: 'Failed to get on-ramp link: ' + error,
+        error: 'Failed to get top-up link: ' + error,
       });
     }
   } catch (error) {
-    console.error('Error getting on-ramp link:', error);
-    return NextResponse.json({ error: `Failed to get on-ramp link: ${error}` }, { status: 500 });
+    console.error('Error getting top-up link:', error);
+    return NextResponse.json({ error: `Failed to get top-up link: ${error}` }, { status: 500 });
   }
 }

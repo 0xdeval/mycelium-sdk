@@ -5,7 +5,12 @@ export interface CoinbaseCDPAuthParams {
   expiresIn?: number;
 }
 
-export interface OnRampUrlResponse {
+/**
+ * The quote and session URL for a valid on-ramp operation
+ * @public
+ * @category Types
+ */
+export interface TopUpUrlResponse {
   quote?: {
     destinationNetwork: string;
     exchangeRate: string;
@@ -25,16 +30,21 @@ export interface OnRampUrlResponse {
   };
 }
 
-interface OffRampUrlResponseSellingParams {
+interface CashOutUrlResponseSellingParams {
   value: string;
   currency: string;
 }
 
-export interface OffRampUrlResponse {
-  cashout_total: OffRampUrlResponseSellingParams;
-  cashout_subtotal: OffRampUrlResponseSellingParams;
-  sell_amount: OffRampUrlResponseSellingParams;
-  coinbase_fee: OffRampUrlResponseSellingParams;
+/**
+ * Details and a URL link for a valid off-ramp operation
+ * @public
+ * @category Types
+ */
+export interface CashOutUrlResponse {
+  cashout_total: CashOutUrlResponseSellingParams;
+  cashout_subtotal: CashOutUrlResponseSellingParams;
+  sell_amount: CashOutUrlResponseSellingParams;
+  coinbase_fee: CashOutUrlResponseSellingParams;
   quote_id: string;
   offramp_url: string;
 }
@@ -56,6 +66,11 @@ interface RampConfigCountryWithMethods {
   payment_methods?: RampConfigPaymentMethod[];
 }
 
+/**
+ * The list of countries and payment methods for on/off-ramp
+ * @public
+ * @category Types
+ */
 export interface RampConfigResponse {
   countries: RampConfigCountryWithMethods[];
 }

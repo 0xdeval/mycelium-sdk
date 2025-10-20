@@ -5,7 +5,7 @@ import type { TokenBalance } from '@/types/token';
 import type { AssetIdentifier } from '@/utils/assets';
 import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult } from '@/types/protocols/general';
-import type { OffRampUrlResponse, OnRampUrlResponse, RampConfigResponse } from '@/types/ramp';
+import type { CashOutUrlResponse, TopUpUrlResponse } from '@/types/ramp';
 
 /**
  * Abstract base class for smart wallet implementations
@@ -145,17 +145,7 @@ export abstract class SmartWallet {
     paymentCurrency?: string,
     paymentMethod?: string,
     country?: string,
-  ): Promise<OnRampUrlResponse>;
-
-  /**
-   * @internal
-   * Return all supported countries and payment methods for on-ramp by Coinbase CDP
-   * @category Ramp
-   *
-   * @returns RampConfigResponse with supported countries and payment methods for on-ramp
-   * @throws If API returned an error
-   */
-  abstract topUpOptions(): Promise<RampConfigResponse>;
+  ): Promise<TopUpUrlResponse>;
 
   /**
    * @internal
@@ -178,15 +168,5 @@ export abstract class SmartWallet {
     sellAmount: string,
     cashoutCurrency?: string,
     sellCurrency?: string,
-  ): Promise<OffRampUrlResponse>;
-
-  /**
-   * @internal
-   * Return all supported countries and payment methods for off-ramp by Coinbase CDP
-   * @category Ramp
-   *
-   * @returns RampConfigResponse with supported countries and payment methods for off-ramp
-   * @throws If API returned an error
-   */
-  abstract cashOutOptions(): Promise<RampConfigResponse>;
+  ): Promise<CashOutUrlResponse>;
 }

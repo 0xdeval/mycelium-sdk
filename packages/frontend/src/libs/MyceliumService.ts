@@ -1,10 +1,12 @@
 import type { WalletRecord } from '@/libs/WalletsDatabase';
 import {
   MyceliumSDK,
-  type OnRampUrlResponse,
+  type TopUpUrlResponse,
+  type RampConfigResponse,
   type SmartWallet,
   type VaultBalance,
   type VaultTxnResult,
+  type CashOutUrlResponse,
 } from '@mycelium-sdk/core';
 
 export class MyceliumService {
@@ -52,6 +54,10 @@ export class MyceliumService {
         },
         protocolsRouterConfig: {
           riskLevel: 'low',
+        },
+        coinbaseCDPConfig: {
+          apiKeyId: process.env.NEXT_PUBLIC_COINBASE_CDP_API_KEY_ID!,
+          apiKeySecret: process.env.NEXT_PUBLIC_COINBASE_CDP_API_KEY_SECRET!,
         },
       });
 
@@ -112,7 +118,7 @@ export class MyceliumService {
     });
   }
 
-  async getOnRampLink(walletId: string): Promise<OnRampUrlResponse> {
+  async getTopUpLink(walletId: string): Promise<TopUpUrlResponse> {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }
@@ -121,11 +127,53 @@ export class MyceliumService {
       walletId,
     });
 
-    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/onramp-success`;
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/topup-success`;
 
-    const onRampQuote: OnRampUrlResponse = await wallet.topUp('100', redirectUrl, 'USDC', 'USD');
+    const topUpLink: TopUpUrlResponse = await wallet.topUp('100', redirectUrl, 'USDC', 'USD');
 
-    return onRampQuote;
+    return topUpLink;
+  }
+
+  async getCashOutLink(walletId: string): Promise<CashOutUrlResponse> {
+    if (!this.sdk) {
+      throw new Error('SDK not initialized');
+    }
+
+    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+      walletId,
+    });
+
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/cashout-success`;
+
+    const cashOutLink: CashOutUrlResponse = await wallet.cashOut(
+      'US',
+      'FIAT_WALLET',
+      redirectUrl,
+      '100',
+      'USDC',
+      'USD',
+    );
+
+    return cashOutLink;
+  }
+
+  async getTopUpOptions(): Promise<RampConfigResponse> {
+    if (!this.sdk) {
+      throw new Error('SDK not initialized');
+    }
+
+    const onRampConfig = await this.sdk.rampConfig.getTopUpConfig();
+
+    return onRampConfig;
+  }
+
+  async getCashOutOptions(): Promise<RampConfigResponse> {
+    if (!this.sdk) {
+      throw new Error('SDK not initialized');
+    }
+    const offRampConfig = await this.sdk.rampConfig.getCashOutConfig();
+
+    return offRampConfig;
   }
 
   async earn(walletId: string, amount: string): Promise<VaultTxnResult> {

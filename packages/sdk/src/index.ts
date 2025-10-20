@@ -25,7 +25,7 @@ import { PrivyClient } from '@privy-io/server-auth';
 import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
-import { CoinbaseCDP } from './tools/CoinbaseCDP';
+import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from './tools/CoinbaseCDP';
 
 /**
  * Main SDK facade for integrating wallets and protocols.
@@ -96,7 +96,7 @@ export class MyceliumSDK {
    * Calling the respective method will throw an error.
    * @internal
    */
-  private coinbaseCDP: CoinbaseCDP | null = null;
+  private coinbaseCDP: CoinbaseCDPType | null = null;
 
   /**
    * Creates a new SDK instance
@@ -142,12 +142,57 @@ export class MyceliumSDK {
 
   /**
    * Returns the chain manager instance for multi-chain operations
-   * @internal
+   * @public
+   * @category Tools
+   *
    * @returns ChainManager instance of the type {@link ChainManager}
    */
   get chainManager(): ChainManager {
     return this._chainManager;
   }
+
+  /**
+   * Coinbase CDP configuration methods for ramp operations
+   * @public
+   * @category Tools
+   */
+  public readonly rampConfig = {
+    /**
+     * Return all supported countries and payment methods for on-ramp by Coinbase CDP
+     * @public
+     * @category Ramp
+     *
+     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for top-up
+     * @throws If API returned an error
+     */
+    getTopUpConfig: async () => {
+      if (!this.coinbaseCDP) {
+        throw new Error(
+          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+        );
+      }
+
+      return await this.coinbaseCDP.getOnRampConfig();
+    },
+    /**
+     * Return all supported countries and payment methods for off-ramp by Coinbase CDP
+     * @public
+     * @category Ramp
+     *
+     *
+     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for cash out
+     * @throws If API returned an error
+     */
+    getCashOutConfig: async () => {
+      if (!this.coinbaseCDP) {
+        throw new Error(
+          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+        );
+      }
+
+      return await this.coinbaseCDP.getOffRampConfig();
+    },
+  };
 
   /**
    * Recommends and initializes a protocol based on router settings

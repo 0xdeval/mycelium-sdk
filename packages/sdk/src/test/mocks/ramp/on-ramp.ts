@@ -1,6 +1,6 @@
-import type { CoinbaseCDPError, OnRampUrlResponse, RampConfigResponse } from '@/types/ramp';
+import type { CoinbaseCDPError, TopUpUrlResponse, RampConfigResponse } from '@/types/ramp';
 
-export const onRampResponseMock: OnRampUrlResponse = {
+export const onRampResponseMock: TopUpUrlResponse = {
   quote: {
     destinationNetwork: 'base',
     exchangeRate: '1',

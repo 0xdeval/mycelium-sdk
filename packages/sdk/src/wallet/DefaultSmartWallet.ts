@@ -20,7 +20,7 @@ import { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult, Protocol } from '@/types/protocols/general';
 import type { CoinbaseCDP } from '@/tools/CoinbaseCDP';
-import type { OnRampUrlResponse, RampConfigResponse } from '@/types/ramp';
+import type { TopUpUrlResponse } from '@/types/ramp';
 
 /**
  * Default ERC-4337 smart wallet implementation. Implements main methods that a user can use to interact with DeFi protocols and use all related functionalities
@@ -346,7 +346,7 @@ export class DefaultSmartWallet extends SmartWallet {
     paymentCurrency?: string,
     paymentMethod?: string,
     country?: string,
-  ): Promise<OnRampUrlResponse> {
+  ): Promise<TopUpUrlResponse> {
     if (!this.coinbaseCDP) {
       throw new Error(
         'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
@@ -366,24 +366,6 @@ export class DefaultSmartWallet extends SmartWallet {
     );
 
     return onRampLink;
-  }
-
-  /**
-   * Return all supported countries and payment methods for on-ramp by Coinbase CDP
-   * @category Ramp
-   *
-   * @returns @see {@link RampConfigResponse} with supported countries and payment methods for on-ramp
-   * @throws If API returned an error
-   */
-  async topUpOptions(): Promise<RampConfigResponse> {
-    if (!this.coinbaseCDP) {
-      throw new Error(
-        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
-      );
-    }
-
-    const onRampConfig = await this.coinbaseCDP.getOnRampConfig();
-    return onRampConfig;
   }
 
   /**
@@ -432,24 +414,6 @@ export class DefaultSmartWallet extends SmartWallet {
     );
 
     return offRampLink;
-  }
-
-  /**
-   * Return all supported countries and payment methods for off-ramp by Coinbase CDP
-   * @category Ramp
-   *
-   * @returns @see {@link RampConfigResponse} with supported countries and payment methods for off-ramp
-   * @throws If API returned an error
-   */
-  async cashOutOptions(): Promise<RampConfigResponse> {
-    if (!this.coinbaseCDP) {
-      throw new Error(
-        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
-      );
-    }
-
-    const offRampConfig = await this.coinbaseCDP.getOffRampConfig();
-    return offRampConfig;
   }
 
   /**

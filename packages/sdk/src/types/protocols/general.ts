@@ -19,7 +19,7 @@ export interface ProtocolInfo {
  */
 export interface Protocol {
   instance: BaseProtocol;
-  info?: ProtocolInfo;
+  info: ProtocolInfo;
 }
 
 /**

@@ -2,10 +2,10 @@ import { generateJwt } from '@coinbase/cdp-sdk/auth';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import type {
   CoinbaseCDPAuthParams,
-  OnRampUrlResponse,
+  TopUpUrlResponse,
   CoinbaseCDPError,
   RampConfigResponse,
-  OffRampUrlResponse,
+  CashOutUrlResponse,
 } from '@/types/ramp';
 import type { Address } from 'viem';
 import type { ChainManager } from '@/tools/ChainManager';
@@ -65,6 +65,14 @@ export class CoinbaseCDP {
     this.apiKeySecret = apiKeySecret;
     this.chainManager = chainManager;
     this.integratorId = integratorId;
+
+    this.verifyParameters();
+  }
+
+  private verifyParameters(): void {
+    if (!this.apiKeyId || !this.apiKeySecret || !this.integratorId) {
+      throw new Error('API key ID, secret and integrator ID are required');
+    }
   }
 
   /**
@@ -110,7 +118,7 @@ export class CoinbaseCDP {
     paymentCurrency: string = 'USD',
     paymentMethod: string = 'CARD',
     country?: string,
-  ): Promise<OnRampUrlResponse> {
+  ): Promise<TopUpUrlResponse> {
     if (!checkValidUrl(redirectUrl)) {
       throw new Error('Redirect URL is not a valid URL');
     }
@@ -120,7 +128,7 @@ export class CoinbaseCDP {
 
     const authJwtToken = await this.auth(this.onRampUrlAuthParams);
 
-    const response: AxiosResponse<OnRampUrlResponse | CoinbaseCDPError> = await this.clientV2.post(
+    const response: AxiosResponse<TopUpUrlResponse | CoinbaseCDPError> = await this.clientV2.post(
       this.onRampUrlAuthParams.requestPath,
       {
         destinationAddress: receiverAddress,
@@ -143,7 +151,7 @@ export class CoinbaseCDP {
       throw error;
     }
 
-    const onRampResponse = response.data as OnRampUrlResponse;
+    const onRampResponse = response.data as TopUpUrlResponse;
 
     return onRampResponse;
   }
@@ -156,7 +164,7 @@ export class CoinbaseCDP {
    * @returns Config with supported countries and payment methods for on-ramp
    * @throws If API returned an error
    */
-  async getOnRampConfig(): Promise<RampConfigResponse> {
+  public async getOnRampConfig(): Promise<RampConfigResponse> {
     const authJwtToken = await this.auth(this.onRampConfigAuthParams);
 
     const response: AxiosResponse<RampConfigResponse | CoinbaseCDPError> = await this.clientV1.get(
@@ -193,6 +201,7 @@ export class CoinbaseCDP {
    * @throws Error if redirect URL is not a valid URL
    * @throws CoinbaseCDPError if the request fails
    */
+  // TODO: Find an issue why it returns a 400 Axios error
   async getOffRampLink(
     address: Address,
     country: string,
@@ -201,7 +210,7 @@ export class CoinbaseCDP {
     sellAmount: string,
     cashoutCurrency: string = 'USD',
     sellCurrency: string = 'USDC',
-  ): Promise<OffRampUrlResponse> {
+  ): Promise<CashOutUrlResponse> {
     if (!checkValidUrl(redirectUrl)) {
       throw new Error('Redirect URL is not a valid URL');
     }
@@ -211,7 +220,7 @@ export class CoinbaseCDP {
 
     const authJwtToken = await this.auth(this.offRampUrlAuthParams);
 
-    const response: AxiosResponse<OffRampUrlResponse | CoinbaseCDPError> = await this.clientV1.post(
+    const response: AxiosResponse<CashOutUrlResponse | CoinbaseCDPError> = await this.clientV1.post(
       this.offRampUrlAuthParams.requestPath,
       {
         sourceAddress: address,
@@ -235,7 +244,7 @@ export class CoinbaseCDP {
       throw error;
     }
 
-    const offRampResponse = response.data as OffRampUrlResponse;
+    const offRampResponse = response.data as CashOutUrlResponse;
 
     return offRampResponse;
   }
@@ -247,7 +256,7 @@ export class CoinbaseCDP {
    * @returns Config with supported countries and payment methods for off-ramp
    * @throws If API returned an error
    */
-  async getOffRampConfig(): Promise<RampConfigResponse> {
+  public async getOffRampConfig(): Promise<RampConfigResponse> {
     const authJwtToken = await this.auth(this.offRampConfigAuthParams);
 
     const response: AxiosResponse<RampConfigResponse | CoinbaseCDPError> = await this.clientV1.get(
