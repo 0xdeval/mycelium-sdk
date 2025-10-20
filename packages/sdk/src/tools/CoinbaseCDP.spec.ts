@@ -1,7 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
-import { onRampResponseMock, coinbaseCDPErrorMock } from '@mycelium/sdk/test/mocks/ramp/on-ramp';
+import {
+  onRampResponseMock,
+  coinbaseCDPErrorMock,
+  onRampConfigResponseMock,
+} from '@mycelium/sdk/test/mocks/ramp/on-ramp';
 import type { ChainManager } from '@mycelium/sdk/tools/ChainManager';
 import type { CoinbaseCDP as cdp } from '@mycelium/sdk/tools/CoinbaseCDP';
+import {
+  offRampConfigResponseMock,
+  offRampResponseMock,
+} from '@mycelium/sdk/test/mocks/ramp/off-ramp';
 
 vi.mock('../../utils/urls', () => ({
   checkValidUrl: vi.fn().mockReturnValue(true),
@@ -20,8 +28,9 @@ vi.mock('@coinbase/cdp-sdk/auth', () => ({
 
 vi.mock('axios', () => {
   const post = vi.fn();
-  const create = vi.fn(() => ({ post }));
-  return { default: { create, post } };
+  const get = vi.fn();
+  const create = vi.fn(() => ({ post, get }));
+  return { default: { create, post, get } };
 });
 
 let CoinbaseCDP: typeof cdp;
@@ -33,10 +42,17 @@ const getAxiosPostMock = async () => {
   return instance.post as Mock;
 };
 
+const getAxiosGetMock = async () => {
+  const axios = await import('axios');
+  const createMock = axios.default.create as unknown as Mock;
+  const instance = createMock.mock.results.at(-1)?.value ?? createMock();
+  return instance.get as Mock;
+};
+
 const makeChainManager = (chainId: number = 8453): ChainManager =>
   ({
     getSupportedChain: vi.fn().mockReturnValue(chainId),
-    getChain: vi.fn((id: number) => ({ id, name: id === 8453 ? 'base' : 'base-sepolia' }) as any),
+    getChain: vi.fn((id: number) => ({ id, name: id === 8453 ? 'base' : 'base-sepolia' })),
   }) as unknown as ChainManager;
 
 describe('CoinbaseCDP (implementation)', () => {
@@ -134,21 +150,16 @@ describe('CoinbaseCDP (implementation)', () => {
       post.mockResolvedValueOnce({ status: 201, data: onRampResponseMock });
 
       const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
-      const res = await cdp.getOnRampLink(addr as any, redirectUrl, amount);
+      const res = await cdp.getOnRampLink(addr, redirectUrl, amount);
       expect(res).toEqual(onRampResponseMock);
     });
 
     it('validates redirect url via mocked checkValidUrl (negative case)', async () => {
-      try {
-        const urls = await import('../../utils/urls');
-        vi.mocked(urls.checkValidUrl).mockReturnValueOnce(false);
-      } catch {
-        const urls = await import('../../utils/urls');
-        vi.mocked(urls.checkValidUrl).mockReturnValueOnce(false);
-      }
+      const urls = await import('../../utils/urls');
+      vi.mocked(urls.checkValidUrl).mockReturnValueOnce(false);
 
       const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
-      await expect(cdp.getOnRampLink(addr as any, 'invalid-url', amount)).rejects.toThrow(
+      await expect(cdp.getOnRampLink(addr, 'invalid-url', amount)).rejects.toThrow(
         'Redirect URL is not a valid URL',
       );
     });
@@ -158,9 +169,7 @@ describe('CoinbaseCDP (implementation)', () => {
       post.mockRejectedValueOnce(new Error('Network error'));
 
       const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
-      await expect(cdp.getOnRampLink(addr as any, redirectUrl, amount)).rejects.toThrow(
-        'Network error',
-      );
+      await expect(cdp.getOnRampLink(addr, redirectUrl, amount)).rejects.toThrow('Network error');
     });
 
     it('throws when API responds with non-200/201', async () => {
@@ -168,7 +177,172 @@ describe('CoinbaseCDP (implementation)', () => {
       post.mockResolvedValueOnce({ status: 400, data: coinbaseCDPErrorMock });
 
       const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
-      await expect(cdp.getOnRampLink(addr as any, redirectUrl, amount)).rejects.toThrow();
+      await expect(cdp.getOnRampLink(addr, redirectUrl, amount)).rejects.toThrow();
+    });
+  });
+
+  describe('getOffRampLink', () => {
+    const addr = '0x1234567890123456789012345678901234567890';
+    const redirectUrl = 'https://example.com/success';
+    const country = 'US';
+    const paymentMethod = 'FIAT_WALLET';
+    const sellAmount = '100';
+    const cashoutCurrency = 'USD';
+    const sellCurrency = 'USDC';
+
+    it('returns off-ramp link with default parameters', async () => {
+      const post = await getAxiosPostMock();
+      post.mockResolvedValueOnce({ status: 200, data: offRampResponseMock });
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      const res = await cdp.getOffRampLink(
+        addr,
+        country,
+        paymentMethod,
+        redirectUrl,
+        sellAmount,
+        cashoutCurrency,
+        sellCurrency,
+      );
+
+      expect(res).toEqual(offRampResponseMock);
+      expect(res.offramp_url).toBeDefined();
+      expect(res.quote_id).toBeDefined();
+      expect(res.cashout_total).toBeDefined();
+      expect(res.cashout_subtotal).toBeDefined();
+      expect(res.sell_amount).toBeDefined();
+      expect(res.coinbase_fee).toBeDefined();
+    });
+
+    it('passes custom parameters to axios correctly', async () => {
+      const post = await getAxiosPostMock();
+      post.mockResolvedValueOnce({ status: 200, data: offRampResponseMock });
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      await cdp.getOffRampLink(
+        addr,
+        country,
+        paymentMethod,
+        redirectUrl,
+        sellAmount,
+        cashoutCurrency,
+        sellCurrency,
+      );
+
+      expect(post).toHaveBeenCalledWith(
+        '/onramp/v1/sell/quote',
+        {
+          sourceAddress: addr,
+          country,
+          paymentMethod,
+          partnerUserId: 'test-integrator-id',
+          redirectUrl,
+          sellAmount,
+          sellNetwork: 'base',
+          cashoutCurrency,
+          sellCurrency,
+        },
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            Authorization: expect.stringMatching(/^Bearer\s+.+/),
+            'Content-Type': 'application/json',
+          }),
+        }),
+      );
+    });
+
+    it('returns data for 201', async () => {
+      const post = await getAxiosPostMock();
+      post.mockResolvedValueOnce({ status: 201, data: offRampResponseMock });
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      const res = await cdp.getOffRampLink(
+        addr,
+        country,
+        paymentMethod,
+        redirectUrl,
+        sellAmount,
+        cashoutCurrency,
+        sellCurrency,
+      );
+      expect(res).toEqual(offRampResponseMock);
+    });
+
+    it('validates redirect url via mocked checkValidUrl (negative case)', async () => {
+      const urls = await import('../../utils/urls');
+      vi.mocked(urls.checkValidUrl).mockReturnValueOnce(false);
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      await expect(
+        cdp.getOffRampLink(
+          addr,
+          country,
+          paymentMethod,
+          'invalid-url',
+          sellAmount,
+          cashoutCurrency,
+          sellCurrency,
+        ),
+      ).rejects.toThrow('Redirect URL is not a valid URL');
+    });
+
+    it('propagates axios rejections', async () => {
+      const post = await getAxiosPostMock();
+      post.mockRejectedValueOnce(new Error('Network error'));
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      await expect(
+        cdp.getOffRampLink(
+          addr,
+          country,
+          paymentMethod,
+          redirectUrl,
+          sellAmount,
+          cashoutCurrency,
+          sellCurrency,
+        ),
+      ).rejects.toThrow('Network error');
+    });
+
+    it('throws when API responds with non-200/201', async () => {
+      const post = await getAxiosPostMock();
+      post.mockResolvedValueOnce({ status: 400, data: coinbaseCDPErrorMock });
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      await expect(
+        cdp.getOffRampLink(
+          addr,
+          country,
+          paymentMethod,
+          redirectUrl,
+          sellAmount,
+          cashoutCurrency,
+          sellCurrency,
+        ),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('getOffRampConfig', () => {
+    it('returns off-ramp config', async () => {
+      const get = await getAxiosGetMock();
+      get.mockResolvedValueOnce({ status: 200, data: offRampConfigResponseMock });
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      const res = await cdp.getOffRampConfig();
+      expect(res).toEqual(offRampConfigResponseMock);
+    });
+  });
+
+  describe('getOnRampConfig', () => {
+    it('returns on-ramp config', async () => {
+      const get = await getAxiosGetMock();
+      get.mockResolvedValueOnce({ status: 200, data: onRampConfigResponseMock });
+
+      const cdp = new CoinbaseCDP('k', 's', 'test-integrator-id', chainManager);
+      const res = await cdp.getOnRampConfig();
+      expect(res).toEqual(onRampConfigResponseMock);
     });
   });
 });

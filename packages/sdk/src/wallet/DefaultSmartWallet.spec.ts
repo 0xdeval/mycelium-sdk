@@ -1,7 +1,7 @@
 import { type Address, type LocalAccount, pad } from 'viem';
 import { toCoinbaseSmartAccount } from 'viem/account-abstraction';
 import { baseSepolia, unichain } from 'viem/chains';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { smartWalletFactoryAbi } from '@mycelium/sdk/abis/smartWalletFactory';
 import { smartWalletFactoryAddress } from '@mycelium/sdk/constants/addresses';
@@ -14,6 +14,8 @@ import type { Protocol } from '@mycelium/sdk/types/protocols/general';
 import type { TransactionData } from '@mycelium/sdk/types/transaction';
 import { createMockCoinbaseCDP } from '@mycelium/sdk/test/mocks/CoinbaseCDPMock';
 import type { CoinbaseCDP } from '@mycelium/sdk/tools/CoinbaseCDP';
+import { onRampConfigResponseMock, onRampResponseMock } from '../test/mocks/ramp/on-ramp';
+import { offRampConfigResponseMock, offRampResponseMock } from '../test/mocks/ramp/off-ramp';
 
 vi.mock('viem/account-abstraction', () => ({
   toCoinbaseSmartAccount: vi.fn(),
@@ -260,5 +262,296 @@ describe('DefaultSmartWallet', () => {
     expect(result).not.toBeNull();
     expect(result?.shares).toBe('100');
     expect(result?.depositedAmount).toBe('100');
+  });
+
+  describe('topUp (on-ramp)', () => {
+    const wallet = new DefaultSmartWallet(
+      mockOwners,
+      mockSigner,
+      mockChainManager,
+      mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
+    );
+
+    it('should generate a proper on-ramp link with all parameters', async () => {
+      const amount = '100';
+      const redirectUrl = 'https://mysite.com/success';
+      const purchaseCurrency = 'USDC';
+      const paymentCurrency = 'USD';
+      const paymentMethod = 'CARD';
+      const country = 'US';
+
+      const result = await wallet.topUp(
+        amount,
+        redirectUrl,
+        purchaseCurrency,
+        paymentCurrency,
+        paymentMethod,
+        country,
+      );
+
+      expect(mockCoinbaseCDP.getOnRampLink).toHaveBeenCalledWith(
+        await wallet.getAddress(),
+        redirectUrl,
+        amount,
+        purchaseCurrency,
+        paymentCurrency,
+        paymentMethod,
+        country,
+      );
+      expect(result).toEqual(onRampResponseMock);
+    });
+
+    it('should generate on-ramp link with minimal parameters', async () => {
+      const amount = '50';
+      const redirectUrl = 'https://mysite.com/success';
+
+      const result = await wallet.topUp(amount, redirectUrl);
+
+      expect(mockCoinbaseCDP.getOnRampLink).toHaveBeenCalledWith(
+        await wallet.getAddress(),
+        redirectUrl,
+        amount,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
+      expect(result).toEqual(onRampResponseMock);
+    });
+
+    it('should throw error when CoinbaseCDP is not initialized', async () => {
+      const smartWalletWithoutCDP = new DefaultSmartWallet(
+        [getRandomAddress()],
+        mockSigner,
+        mockChainManager,
+        mockProtocol,
+        null, // No CoinbaseCDP
+      );
+
+      await expect(
+        smartWalletWithoutCDP.topUp('100', 'https://mysite.com/success'),
+      ).rejects.toThrow(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    });
+
+    it('should handle CoinbaseCDP API errors', async () => {
+      const error = new Error('API Error');
+      mockCoinbaseCDP.getOnRampLink = vi.fn().mockRejectedValue(error);
+
+      await expect(wallet.topUp('100', 'https://mysite.com/success')).rejects.toThrow('API Error');
+    });
+  });
+
+  describe('topUpOptions (on-ramp config)', () => {
+    const wallet = new DefaultSmartWallet(
+      mockOwners,
+      mockSigner,
+      mockChainManager,
+      mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
+    );
+
+    it('should return on-ramp configuration options', async () => {
+      const result = await wallet.topUpOptions();
+
+      expect(mockCoinbaseCDP.getOnRampConfig).toHaveBeenCalledOnce();
+      expect(result).toEqual(onRampConfigResponseMock);
+    });
+
+    it('should throw error when CoinbaseCDP is not initialized', async () => {
+      const smartWalletWithoutCDP = new DefaultSmartWallet(
+        [getRandomAddress()],
+        mockSigner,
+        mockChainManager,
+        mockProtocol,
+        null,
+      );
+
+      await expect(smartWalletWithoutCDP.topUpOptions()).rejects.toThrow(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    });
+  });
+
+  describe('cashOut (off-ramp)', () => {
+    const wallet = new DefaultSmartWallet(
+      mockOwners,
+      mockSigner,
+      mockChainManager,
+      mockProtocol as unknown as Protocol['instance'],
+      mockCoinbaseCDP,
+    );
+
+    it('should generate a proper off-ramp link with all parameters', async () => {
+      const country = 'US';
+      const paymentMethod = 'FIAT_WALLET';
+      const redirectUrl = 'https://mysite.com/success';
+      const sellAmount = '100';
+      const cashoutCurrency = 'USD';
+      const sellCurrency = 'USDC';
+
+      const result = await wallet.cashOut(
+        country,
+        paymentMethod,
+        redirectUrl,
+        sellAmount,
+        cashoutCurrency,
+        sellCurrency,
+      );
+
+      expect(mockCoinbaseCDP.getOffRampLink).toHaveBeenCalledWith(
+        await wallet.getAddress(),
+        country,
+        paymentMethod,
+        redirectUrl,
+        sellAmount,
+        cashoutCurrency,
+        sellCurrency,
+      );
+      expect(result).toEqual(offRampResponseMock);
+    });
+
+    it('should generate off-ramp link with minimal parameters', async () => {
+      const country = 'US';
+      const paymentMethod = 'CARD';
+      const redirectUrl = 'https://mysite.com/success';
+      const sellAmount = '50';
+
+      const result = await wallet.cashOut(country, paymentMethod, redirectUrl, sellAmount);
+
+      expect(mockCoinbaseCDP.getOffRampLink).toHaveBeenCalledWith(
+        await wallet.getAddress(),
+        country,
+        paymentMethod,
+        redirectUrl,
+        sellAmount,
+        undefined,
+        undefined,
+      );
+      expect(result).toEqual(offRampResponseMock);
+    });
+
+    it('should throw error when CoinbaseCDP is not initialized', async () => {
+      const smartWalletWithoutCDP = new DefaultSmartWallet(
+        [getRandomAddress()],
+        mockSigner,
+        mockChainManager,
+        mockProtocol,
+        null,
+      );
+
+      await expect(
+        smartWalletWithoutCDP.cashOut('US', 'CARD', 'https://mysite.com/success', '100'),
+      ).rejects.toThrow(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    });
+
+    it('should handle CoinbaseCDP API errors', async () => {
+      const error = new Error('API Error');
+      mockCoinbaseCDP.getOffRampLink = vi.fn().mockRejectedValue(error);
+
+      await expect(
+        wallet.cashOut('US', 'CARD', 'https://mysite.com/success', '100'),
+      ).rejects.toThrow('API Error');
+    });
+  });
+
+  describe('cashOutOptions (off-ramp config)', () => {
+    let mockCoinbaseCDP: CoinbaseCDP;
+    let wallet: DefaultSmartWallet;
+
+    beforeEach(() => {
+      vi.restoreAllMocks();
+      mockCoinbaseCDP = createMockCoinbaseCDP();
+      wallet = new DefaultSmartWallet(
+        mockOwners,
+        mockSigner,
+        mockChainManager,
+        mockProtocol as unknown as Protocol['instance'],
+        mockCoinbaseCDP,
+      );
+    });
+
+    it('should return off-ramp configuration options', async () => {
+      const result = await wallet.cashOutOptions();
+
+      expect(mockCoinbaseCDP.getOffRampConfig).toHaveBeenCalledOnce();
+      expect(result).toEqual(offRampConfigResponseMock);
+    });
+
+    it('should throw error when CoinbaseCDP is not initialized', async () => {
+      const smartWalletWithoutCDP = new DefaultSmartWallet(
+        [getRandomAddress()],
+        mockSigner,
+        mockChainManager,
+        mockProtocol,
+        null,
+      );
+
+      await expect(smartWalletWithoutCDP.cashOutOptions()).rejects.toThrow(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    });
+  });
+
+  describe('integration scenarios', () => {
+    let mockCoinbaseCDP: CoinbaseCDP;
+    let mockChainManager: ChainManager;
+    let wallet: DefaultSmartWallet;
+
+    beforeEach(() => {
+      vi.restoreAllMocks();
+      mockCoinbaseCDP = createMockCoinbaseCDP();
+      mockChainManager = createMockChainManager();
+      wallet = new DefaultSmartWallet(
+        mockOwners,
+        mockSigner,
+        mockChainManager,
+        mockProtocol as unknown as Protocol['instance'],
+        mockCoinbaseCDP,
+      );
+    });
+
+    it('should handle complete on-ramp flow', async () => {
+      // Get available on-ramp options
+      const options = await wallet.topUpOptions();
+      expect(options.countries).toBeDefined();
+
+      // Generate on-ramp link
+      const onRampResult = await wallet.topUp(
+        '100',
+        'https://mysite.com/success',
+        'USDC',
+        'USD',
+        'CARD',
+        'US',
+      );
+
+      expect(onRampResult.session?.onrampUrl).toContain('pay.coinbase.com');
+      expect(onRampResult.quote).toBeDefined();
+    });
+
+    it('should handle complete off-ramp flow', async () => {
+      // Get available off-ramp options
+      const options = await wallet.cashOutOptions();
+      expect(options.countries).toBeDefined();
+
+      // Generate off-ramp link
+      const offRampResult = await wallet.cashOut(
+        'US',
+        'FIAT_WALLET',
+        'https://mysite.com/success',
+        '100',
+        'USD',
+        'USDC',
+      );
+
+      expect(offRampResult.offramp_url).toContain('pay.coinbase.com');
+      expect(offRampResult.cashout_total).toBeDefined();
+      expect(offRampResult.sell_amount).toBeDefined();
+    });
   });
 });

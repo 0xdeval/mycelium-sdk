@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import type { CoinbaseCDP } from '@/tools/CoinbaseCDP';
-import { onRampResponseMock } from '@/test/mocks/ramp/on-ramp';
+import { onRampConfigResponseMock, onRampResponseMock } from '@/test/mocks/ramp/on-ramp';
+import { offRampConfigResponseMock, offRampResponseMock } from './ramp/off-ramp';
 
 /**
  * Mock Coinbase CDP: returns an object with vi.fn and correct typing.
@@ -14,6 +15,14 @@ export const createMockCoinbaseCDP = (overrides: Partial<CoinbaseCDP> = {}): Coi
   return {
     auth: vi.fn<CoinbaseCDP['auth']>().mockResolvedValue('mock-jwt-token'),
     getOnRampLink: vi.fn<CoinbaseCDP['getOnRampLink']>().mockResolvedValue(onRampResponseMock),
+    getOnRampConfig: vi
+      .fn<CoinbaseCDP['getOnRampConfig']>()
+      .mockResolvedValue(onRampConfigResponseMock),
+    getOffRampLink: vi.fn<CoinbaseCDP['getOffRampLink']>().mockResolvedValue(offRampResponseMock),
+    getOffRampConfig: vi
+      .fn<CoinbaseCDP['getOffRampConfig']>()
+      .mockResolvedValue(offRampConfigResponseMock),
+
     ...overrides,
   } as unknown as CoinbaseCDP;
 };
