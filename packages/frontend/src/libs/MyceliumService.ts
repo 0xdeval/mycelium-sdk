@@ -134,7 +134,15 @@ export class MyceliumService {
     return topUpLink;
   }
 
-  async getCashOutLink(walletId: string): Promise<CashOutUrlResponse> {
+  async getCashOutLink(
+    walletId: string,
+    country: string,
+    paymentMethod: string,
+    redirectLink: string,
+    amount: string,
+    tokenToSell: string,
+    fiatToReceive: string,
+  ): Promise<CashOutUrlResponse> {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }
@@ -143,15 +151,14 @@ export class MyceliumService {
       walletId,
     });
 
-    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/cashout-success`;
-
+    console.log('Current redirect link:', redirectLink);
     const cashOutLink: CashOutUrlResponse = await wallet.cashOut(
-      'US',
-      'FIAT_WALLET',
-      redirectUrl,
-      '100',
-      'USD',
-      'USDC',
+      country,
+      paymentMethod,
+      redirectLink,
+      amount,
+      fiatToReceive,
+      tokenToSell,
     );
 
     return cashOutLink;

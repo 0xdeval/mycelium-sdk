@@ -4,10 +4,19 @@ import type { CashOutUrlResponse } from '@mycelium-sdk/core';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ walletId: string }> },
+  {
+    params,
+  }: {
+    params: Promise<{
+      walletId: string;
+    }>;
+  },
 ) {
   try {
     const { walletId } = await params;
+
+    const { country, paymentMethod, redirectLink, amount, tokenToSell, fiatToReceive } =
+      await request.json();
 
     if (!walletId) {
       return NextResponse.json({ error: 'Wallet ID is required' }, { status: 400 });
@@ -17,7 +26,15 @@ export async function POST(
     await myceliumService.init();
 
     try {
-      const cashOutLink: CashOutUrlResponse = await myceliumService.getCashOutLink(walletId);
+      const cashOutLink: CashOutUrlResponse = await myceliumService.getCashOutLink(
+        walletId,
+        country,
+        paymentMethod,
+        redirectLink,
+        amount,
+        tokenToSell,
+        fiatToReceive,
+      );
       return NextResponse.json({
         success: true,
         data: cashOutLink,

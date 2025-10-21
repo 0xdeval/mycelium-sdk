@@ -247,6 +247,7 @@ export const AccountInfo = ({
       border="1px solid"
       borderColor="whiteAlpha.100"
       borderRadius="2xl"
+      boxShadow="0px 0px 10px 0px rgba(255, 255, 255, 0.2)"
       w={{ base: 'full', md: '60%', xl: '40%', '2xl': '30%' }}
       gap={8}
       pt={8}

@@ -95,6 +95,9 @@ importers:
       '@privy-io/server-auth':
         specifier: ^1.0.0
         version: 1.32.5(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.38.2(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+      country-list:
+        specifier: ^2.4.1
+        version: 2.4.1
       framer-motion:
         specifier: ^12.23.12
         version: 12.23.24(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -129,6 +132,9 @@ importers:
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
+      '@types/country-list':
+        specifier: ^2.1.4
+        version: 2.1.4
       '@types/node':
         specifier: ^24.6.2
         version: 24.8.0
@@ -3001,6 +3007,12 @@ packages:
         integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==,
       }
 
+  '@types/country-list@2.1.4':
+    resolution:
+      {
+        integrity: sha512-c4orjm0wT+BRt6Ynf2/QRRL+iMX4SdLT11jAjKqkJ7mQr/DLOmdz7qR8i04j9Y7wFSoP70cXJc18FN4YGNgGaA==,
+      }
+
   '@types/debug@4.1.12':
     resolution:
       {
@@ -4681,6 +4693,12 @@ packages:
         integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==,
       }
     engines: { node: '>=10' }
+
+  country-list@2.4.1:
+    resolution:
+      {
+        integrity: sha512-KhVV/UfUV3dSNpsWIqHTQxLpYDKPKz1UwkRjadt+YbX2PRhyCEihEoS5XgB7J7AMXpkicvl+tRHvkNI5wbji/g==,
+      }
 
   crc-32@1.2.2:
     resolution:
@@ -11686,6 +11704,8 @@ snapshots:
     dependencies:
       '@types/node': 24.8.0
 
+  '@types/country-list@2.1.4': {}
+
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 2.1.0
@@ -13577,6 +13597,8 @@ snapshots:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+
+  country-list@2.4.1: {}
 
   crc-32@1.2.2: {}
 
