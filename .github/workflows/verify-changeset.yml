@@ -1,0 +1,24 @@
+name: Verify Changeset
+on:
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check override label
+        id: labelcheck
+        uses: actions-ecosystem/action-has-labels@v1
+        with:
+          labels: 'no-release'
+
+      - name: Fail if no changeset
+        if: steps.labelcheck.outputs.has_labels != 'true'
+        run: |
+          if [ -z "$(ls -1 .changeset/*.md 2>/dev/null)" ]; then
+            echo "No changeset found. Add one with 'pnpm changeset' or label this PR with 'no-release'."
+            exit 1
+          fi
