@@ -48,7 +48,8 @@
     "xencodeddata",
     "sUSDC",
     "Pimlico",
-    "Vercel"
+    "Vercel",
+    "labelcheck"
   ],
   "enableFiletypes": ["!binary"],
   "overrides": [
