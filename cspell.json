@@ -50,7 +50,8 @@
     "Pimlico",
     "Vercel",
     "cashout",
-    "offramp"
+    "offramp",
+    "labelcheck"
   ],
   "enableFiletypes": ["!binary"],
   "overrides": [
