@@ -5,7 +5,7 @@ import type { TokenBalance } from '@/types/token';
 import type { AssetIdentifier } from '@/utils/assets';
 import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult } from '@/types/protocols/general';
-import type { CashOutUrlResponse, TopUpUrlResponse } from '@/types/ramp';
+import type { OffRampUrlResponse, OnRampUrlResponse } from '@/types/ramp';
 
 /**
  * Abstract base class for smart wallet implementations
@@ -145,7 +145,7 @@ export abstract class SmartWallet {
     paymentCurrency?: string,
     paymentMethod?: string,
     country?: string,
-  ): Promise<TopUpUrlResponse>;
+  ): Promise<OnRampUrlResponse>;
 
   /**
    * @internal
@@ -168,5 +168,5 @@ export abstract class SmartWallet {
     sellAmount: string,
     cashoutCurrency?: string,
     sellCurrency?: string,
-  ): Promise<CashOutUrlResponse>;
+  ): Promise<OffRampUrlResponse>;
 }

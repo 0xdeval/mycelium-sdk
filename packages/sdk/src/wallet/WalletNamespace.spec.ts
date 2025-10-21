@@ -28,7 +28,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      { instance: mockProtocol },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -45,7 +45,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      { instance: mockProtocol },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -62,7 +62,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      { instance: mockProtocol },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -85,9 +85,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -123,9 +121,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -149,9 +145,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -184,9 +178,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -213,9 +205,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -249,9 +239,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -284,9 +272,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
@@ -313,9 +299,7 @@ describe('WalletNamespace', () => {
     );
     const smartWalletProvider = new DefaultSmartWalletProvider(
       mockChainManager,
-      {
-        instance: mockProtocol,
-      },
+      mockProtocol,
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);

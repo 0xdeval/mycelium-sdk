@@ -10,7 +10,6 @@ import { createMockChainManager } from '@mycelium/sdk/test/mocks/ChainManagerMoc
 import { getRandomAddress } from '@mycelium/sdk/test/utils';
 import { DefaultSmartWallet } from '@mycelium/sdk/wallet/DefaultSmartWallet';
 import { createMockProtocol } from '@mycelium/sdk/test/mocks/ProtocolMock';
-import type { Protocol } from '@mycelium/sdk/types/protocols/general';
 import type { TransactionData } from '@mycelium/sdk/types/transaction';
 import { createMockCoinbaseCDP } from '@mycelium/sdk/test/mocks/CoinbaseCDPMock';
 import type { CoinbaseCDP } from '@mycelium/sdk/tools/CoinbaseCDP';
@@ -35,7 +34,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
     expect(wallet).toBeInstanceOf(DefaultSmartWallet);
@@ -46,7 +45,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
     expect(wallet.signer).toEqual(mockSigner);
@@ -58,7 +57,7 @@ describe('DefaultSmartWallet', () => {
       owners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
     const mockAddress = getRandomAddress();
@@ -82,7 +81,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
       deploymentAddress,
     );
@@ -98,7 +97,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
       deploymentAddress,
       signerOwnerIndex,
@@ -123,7 +122,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
     const chainId = unichain.id;
@@ -167,7 +166,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
     const chainId = unichain.id;
@@ -213,11 +212,11 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
 
-    const depositSpy = vi.mocked(mockProtocol).deposit as ReturnType<typeof vi.fn>;
+    const depositSpy = vi.mocked(mockProtocol.instance).deposit as ReturnType<typeof vi.fn>;
 
     const amount = '1000';
 
@@ -233,11 +232,11 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
 
-    const withdrawSpy = vi.mocked(mockProtocol).withdraw as ReturnType<typeof vi.fn>;
+    const withdrawSpy = vi.mocked(mockProtocol.instance).withdraw as ReturnType<typeof vi.fn>;
 
     const amount = '1000';
 
@@ -253,7 +252,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
 
@@ -269,7 +268,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
 
@@ -325,7 +324,7 @@ describe('DefaultSmartWallet', () => {
         [getRandomAddress()],
         mockSigner,
         mockChainManager,
-        mockProtocol,
+        mockProtocol.instance,
         null, // No CoinbaseCDP
       );
 
@@ -349,7 +348,7 @@ describe('DefaultSmartWallet', () => {
       mockOwners,
       mockSigner,
       mockChainManager,
-      mockProtocol as unknown as Protocol['instance'],
+      mockProtocol.instance,
       mockCoinbaseCDP,
     );
 
@@ -407,7 +406,7 @@ describe('DefaultSmartWallet', () => {
         [getRandomAddress()],
         mockSigner,
         mockChainManager,
-        mockProtocol,
+        mockProtocol.instance,
         null,
       );
 
@@ -441,7 +440,7 @@ describe('DefaultSmartWallet', () => {
         mockOwners,
         mockSigner,
         mockChainManager,
-        mockProtocol as unknown as Protocol['instance'],
+        mockProtocol.instance,
         mockCoinbaseCDP,
       );
     });

@@ -10,7 +10,7 @@ export interface CoinbaseCDPAuthParams {
  * @public
  * @category Types
  */
-export interface TopUpUrlResponse {
+export interface OnRampUrlResponse {
   quote?: {
     destinationNetwork: string;
     exchangeRate: string;
@@ -30,7 +30,7 @@ export interface TopUpUrlResponse {
   };
 }
 
-interface CashOutUrlResponseSellingParams {
+interface OffRampUrlResponseSellingParams {
   value: string;
   currency: string;
 }
@@ -40,11 +40,11 @@ interface CashOutUrlResponseSellingParams {
  * @public
  * @category Types
  */
-export interface CashOutUrlResponse {
-  cashout_total: CashOutUrlResponseSellingParams;
-  cashout_subtotal: CashOutUrlResponseSellingParams;
-  sell_amount: CashOutUrlResponseSellingParams;
-  coinbase_fee: CashOutUrlResponseSellingParams;
+export interface OffRampUrlResponse {
+  cashout_total: OffRampUrlResponseSellingParams;
+  cashout_subtotal: OffRampUrlResponseSellingParams;
+  sell_amount: OffRampUrlResponseSellingParams;
+  coinbase_fee: OffRampUrlResponseSellingParams;
   quote_id: string;
   offramp_url: string;
 }

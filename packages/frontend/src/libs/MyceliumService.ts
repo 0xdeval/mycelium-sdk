@@ -150,8 +150,8 @@ export class MyceliumService {
       'FIAT_WALLET',
       redirectUrl,
       '100',
-      'USDC',
       'USD',
+      'USDC',
     );
 
     return cashOutLink;

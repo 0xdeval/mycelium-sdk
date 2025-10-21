@@ -1,4 +1,4 @@
-import type { CashOutUrlResponse, RampConfigResponse } from '@/types/ramp';
+import type { OffRampUrlResponse, RampConfigResponse } from '@/types/ramp';
 
 export const offRampConfigResponseMock: RampConfigResponse = {
   countries: [
@@ -29,7 +29,7 @@ export const offRampConfigResponseMock: RampConfigResponse = {
   ],
 };
 
-export const offRampResponseMock: CashOutUrlResponse = {
+export const offRampResponseMock: OffRampUrlResponse = {
   cashout_total: {
     value: '99',
     currency: 'USD',

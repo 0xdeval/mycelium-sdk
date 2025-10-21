@@ -2,10 +2,10 @@ import { generateJwt } from '@coinbase/cdp-sdk/auth';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import type {
   CoinbaseCDPAuthParams,
-  TopUpUrlResponse,
+  OnRampUrlResponse,
   CoinbaseCDPError,
   RampConfigResponse,
-  CashOutUrlResponse,
+  OffRampUrlResponse,
 } from '@/types/ramp';
 import type { Address } from 'viem';
 import type { ChainManager } from '@/tools/ChainManager';
@@ -118,7 +118,7 @@ export class CoinbaseCDP {
     paymentCurrency: string = 'USD',
     paymentMethod: string = 'CARD',
     country?: string,
-  ): Promise<TopUpUrlResponse> {
+  ): Promise<OnRampUrlResponse> {
     if (!checkValidUrl(redirectUrl)) {
       throw new Error('Redirect URL is not a valid URL');
     }
@@ -128,7 +128,7 @@ export class CoinbaseCDP {
 
     const authJwtToken = await this.auth(this.onRampUrlAuthParams);
 
-    const response: AxiosResponse<TopUpUrlResponse | CoinbaseCDPError> = await this.clientV2.post(
+    const response: AxiosResponse<OnRampUrlResponse | CoinbaseCDPError> = await this.clientV2.post(
       this.onRampUrlAuthParams.requestPath,
       {
         destinationAddress: receiverAddress,
@@ -151,7 +151,7 @@ export class CoinbaseCDP {
       throw error;
     }
 
-    const onRampResponse = response.data as TopUpUrlResponse;
+    const onRampResponse = response.data as OnRampUrlResponse;
 
     return onRampResponse;
   }
@@ -210,7 +210,7 @@ export class CoinbaseCDP {
     sellAmount: string,
     cashoutCurrency: string = 'USD',
     sellCurrency: string = 'USDC',
-  ): Promise<CashOutUrlResponse> {
+  ): Promise<OffRampUrlResponse> {
     if (!checkValidUrl(redirectUrl)) {
       throw new Error('Redirect URL is not a valid URL');
     }
@@ -220,7 +220,7 @@ export class CoinbaseCDP {
 
     const authJwtToken = await this.auth(this.offRampUrlAuthParams);
 
-    const response: AxiosResponse<CashOutUrlResponse | CoinbaseCDPError> = await this.clientV1.post(
+    const response: AxiosResponse<OffRampUrlResponse | CoinbaseCDPError> = await this.clientV1.post(
       this.offRampUrlAuthParams.requestPath,
       {
         sourceAddress: address,
@@ -244,7 +244,7 @@ export class CoinbaseCDP {
       throw error;
     }
 
-    const offRampResponse = response.data as CashOutUrlResponse;
+    const offRampResponse = response.data as OffRampUrlResponse;
 
     return offRampResponse;
   }

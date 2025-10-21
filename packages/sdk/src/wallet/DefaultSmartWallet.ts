@@ -20,7 +20,7 @@ import { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult, Protocol } from '@/types/protocols/general';
 import type { CoinbaseCDP } from '@/tools/CoinbaseCDP';
-import type { TopUpUrlResponse } from '@/types/ramp';
+import type { OffRampUrlResponse, OnRampUrlResponse } from '@/types/ramp';
 
 /**
  * Default ERC-4337 smart wallet implementation. Implements main methods that a user can use to interact with DeFi protocols and use all related functionalities
@@ -346,7 +346,7 @@ export class DefaultSmartWallet extends SmartWallet {
     paymentCurrency?: string,
     paymentMethod?: string,
     country?: string,
-  ): Promise<TopUpUrlResponse> {
+  ): Promise<OnRampUrlResponse> {
     if (!this.coinbaseCDP) {
       throw new Error(
         'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
@@ -394,7 +394,7 @@ export class DefaultSmartWallet extends SmartWallet {
     sellAmount: string,
     cashoutCurrency?: string,
     sellCurrency?: string,
-  ) {
+  ): Promise<OffRampUrlResponse> {
     if (!this.coinbaseCDP) {
       throw new Error(
         'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
