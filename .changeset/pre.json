@@ -1,0 +1,8 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@mycelium-sdk/core": "0.1.0"
+  },
+  "changesets": []
+}
