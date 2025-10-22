@@ -34,9 +34,16 @@ export const AccountInfo = ({
   } | null>(null);
   const [vaultInfoItems, setVaultInfoItems] = useState<{ label: string; data: string }[]>([]);
 
-  const usdcBalance = useMemo(() => {
-    const balance = walletBalances?.balances.find((balance) => balance.symbol === 'USDC')?.balance;
-    return balance ? balance.toString() : '0';
+  const usdcBalance: number = useMemo(() => {
+    const balances = walletBalances?.balances
+      .filter((balance) => balance.symbol === 'USDC')
+      .map((balance) => formatBalance(balance.formattedBalance));
+
+    if (balances && balances.length > 0) {
+      return parseFloat(balances[0] ?? '0');
+    } else {
+      return 0;
+    }
   }, [walletBalances]);
 
   useEffect(() => {
@@ -92,17 +99,14 @@ export const AccountInfo = ({
   }, [walletId, walletAddress, handleLoadVaultDepositedAmount]);
 
   const handleDeposit = async () => {
-    if (!walletId || !walletAddress || !depositAmount) {
+    if (!walletId || !walletAddress || !depositAmount || !usdcBalance) {
       console.error('Missing required data for deposit');
       return;
     }
 
     setDepositSuccess(null);
 
-    const usdcUserBalance =
-      walletBalances?.balances.find((balance) => balance.symbol === 'USDC')?.balance || 0;
-
-    if (parseFloat(depositAmount) > usdcUserBalance) {
+    if (parseFloat(depositAmount) > usdcBalance) {
       toaster.create({
         title: 'Wrong amount to deposit',
         description: "You don't have enough USDC to deposit",

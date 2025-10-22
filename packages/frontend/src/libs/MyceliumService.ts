@@ -151,7 +151,6 @@ export class MyceliumService {
       walletId,
     });
 
-    console.log('Current redirect link:', redirectLink);
     const cashOutLink: CashOutUrlResponse = await wallet.cashOut(
       country,
       paymentMethod,

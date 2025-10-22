@@ -201,7 +201,6 @@ export class CoinbaseCDP {
    * @throws Error if redirect URL is not a valid URL
    * @throws CoinbaseCDPError if the request fails
    */
-  // TODO: Find an issue why it returns a 400 Axios error
   async getOffRampLink(
     address: Address,
     country: string,

@@ -10,7 +10,6 @@ export async function GET(_request: NextRequest) {
     try {
       const topUpOptions: RampConfigResponse = await myceliumService.getTopUpOptions();
 
-      console.log('topUpOptions', topUpOptions);
       return NextResponse.json({
         success: true,
         data: topUpOptions,

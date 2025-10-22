@@ -20,7 +20,6 @@ export const AccountCreation = ({
   const [userId, setUserId] = useState<string | null>(null);
 
   const handleCreateWallet = async () => {
-    console.log('userId: ', userId);
     if (!userId?.trim()) {
       onError('Please enter a user ID');
       return;
@@ -32,12 +31,10 @@ export const AccountCreation = ({
       const response = await fetch(`/api/sdk/get-wallet/${userId}`);
       const data = await response.json();
 
-      console.log('response after get wallet: ', data);
       if (data.found) {
         onWalletCreated(data.walletId, data.address, userId);
         return;
       } else {
-        console.log('creating wallet for user: ', userId);
         const response = await fetch(`/api/sdk/create-wallet`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

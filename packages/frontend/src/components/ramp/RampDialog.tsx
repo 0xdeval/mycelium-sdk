@@ -78,7 +78,6 @@ export const RampDialog = ({ buttonText, rampType, walletId }: RampDialogProps) 
       }
 
       const data = await response.json();
-      console.log(' link response', data);
 
       if (data.success) {
         window.open(data.data.offramp_url, '_blank');
@@ -129,7 +128,6 @@ export const RampDialog = ({ buttonText, rampType, walletId }: RampDialogProps) 
 
   const getOptionsByCountry = (country: string) => {
     const countryOptions = rampOptions?.countries.filter((item) => item.id === country)[0];
-    console.log('countryOptions', countryOptions);
 
     const paymentMethods = countryOptions?.payment_methods;
 
