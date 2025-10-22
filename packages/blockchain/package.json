@@ -1,5 +1,6 @@
 {
   "name": "blockchain",
+  "private": true,
   "scripts": {
     "dev": "bash scripts/run.sh",
     "start": "bash scripts/run.sh",

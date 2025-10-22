@@ -33,8 +33,8 @@ export interface ProtocolsRouterConfig {
 
 /**
  * @internal
+ * The info about a protocol vault
  * @category Types
- * @description The info about a protocol vault
  * @remarks
  * Generic type that shows the whole list of optional and mandatory fields for a protocol vault
  */
@@ -54,8 +54,8 @@ export interface VaultInfo {
 
 /**
  * @public
+ * The info about current user's balance in a protocol vault
  * @category Types
- * @description The info about current user's balance in a protocol vault
  * @remarks
  * The generic type that shows fields that should be present in a protocol vault balance
  */
@@ -70,8 +70,8 @@ export interface VaultBalance {
 
 /**
  * @public
+ * The result fields of a protocol vault related transaction
  * @category Types
- * @description The result fields of a protocol vault related transactions
  * @remarks
  * The generic type that shows fields that should be present for each protocol vault related transaction
  */

@@ -3,7 +3,7 @@ import type { SupportedChainId } from '@/constants/chains';
 /**
  * @internal
  * @category Types
- * @description Detailed token balance information
+ *  Detailed token balance information
  *
  */
 export interface TokenBalance {

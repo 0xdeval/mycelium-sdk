@@ -12,9 +12,12 @@ import { PrivyEmbeddedWalletProvider } from '@mycelium/sdk/wallet/providers/Priv
 import { WalletNamespace } from '@mycelium/sdk/wallet/WalletNamespace';
 import { WalletProvider } from '@mycelium/sdk/wallet/WalletProvider';
 import { createMockProtocol } from '@mycelium/sdk/test/mocks/ProtocolMock';
+import { createMockCoinbaseCDP } from '@mycelium/sdk/test/mocks/CoinbaseCDPMock';
+import type { CoinbaseCDP } from '@mycelium/sdk/tools/CoinbaseCDP';
 
 const mockChainManager = createMockChainManager() as unknown as ChainManager;
 const mockProtocol = createMockProtocol();
+const mockCoinbaseCDP: CoinbaseCDP = createMockCoinbaseCDP();
 
 describe('WalletNamespace', () => {
   it('should provide access to embedded wallet provider', () => {
@@ -23,7 +26,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const walletNamespace = new WalletNamespace(walletProvider);
 
@@ -36,7 +43,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const walletNamespace = new WalletNamespace(walletProvider);
 
@@ -49,7 +60,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const createEmbeddedWalletSpy = vi.spyOn(walletProvider, 'createEmbeddedWallet');
     const walletNamespace = new WalletNamespace(walletProvider);
@@ -68,7 +83,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const createSmartWalletSpy = vi.spyOn(walletProvider, 'createSmartWallet');
     const walletNamespace = new WalletNamespace(walletProvider);
@@ -100,7 +119,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const createWalletWithEmbeddedSignerSpy = vi.spyOn(
       walletProvider,
@@ -120,7 +143,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const createWalletWithEmbeddedSignerSpy = vi.spyOn(
       walletProvider,
@@ -149,7 +176,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const getEmbeddedWalletSpy = vi.spyOn(walletProvider, 'getEmbeddedWallet');
     const walletNamespace = new WalletNamespace(walletProvider);
@@ -172,7 +203,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const getSmartWalletWithEmbeddedSignerSpy = vi.spyOn(
       walletProvider,
@@ -202,7 +237,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const getSmartWalletSpy = vi.spyOn(walletProvider, 'getSmartWallet');
     const walletNamespace = new WalletNamespace(walletProvider);
@@ -231,7 +270,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const walletNamespace = new WalletNamespace(walletProvider);
 
@@ -254,7 +297,11 @@ describe('WalletNamespace', () => {
       mockPrivyClient,
       mockChainManager,
     );
-    const smartWalletProvider = new DefaultSmartWalletProvider(mockChainManager, mockProtocol);
+    const smartWalletProvider = new DefaultSmartWalletProvider(
+      mockChainManager,
+      mockProtocol,
+      mockCoinbaseCDP,
+    );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
     const walletNamespace = new WalletNamespace(walletProvider);
 

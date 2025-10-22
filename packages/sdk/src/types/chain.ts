@@ -2,7 +2,7 @@ import type { SUPPORTED_CHAIN_IDS } from '@/constants/chains';
 
 /**
  * Chain configuration
- * @description Configuration for each supported chain
+ *  Configuration for each supported chain
  */
 export interface ChainConfig {
   /** Chain ID */

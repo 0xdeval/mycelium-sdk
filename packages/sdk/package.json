@@ -1,8 +1,11 @@
 {
   "name": "@mycelium-sdk/core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,7 +42,9 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@coinbase/cdp-sdk": "^1.38.4",
     "@privy-io/server-auth": "^1.32.2",
+    "axios": "^1.12.2",
     "dotenv": "^17.2.1",
     "eslint": "^9.34.0",
     "prettier": "^3.6.2",

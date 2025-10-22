@@ -5,7 +5,7 @@ import {
   createBundlerClient,
 } from 'viem/account-abstraction';
 
-import { type SUPPORTED_CHAIN_IDS, type SupportedChainId, CHAINS_MAP } from '@/constants/chains';
+import { type SUPPORTED_CHAIN_IDS, CHAINS_MAP } from '@/constants/chains';
 import type { ChainConfig } from '@/types/chain';
 import { chainById } from '@/utils/chains';
 import { logger } from '@/tools/Logger';
@@ -189,50 +189,5 @@ export class ChainManager {
     });
 
     return client;
-  }
-
-  /**
-   * Returns a supported chain that was initiated in SDK
-   *
-   * @internal
-   * @category Info
-   * @param name Name of the chain
-   * @returns Chain ID
-   * @throws Error if chain is not found
-   */
-  getChainIdByName(name: string): SupportedChainId {
-    // TODO: strange case
-    if (name === 'ethereum') {
-      // @ts-ignore
-      return this.chainNames['mainnet'].id;
-    }
-    const chain = this.chainNames[name];
-    if (!chain) {
-      throw new Error(`Chain not found for name: ${name}`);
-    }
-    return chain.id;
-  }
-
-  /**
-   * Returns all supported chain names
-   *
-   * @internal
-   * @category Info
-   * @returns Array of supported chain names
-   */
-  getSupportedChainNames(): string[] {
-    return Object.keys(this.chainNames);
-  }
-
-  /**
-   * Returns whether the given chain name is supported
-   *
-   * @internal
-   * @category Info
-   * @param chainName Name of the chain
-   * @returns True if supported
-   */
-  isChainSupported(chainName: string): boolean {
-    return chainName in this.chainNames;
   }
 }

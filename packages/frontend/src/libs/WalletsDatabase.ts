@@ -41,7 +41,6 @@ export class WalletsDatabase {
     await this.ensureFile();
     this.cache = await this.readFile();
     this.initialized = true;
-    console.log('WalletDatabase (file) initialized:', this.filePath);
   }
 
   private async ensureFile(): Promise<void> {
