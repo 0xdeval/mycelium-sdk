@@ -19,18 +19,18 @@ import { type AssetIdentifier, parseAssetAmount, resolveAsset } from '@/utils/as
 import { SmartWallet } from '@/wallet/base/wallets/SmartWallet';
 import type { TransactionData } from '@/types/transaction';
 import type { VaultBalance, VaultTxnResult, Protocol } from '@/types/protocols/general';
+import type { CoinbaseCDP } from '@/tools/CoinbaseCDP';
+import type { OffRampUrlResponse, OnRampUrlResponse } from '@/types/ramp';
 
 /**
- * Default ERC-4337 smart wallet implementation (internal)
+ * Default ERC-4337 smart wallet implementation. Implements main methods that a user can use to interact with DeFi protocols and use all related functionalities
  *
- * @internal
- * @category Wallets
+ * @public
+ * @category Wallets operations
  * @remarks
  * Backed by Coinbase Smart Account and compatible with ERC-4337 UserOperations
  * Supports multi-owner wallets (EVM addresses or WebAuthn owners), gas-sponsored flows,
  * and cross-chain operations via {@link ChainManager}
- *
- * Not exported in the public API. It’s composed internally by higher-level providers/namespaces
  */
 export class DefaultSmartWallet extends SmartWallet {
   /** Owners (EVM addresses or WebAuthn public keys) */
@@ -47,6 +47,8 @@ export class DefaultSmartWallet extends SmartWallet {
   private nonce?: bigint;
   /** Selected protocol provider instance */
   private protocolProvider: Protocol['instance'];
+  /** Coinbase CDP instance to interact with Coinbase CDP API */
+  private coinbaseCDP: CoinbaseCDP | null;
 
   /**
    * Creates a smart wallet instance
@@ -65,6 +67,7 @@ export class DefaultSmartWallet extends SmartWallet {
     signer: LocalAccount,
     chainManager: ChainManager,
     protocolProvider: Protocol['instance'],
+    coinbaseCDP: CoinbaseCDP | null,
     deploymentAddress?: Address,
     signerOwnerIndex?: number,
     nonce?: bigint,
@@ -77,13 +80,14 @@ export class DefaultSmartWallet extends SmartWallet {
     this.chainManager = chainManager;
     this.nonce = nonce;
     this.protocolProvider = protocolProvider;
+    this.coinbaseCDP = coinbaseCDP;
   }
 
   /**
    * Returns the signer account for this smart wallet
    *
-   * @internal
-   * @category Accessors
+   * @public
+   * @category Account
    * @remarks
    * Used to authorize UserOperations and on-chain transactions
    */
@@ -94,8 +98,8 @@ export class DefaultSmartWallet extends SmartWallet {
   /**
    * Resolves the smart wallet address
    *
-   * @internal
-   * @category Accessors
+   * @public
+   * @category Account
    * @remarks
    * If `deploymentAddress` is known, returns it. Otherwise derives a deterministic address
    * via the factory (`getAddress`) using owners and `nonce` (CREATE2-style)
@@ -138,7 +142,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * Builds a Coinbase Smart Account for a specific chain
    *
    * @internal
-   * @category Accounts
+   * @category Account
    * @param chainId Target chain ID
    * @returns Viem Coinbase Smart Account for the given chain
    */
@@ -156,10 +160,10 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Fetches balances (ETH + ERC-20) across supported chains
+   * Fetches balances (ETH + ERC-20) for a smart account across supported chains
    *
-   * @internal
-   * @category Balances
+   * @public
+   * @category Account
    * @returns Promise resolving to a list of {@link TokenBalance}
    */
   async getBalance(): Promise<TokenBalance[]> {
@@ -174,10 +178,11 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Deposits into the selected protocol’s vault
-   *
-   * @internal
-   * @category Protocol
+   * Deposits into the selected protocol’s vault to start earning yield
+   * @public
+   * @category Earn
+   * @remarks
+   * The protocol is selected on the SDK initialization step
    * @param amount Human-readable amount string
    * @returns Transaction result for the deposit
    */
@@ -191,9 +196,10 @@ export class DefaultSmartWallet extends SmartWallet {
 
   /**
    * Reads current deposit balance from the selected protocol’s vault
+   * Method to read the current deposit balance from the selected protocol’s vault for a smart account
    *
-   * @internal
-   * @category Protocol
+   * @public
+   * @category Earn
    * @returns Vault balance or `null` if nothing deposited
    */
   async getEarnBalance(): Promise<VaultBalance | null> {
@@ -209,11 +215,12 @@ export class DefaultSmartWallet extends SmartWallet {
 
   /**
    * Withdraws from the selected protocol’s vault
-   *
-   * @internal
-   * @category Protocol
+   * @public
+   * @category Earn
    * @param amount Human-readable amount string
    * @returns Transaction result for the withdrawal
+   * @throws Error if the withdrawal fails
+   * @throws Error a user didn't deposit anything
    */
   async withdraw(amount: string): Promise<VaultTxnResult> {
     const withdrawTransactionResult = await this.protocolProvider.withdraw(amount, this);
@@ -222,12 +229,11 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Sends a single transaction via ERC-4337 (gas-sponsored)
-   *
-   * @internal
-   * @category Transactions
-   * @remarks
    * Builds a UserOperation and submits via the bundler, then waits for inclusion
+
+   *
+   * @public
+   * @category Transactions
    *
    * @param transactionData Transaction details (`to`, `value`, `data`)
    * @param chainId Target chain ID
@@ -269,10 +275,11 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Sends a batch of transactions via ERC-4337 (gas-sponsored)
+   * Builds a UserOperation from several onchain transactions and submits via the bundler, then waits for inclusion
    *
-   * @internal
+   * @public
    * @category Transactions
+   *
    * @param transactionData An array of calls to execute
    * @param chainId Target chain ID
    * @returns Promise that resolves to the UserOperation hash for the batch
@@ -313,22 +320,108 @@ export class DefaultSmartWallet extends SmartWallet {
   }
 
   /**
-   * Funds the wallet with USDC via an on-ramp service
+   * Funds the smart wallet with the specified amount of the specified token via Coinbase CDP on-ramp service
    *
-   * @internal
-   * @category On-Ramp
+   * @public
+   * @category Ramp
+   *
    * @remarks
-   * Placeholder for future on-ramp integration. Should return a URL to the provider’s flow
+   * If Coinbase CDP is not initialized, the method will throw an error. For more details, visit @see {@link https://docs.cdp.coinbase.com/api-reference/v2/rest-api/onramp/create-an-onramp-session}
    *
-   * @returns A URL string to the on-ramp service (to be implemented)
+   * @param amount Amount of token that a user wants to purchase and top up his account with (e.g., `"100"`, `"1.5"`)
+   * @param redirectUrl URL to redirect to after the on-ramp is complete. It's required to be a valid URL
+   * @param purchaseCurrency Purchase currency (e.g., `"USDC"`, `"ETH"`)
+   * @param paymentCurrency Payment currency (e.g., `"USD"`, `"EUR"`)
+   * @param paymentMethod Payment method (e.g., `"CARD"`)
+   * @param chain Chain name (e.g., `"base"`)
+   * @param country Country code (e.g., `"US"`)
+   *
+   *
+   * @returns @see {@link OnRampUrlResponse}
    */
-  fundUSDC() {}
+  async topUp(
+    amount: string,
+    redirectUrl: string,
+    purchaseCurrency?: string,
+    paymentCurrency?: string,
+    paymentMethod?: string,
+    country?: string,
+  ): Promise<OnRampUrlResponse> {
+    if (!this.coinbaseCDP) {
+      throw new Error(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    }
+
+    const address = await this.getAddress();
+
+    const onRampLink = await this.coinbaseCDP.getOnRampLink(
+      address,
+      redirectUrl,
+      amount,
+      purchaseCurrency,
+      paymentCurrency,
+      paymentMethod,
+      country,
+    );
+
+    return onRampLink;
+  }
 
   /**
-   * Builds transaction data to send ETH or ERC-20 tokens
+   * Cashout token from smart wallet to fiat currency via Coinbase CDP off-ramp service
    *
-   * @internal
-   * @category Transfers
+   * @public
+   * @category Ramp
+   *
+   * @remarks
+   * If Coinbase CDP is not initialized, the method will throw an error. For more details, visit @see {@link https://docs.cdp.coinbase.com/api-reference/rest-api/onramp-offramp/create-sell-quote}
+   *
+   * @param country Country code (e.g., `"US"`)
+   * @param paymentMethod Payment method (e.g., `"CARD"`). To get the ful list, visit ""
+   * @param redirectUrl URL to redirect to after the off-ramp is complete. It's required to be a valid URL
+   * @param sellAmount Amount of token that a user wants to sell (e.g., `"100"`, `"1.5"`)
+   * @param cashoutCurrency Cashout currency (e.g., `"USD"`, `"EUR"`). To get the ful list, visit ""
+   * @param sellCurrency Sell currency (e.g., `"USDC"`, `"ETH"`). To get the ful list, visit ""
+   *
+   *
+   * @returns @see {@link OffRampUrlResponse}
+   */
+  async cashOut(
+    country: string,
+    paymentMethod: string,
+    redirectUrl: string,
+    sellAmount: string,
+    cashoutCurrency?: string,
+    sellCurrency?: string,
+  ): Promise<OffRampUrlResponse> {
+    if (!this.coinbaseCDP) {
+      throw new Error(
+        'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    }
+
+    const address = await this.getAddress();
+
+    const offRampLink = await this.coinbaseCDP.getOffRampLink(
+      address,
+      country,
+      paymentMethod,
+      redirectUrl,
+      sellAmount,
+      cashoutCurrency,
+      sellCurrency,
+    );
+
+    return offRampLink;
+  }
+
+  /**
+   * Send tokens from a smart account to another address
+   *
+   * @public
+   * @category Transactions
+   *
    * @param amount Human-readable amount (e.g., `1.5`)
    * @param asset Asset symbol (e.g., `"usdc"`, `"eth"`) or token address
    * @param recipientAddress Destination address

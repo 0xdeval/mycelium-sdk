@@ -92,6 +92,7 @@ export const AccountHeader = ({
       border="1px solid"
       borderColor="whiteAlpha.100"
       borderRadius="2xl"
+      boxShadow="0px 0px 10px 0px rgba(255, 255, 255, 0.2)"
       px={3}
       py={3}
       w={{ base: 'full', md: '60%', xl: '40%', '2xl': '30%' }}

@@ -24,7 +24,7 @@ export class ProtocolRouter extends ProtocolRouterBase {
   }
   /**
    * Get all protocols available for the current configuration
-   * @description
+   *
    * Includes all non-premium protocols and premium protocols if the API key is valid
    * @returns Array of available protocol definitions
    */
@@ -58,7 +58,7 @@ export class ProtocolRouter extends ProtocolRouterBase {
 
   /**
    * Recommend the best protocol for the current router configuration
-   * @description
+   *
    * Filters available protocols by risk level and supported chains. More criteria will be added later on
    *
    *

@@ -63,7 +63,7 @@ export abstract class ProtocolRouterBase {
 
   /**
    * Recommend the most suitable protocol based on router configuration
-   * @description Returns a protocol that best matches the configured risk level, APY, and chain support
+   *  Returns a protocol that best matches the configured risk level, APY, and chain support
    * @returns Protocol instance considered the best match
    */
   abstract recommend(): Protocol;

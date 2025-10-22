@@ -3,7 +3,8 @@ import { AccountHeader } from '@/components/AccountHeader';
 import { AccountInfo } from '@/components/AccountInfo';
 import type { WalletData } from '@/types/wallet';
 import { toaster, Toaster } from '@/components/ui/toaster';
-
+import { Flex } from '@chakra-ui/react';
+import { Ramp } from '@/components/ramp/Ramp';
 interface AccountContentProps {
   userData: string;
   walletAddress: string;
@@ -44,25 +45,29 @@ export const AccountContent = ({ userData, walletAddress, walletId }: AccountCon
   }, [userData, walletAddress, walletId]);
 
   return (
-    <>
+    <Flex flexDir="column" gap={24} align="center" justify="center" w="full">
       <Toaster />
-      <AccountHeader
-        userData={userData}
-        walletAddress={walletAddress}
-        walletId={walletId}
-        walletBalances={walletBalances}
-        isBalanceLoading={isBalanceLoading}
-        setIsBalanceLoading={setIsBalanceLoading}
-        handleUpdateWalletBalance={handleUpdateWalletBalance}
-      />
+      <Flex flexDir="column" gap={4} align="center" justify="center" w="full">
+        <AccountHeader
+          userData={userData}
+          walletAddress={walletAddress}
+          walletId={walletId}
+          walletBalances={walletBalances}
+          isBalanceLoading={isBalanceLoading}
+          setIsBalanceLoading={setIsBalanceLoading}
+          handleUpdateWalletBalance={handleUpdateWalletBalance}
+        />
 
-      <AccountInfo
-        walletBalances={walletBalances}
-        isBalanceLoading={isBalanceLoading}
-        walletAddress={walletAddress}
-        walletId={walletId}
-        handleUpdateWalletBalance={handleUpdateWalletBalance}
-      />
-    </>
+        <AccountInfo
+          walletBalances={walletBalances}
+          isBalanceLoading={isBalanceLoading}
+          walletAddress={walletAddress}
+          walletId={walletId}
+          handleUpdateWalletBalance={handleUpdateWalletBalance}
+        />
+      </Flex>
+
+      <Ramp walletId={walletId} />
+    </Flex>
   );
 };

@@ -5,7 +5,7 @@ import type { TransactionData } from '@/types/transaction';
 
 /**
  * Mock Smart Wallet for testing
- * @description Provides a mock implementation of SmartWallet for testing purposes
+ *  Provides a mock implementation of SmartWallet for testing purposes
  */
 export const createMockSmartWallet = (): SmartWallet => {
   return {

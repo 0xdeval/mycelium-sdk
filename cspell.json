@@ -49,6 +49,8 @@
     "sUSDC",
     "Pimlico",
     "Vercel",
+    "cashout",
+    "offramp",
     "labelcheck"
   ],
   "enableFiletypes": ["!binary"],

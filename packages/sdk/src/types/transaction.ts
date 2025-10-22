@@ -2,7 +2,7 @@ import type { Address, Hex } from 'viem';
 
 /**
  * Transaction data for execution
- * @description Raw transaction data for wallet execution
+ *  Raw transaction data for wallet execution
  */
 export interface TransactionData {
   /** Target contract address */

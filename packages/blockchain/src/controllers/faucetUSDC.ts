@@ -7,7 +7,6 @@ export const usdcFaucetImpersonate = async (
   res: Response<FaucetResponse | { error: string }>,
 ) => {
   try {
-    console.log('req.body in usdcFaucetImpersonate', req.body);
     const { to, amountUsdc = '100' } = req.body;
     if (!to) {
       return res.status(400).json({ error: '`to` is required' });

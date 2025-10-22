@@ -9,6 +9,9 @@
 
 export * from '@/public/types';
 
+/** @internal */
+export { DefaultSmartWallet } from '@/wallet/DefaultSmartWallet';
+
 import { ChainManager } from '@/tools/ChainManager';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
 import { WalletNamespace } from '@/wallet/WalletNamespace';
@@ -22,6 +25,7 @@ import { PrivyClient } from '@privy-io/server-auth';
 import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
+import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from './tools/CoinbaseCDP';
 
 /**
  * Main SDK facade for integrating wallets and protocols.
@@ -44,7 +48,9 @@ import { logger } from '@/tools/Logger';
  * const config: MyceliumSDKConfig = {
  *   walletsConfig: { /* ... *\/ },
  *   protocolsRouterConfig: { /* ... *\/ },
- *   chain: { /* ... *\/ }
+ *   chain: { /* ... *\/ },
+ *   coinbaseCDPConfig: { /* ... *\/ },
+ *   integratorId: 'MyceliumApp',
  * };
  *
  * const sdk = new MyceliumSDK(config);
@@ -84,6 +90,15 @@ export class MyceliumSDK {
   private protocol: Protocol;
 
   /**
+   * Coinbase CDP instance to Coinbase related and onchain operations using Coinbase CDP API
+   * @remarks
+   * If the configuration is not provided, the Coinbase CDP functionality will be disabled.
+   * Calling the respective method will throw an error.
+   * @internal
+   */
+  private coinbaseCDP: CoinbaseCDPType | null = null;
+
+  /**
    * Creates a new SDK instance
    *
    * @param config SDK configuration (networks, wallets, protocol router settings)
@@ -106,6 +121,15 @@ export class MyceliumSDK {
       );
     }
 
+    if (config.coinbaseCDPConfig) {
+      this.coinbaseCDP = new CoinbaseCDP(
+        config.coinbaseCDPConfig.apiKeyId,
+        config.coinbaseCDPConfig.apiKeySecret,
+        config.integratorId,
+        this.chainManager,
+      );
+    }
+
     const protocolsRouterConfig = config.protocolsRouterConfig || {
       riskLevel: 'low',
     };
@@ -118,12 +142,57 @@ export class MyceliumSDK {
 
   /**
    * Returns the chain manager instance for multi-chain operations
-   * @internal
+   * @public
+   * @category Tools
+   *
    * @returns ChainManager instance of the type {@link ChainManager}
    */
   get chainManager(): ChainManager {
     return this._chainManager;
   }
+
+  /**
+   * Coinbase CDP configuration methods for ramp operations
+   * @public
+   * @category Tools
+   */
+  public readonly rampConfig = {
+    /**
+     * Return all supported countries and payment methods for on-ramp by Coinbase CDP
+     * @public
+     * @category Ramp
+     *
+     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for top-up
+     * @throws If API returned an error
+     */
+    getTopUpConfig: async () => {
+      if (!this.coinbaseCDP) {
+        throw new Error(
+          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+        );
+      }
+
+      return await this.coinbaseCDP.getOnRampConfig();
+    },
+    /**
+     * Return all supported countries and payment methods for off-ramp by Coinbase CDP
+     * @public
+     * @category Ramp
+     *
+     *
+     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for cash out
+     * @throws If API returned an error
+     */
+    getCashOutConfig: async () => {
+      if (!this.coinbaseCDP) {
+        throw new Error(
+          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
+        );
+      }
+
+      return await this.coinbaseCDP.getOffRampConfig();
+    },
+  };
 
   /**
    * Recommends and initializes a protocol based on router settings
@@ -177,7 +246,11 @@ export class MyceliumSDK {
     }
 
     if (!config.smartWalletConfig || config.smartWalletConfig.provider.type === 'default') {
-      this.smartWalletProvider = new DefaultSmartWalletProvider(this.chainManager, this.protocol);
+      this.smartWalletProvider = new DefaultSmartWalletProvider(
+        this.chainManager,
+        this.protocol,
+        this.coinbaseCDP,
+      );
     } else {
       throw new Error(
         `Unsupported smart wallet provider: ${config.smartWalletConfig.provider.type}`,
