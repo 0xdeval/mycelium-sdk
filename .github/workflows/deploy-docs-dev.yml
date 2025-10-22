@@ -61,3 +61,9 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           preview: true
+
+      - name: Show preview URL
+        run: |
+          echo "Preview URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "### Staging (develop) URL" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
