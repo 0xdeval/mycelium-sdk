@@ -6,9 +6,9 @@
 
 <div align="center">
   <a href="https://github.com/0xdeval/mycelium-sdk/blob/main/LICENSE"><img src="https://img.shields.io/github/license/0xdeval/mycelium-sdk?style=for-the-badge" alt="License"></a>
-  <a href="https://www.npmjs.com/package/@myceloum-sdk/core"><img src="https://img.shields.io/npm/v/@mycelium-sdk/core?style=for-the-badge" alt="NPM Version"></a>
+  <a href="https://www.npmjs.com/package/@mycelium-sdk/core"><img src="https://img.shields.io/npm/v/@mycelium-sdk/core?style=for-the-badge" alt="NPM Version"></a>
   <a href="https://docs.mycelium.sh/"><img src="https://img.shields.io/badge/Documentation-Read%20Docs-blue?style=for-the-badge" alt="Documentation"></a>
-  <a href="https://github.com/elizaos/eliza/actions/workflows/image.yaml"><img src="https://img.shields.io/github/actions/workflow/status/0xdeval/mycelium-sdk/monorepo-ci.yml?branch=main&style=for-the-badge" alt="CI Status"></a>
+  <a href="https://github.com/0xdeval/mycelium-sdk/actions/workflows/monorepo-ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/0xdeval/mycelium-sdk/monorepo-ci.yml?branch=main&style=for-the-badge" alt="CI Status"></a>
 </div>
 
 # What is MyceliumSDK?
