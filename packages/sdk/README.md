@@ -142,4 +142,4 @@ Check the [CONTRIBUTION.md](https://github.com/0xdeval/mycelium-sdk/blob/main/CO
 
 ## License
 
-This project is licensed under the dual license - Apache 2.0 + Commercial - see the [LICENSE](https://github.com/0xdeval/mycelium-sdk/blob/main/LICENSE.md)
+This project is licensed under the dual license - Apache 2.0 + Commercial - see the [LICENSE](https://github.com/0xdeval/mycelium-sdk/blob/main/LICENSE)
