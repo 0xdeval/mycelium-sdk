@@ -26,6 +26,7 @@ import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
 import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from './tools/CoinbaseCDP';
+import { RampNamespace } from './ramp/RampNamespace';
 
 /**
  * Main SDK facade for integrating wallets and protocols.
@@ -70,6 +71,16 @@ export class MyceliumSDK {
    * @category Wallets
    */
   public readonly wallet: WalletNamespace;
+
+  /**
+   * Ramp namespace to manage ramp operations. Methods are available on {@link RampNamespace}
+   * @public
+   * @remarks
+   * If the Coinbase CDP configuration is not provided, the ramp functionality will be disabled.
+   * Calling the respective method will throw an error
+   * @category Tools
+   */
+  public readonly rampNamespace: RampNamespace | null = null;
 
   /**
    * Chain manager instance to manage chain related entities
@@ -128,6 +139,8 @@ export class MyceliumSDK {
         config.integratorId,
         this.chainManager,
       );
+
+      this.rampNamespace = new RampNamespace(this.coinbaseCDP);
     }
 
     const protocolsRouterConfig = config.protocolsRouterConfig || {
@@ -151,48 +164,15 @@ export class MyceliumSDK {
     return this._chainManager;
   }
 
-  /**
-   * Coinbase CDP configuration methods for ramp operations
-   * @public
-   * @category Tools
-   */
-  public readonly rampConfig = {
-    /**
-     * Return all supported countries and payment methods for on-ramp by Coinbase CDP
-     * @public
-     * @category Ramp
-     *
-     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for top-up
-     * @throws If API returned an error
-     */
-    getTopUpConfig: async () => {
-      if (!this.coinbaseCDP) {
-        throw new Error(
-          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
-        );
-      }
+  get ramp(): RampNamespace {
+    if (!this.rampNamespace) {
+      throw new Error(
+        'Ramp namespace is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    }
 
-      return await this.coinbaseCDP.getOnRampConfig();
-    },
-    /**
-     * Return all supported countries and payment methods for off-ramp by Coinbase CDP
-     * @public
-     * @category Ramp
-     *
-     *
-     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for cash out
-     * @throws If API returned an error
-     */
-    getCashOutConfig: async () => {
-      if (!this.coinbaseCDP) {
-        throw new Error(
-          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
-        );
-      }
-
-      return await this.coinbaseCDP.getOffRampConfig();
-    },
-  };
+    return this.rampNamespace;
+  }
 
   /**
    * Recommends and initializes a protocol based on router settings

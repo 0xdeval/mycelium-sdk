@@ -43,34 +43,6 @@ export class WalletNamespace {
   }
 
   /**
-   * Direct access to the underlying embedded wallet provider
-   *
-   * @public
-   * @category Providers
-   * @remarks
-   * Useful when you need advanced functionality beyond the unified namespace. By default, you should use the unified namespace
-   *
-   * @returns The configured embedded wallet provider instance
-   */
-  get embeddedWalletProvider() {
-    return this.provider.embeddedWalletProvider;
-  }
-
-  /**
-   * Direct access to the underlying smart wallet provider
-   *
-   * @public
-   * @category Providers
-   * @remarks
-   * Useful when you need advanced functionality beyond the unified namespace. By default, you should use the unified namespace
-   *
-   * @returns The configured smart wallet provider instance
-   */
-  get smartWalletProvider() {
-    return this.provider.smartWalletProvider;
-  }
-
-  /**
    * Creates an embedded wallet
    *
    * @public

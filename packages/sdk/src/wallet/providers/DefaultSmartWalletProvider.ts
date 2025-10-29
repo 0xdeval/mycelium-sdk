@@ -146,16 +146,4 @@ export class DefaultSmartWalletProvider extends SmartWalletProvider {
       ownerIndex,
     );
   }
-
-  /**
-   * Funds a wallet via a faucet if supported by the selected chain
-   *
-   * @internal
-   * @category Funding
-   * @remarks
-   * Placeholder for testnet faucet integration
-   *
-   * @returns Future transaction hash or provider response
-   */
-  fundViaFaucet() {}
 }

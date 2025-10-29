@@ -168,7 +168,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const onRampConfig = await this.sdk.rampConfig.getTopUpConfig();
+    const onRampConfig = await this.sdk.ramp.getTopUpConfig();
 
     return onRampConfig;
   }
@@ -177,7 +177,7 @@ export class MyceliumService {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }
-    const offRampConfig = await this.sdk.rampConfig.getCashOutConfig();
+    const offRampConfig = await this.sdk.ramp.getCashOutConfig();
 
     return offRampConfig;
   }

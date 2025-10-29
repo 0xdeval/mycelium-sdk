@@ -20,40 +20,6 @@ const mockProtocol = createMockProtocol();
 const mockCoinbaseCDP: CoinbaseCDP = createMockCoinbaseCDP();
 
 describe('WalletNamespace', () => {
-  it('should provide access to embedded wallet provider', () => {
-    const mockPrivyClient = createMockPrivyClient('test-app-id', 'test-app-secret');
-    const embeddedWalletProvider = new PrivyEmbeddedWalletProvider(
-      mockPrivyClient,
-      mockChainManager,
-    );
-    const smartWalletProvider = new DefaultSmartWalletProvider(
-      mockChainManager,
-      mockProtocol,
-      mockCoinbaseCDP,
-    );
-    const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
-    const walletNamespace = new WalletNamespace(walletProvider);
-
-    expect(walletNamespace.embeddedWalletProvider).toBe(embeddedWalletProvider);
-  });
-
-  it('should provide access to smart wallet provider', () => {
-    const mockPrivyClient = createMockPrivyClient('test-app-id', 'test-app-secret');
-    const embeddedWalletProvider = new PrivyEmbeddedWalletProvider(
-      mockPrivyClient,
-      mockChainManager,
-    );
-    const smartWalletProvider = new DefaultSmartWalletProvider(
-      mockChainManager,
-      mockProtocol,
-      mockCoinbaseCDP,
-    );
-    const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
-    const walletNamespace = new WalletNamespace(walletProvider);
-
-    expect(walletNamespace.smartWalletProvider).toBe(smartWalletProvider);
-  });
-
   it('should create an embedded wallet via namespace', async () => {
     const mockPrivyClient = createMockPrivyClient('test-app-id', 'test-app-secret');
     const embeddedWalletProvider = new PrivyEmbeddedWalletProvider(
