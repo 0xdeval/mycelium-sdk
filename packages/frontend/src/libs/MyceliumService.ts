@@ -2,7 +2,7 @@ import type { WalletRecord } from '@/libs/WalletsDatabase';
 import {
   MyceliumSDK,
   type TopUpUrlResponse,
-  type RampConfigResponse,
+  type FundingOptionsResponse,
   type SmartWallet,
   type VaultBalance,
   type VaultTxnResult,
@@ -71,17 +71,12 @@ export class MyceliumService {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }
-    const embeddedWallet = await this.sdk.wallet.createEmbeddedWallet();
-    const embeddedWalletId = embeddedWallet.walletId as string;
 
-    const wallet = await this.sdk.wallet.createSmartWallet({
-      owners: [embeddedWallet.address],
-      signer: await embeddedWallet.account(),
-    });
+    const { embeddedWalletId, smartWallet } = await this.sdk.wallet.createAccount();
 
     return {
       walletId: embeddedWalletId,
-      walletAddress: await wallet.getAddress(),
+      walletAddress: await smartWallet.getAddress(),
     };
   }
 
@@ -90,7 +85,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+    const wallet = await this.sdk.wallet.getAccount({
       walletId: existingWallet.wallet_id,
     });
 
@@ -104,7 +99,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+    const wallet = await this.sdk.wallet.getAccount({
       walletId,
     });
 
@@ -123,7 +118,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+    const wallet = await this.sdk.wallet.getAccount({
       walletId,
     });
 
@@ -147,7 +142,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+    const wallet = await this.sdk.wallet.getAccount({
       walletId,
     });
 
@@ -163,21 +158,21 @@ export class MyceliumService {
     return cashOutLink;
   }
 
-  async getTopUpOptions(): Promise<RampConfigResponse> {
+  async getTopUpOptions(): Promise<FundingOptionsResponse> {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }
 
-    const onRampConfig = await this.sdk.ramp.getTopUpConfig();
+    const onRampConfig = await this.sdk.funding.getTopUpConfig();
 
     return onRampConfig;
   }
 
-  async getCashOutOptions(): Promise<RampConfigResponse> {
+  async getCashOutOptions(): Promise<FundingOptionsResponse> {
     if (!this.sdk) {
       throw new Error('SDK not initialized');
     }
-    const offRampConfig = await this.sdk.ramp.getCashOutConfig();
+    const offRampConfig = await this.sdk.funding.getCashOutConfig();
 
     return offRampConfig;
   }
@@ -187,7 +182,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+    const wallet = await this.sdk.wallet.getAccount({
       walletId,
     });
 
@@ -200,7 +195,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+    const wallet = await this.sdk.wallet.getAccount({
       walletId,
     });
 
@@ -213,7 +208,7 @@ export class MyceliumService {
       throw new Error('SDK not initialized');
     }
 
-    const wallet = await this.sdk.wallet.getSmartWalletWithEmbeddedSigner({
+    const wallet = await this.sdk.wallet.getAccount({
       walletId,
     });
 

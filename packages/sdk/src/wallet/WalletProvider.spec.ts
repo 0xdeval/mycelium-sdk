@@ -104,9 +104,9 @@ describe('WalletProvider', () => {
     const smartCreateWalletSpy = vi.spyOn(smartWalletProvider, 'createWallet');
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
 
-    const smartWallet = await walletProvider.createWalletWithEmbeddedSigner();
+    const account = await walletProvider.createAccount();
 
-    expect(smartWallet).toBeInstanceOf(DefaultSmartWallet);
+    expect(account.smartWallet).toBeInstanceOf(DefaultSmartWallet);
     expect(embeddedCreateWalletSpy).toHaveBeenCalledOnce();
     expect(smartCreateWalletSpy).toHaveBeenCalledWith({
       owners: [mockSignerAddress],
@@ -147,13 +147,13 @@ describe('WalletProvider', () => {
     const embeddedWalletIndex = 1;
     const nonce = BigInt(456);
 
-    const smartWallet = await walletProvider.createWalletWithEmbeddedSigner({
+    const smartWallet = await walletProvider.createAccount({
       owners: additionalOwners,
       embeddedWalletIndex,
       nonce,
     });
 
-    expect(smartWallet).toBeInstanceOf(DefaultSmartWallet);
+    expect(smartWallet.smartWallet).toBeInstanceOf(DefaultSmartWallet);
     expect(embeddedCreateWalletSpy).toHaveBeenCalledOnce();
     expect(smartCreateWalletSpy).toHaveBeenCalledWith({
       owners: [additionalOwners[0], mockSignerAddress, additionalOwners[1]],
@@ -193,12 +193,12 @@ describe('WalletProvider', () => {
     const additionalOwners = [getRandomAddress(), getRandomAddress()];
     const nonce = BigInt(456);
 
-    const smartWallet = await walletProvider.createWalletWithEmbeddedSigner({
+    const smartWallet = await walletProvider.createAccount({
       owners: additionalOwners,
       nonce,
     });
 
-    expect(smartWallet).toBeInstanceOf(DefaultSmartWallet);
+    expect(smartWallet.smartWallet).toBeInstanceOf(DefaultSmartWallet);
     expect(embeddedCreateWalletSpy).toHaveBeenCalledOnce();
     expect(smartCreateWalletSpy).toHaveBeenCalledWith({
       owners: [additionalOwners[0], additionalOwners[1], mockSignerAddress],
@@ -270,7 +270,7 @@ describe('WalletProvider', () => {
     const deploymentOwners = [mockSignerAddress];
     const signerOwnerIndex = 0;
 
-    const smartWallet = await walletProvider.getSmartWalletWithEmbeddedSigner({
+    const smartWallet = await walletProvider.getAccount({
       walletId,
       deploymentOwners,
       signerOwnerIndex,
@@ -373,7 +373,7 @@ describe('WalletProvider', () => {
     const invalidWalletId = 'invalid-wallet-id';
 
     await expect(
-      walletProvider.getSmartWalletWithEmbeddedSigner({
+      walletProvider.getAccount({
         walletId: invalidWalletId,
       }),
     ).rejects.toThrow('Failed to get wallet with id: invalid-wallet-id');

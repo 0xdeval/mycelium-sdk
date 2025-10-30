@@ -10,5 +10,5 @@ export type { MyceliumSDKConfig } from '@/types/sdk';
 export type {
   OnRampUrlResponse as TopUpUrlResponse,
   OffRampUrlResponse as CashOutUrlResponse,
-  RampConfigResponse,
+  RampConfigResponse as FundingOptionsResponse,
 } from '@/types/ramp';

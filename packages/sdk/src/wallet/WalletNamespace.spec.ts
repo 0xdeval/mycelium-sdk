@@ -91,15 +91,12 @@ describe('WalletNamespace', () => {
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
-    const createWalletWithEmbeddedSignerSpy = vi.spyOn(
-      walletProvider,
-      'createWalletWithEmbeddedSigner',
-    );
+    const createWalletWithEmbeddedSignerSpy = vi.spyOn(walletProvider, 'createAccount');
     const walletNamespace = new WalletNamespace(walletProvider);
 
-    const smartWallet = await walletNamespace.createWalletWithEmbeddedSigner();
+    const account = await walletNamespace.createAccount();
 
-    expect(smartWallet).toBeInstanceOf(DefaultSmartWallet);
+    expect(account.smartWallet).toBeInstanceOf(DefaultSmartWallet);
     expect(createWalletWithEmbeddedSignerSpy).toHaveBeenCalledWith(undefined);
   });
 
@@ -115,10 +112,7 @@ describe('WalletNamespace', () => {
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
-    const createWalletWithEmbeddedSignerSpy = vi.spyOn(
-      walletProvider,
-      'createWalletWithEmbeddedSigner',
-    );
+    const createWalletWithEmbeddedSignerSpy = vi.spyOn(walletProvider, 'createAccount');
     const walletNamespace = new WalletNamespace(walletProvider);
 
     const additionalOwners = [getRandomAddress(), getRandomAddress()];
@@ -130,9 +124,9 @@ describe('WalletNamespace', () => {
       nonce,
     };
 
-    const smartWallet = await walletNamespace.createWalletWithEmbeddedSigner(params);
+    const smartWallet = await walletNamespace.createAccount(params);
 
-    expect(smartWallet).toBeInstanceOf(DefaultSmartWallet);
+    expect(smartWallet.smartWallet).toBeInstanceOf(DefaultSmartWallet);
     expect(createWalletWithEmbeddedSignerSpy).toHaveBeenCalledWith(params);
   });
 
@@ -175,10 +169,7 @@ describe('WalletNamespace', () => {
       mockCoinbaseCDP,
     );
     const walletProvider = new WalletProvider(embeddedWalletProvider, smartWalletProvider);
-    const getSmartWalletWithEmbeddedSignerSpy = vi.spyOn(
-      walletProvider,
-      'getSmartWalletWithEmbeddedSigner',
-    );
+    const getSmartWalletWithEmbeddedSignerSpy = vi.spyOn(walletProvider, 'getAccount');
     const walletNamespace = new WalletNamespace(walletProvider);
 
     const embeddedWallet = await embeddedWalletProvider.createWallet();
@@ -191,7 +182,7 @@ describe('WalletNamespace', () => {
       signerOwnerIndex,
     };
 
-    const smartWallet = await walletNamespace.getSmartWalletWithEmbeddedSigner(params);
+    const smartWallet = await walletNamespace.getAccount(params);
 
     expect(smartWallet).toBeInstanceOf(DefaultSmartWallet);
     expect(getSmartWalletWithEmbeddedSignerSpy).toHaveBeenCalledWith(params);
@@ -274,7 +265,7 @@ describe('WalletNamespace', () => {
     const invalidWalletId = 'invalid-wallet-id';
 
     await expect(
-      walletNamespace.getSmartWalletWithEmbeddedSigner({
+      walletNamespace.getAccount({
         walletId: invalidWalletId,
       }),
     ).rejects.toThrow('Failed to get wallet with id: invalid-wallet-id');

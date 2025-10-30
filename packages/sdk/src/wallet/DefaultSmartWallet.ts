@@ -26,7 +26,7 @@ import type { OffRampUrlResponse, OnRampUrlResponse } from '@/types/ramp';
  * Default ERC-4337 smart wallet implementation. Implements main methods that a user can use to interact with DeFi protocols and use all related functionalities
  *
  * @public
- * @category Wallets operations
+ * @category 3. Account operations
  * @remarks
  * Backed by Coinbase Smart Account and compatible with ERC-4337 UserOperations
  * Supports multi-owner wallets (EVM addresses or WebAuthn owners), gas-sponsored flows,
@@ -323,7 +323,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * Funds the smart wallet with the specified amount of the specified token via Coinbase CDP on-ramp service
    *
    * @public
-   * @category Ramp
+   * @category Funding
    *
    * @remarks
    * If Coinbase CDP is not initialized, the method will throw an error. For more details, visit @see {@link https://docs.cdp.coinbase.com/api-reference/v2/rest-api/onramp/create-an-onramp-session}
@@ -372,7 +372,7 @@ export class DefaultSmartWallet extends SmartWallet {
    * Cashout token from smart wallet to fiat currency via Coinbase CDP off-ramp service
    *
    * @public
-   * @category Ramp
+   * @category Funding
    *
    * @remarks
    * If Coinbase CDP is not initialized, the method will throw an error. For more details, visit @see {@link https://docs.cdp.coinbase.com/api-reference/rest-api/onramp-offramp/create-sell-quote}

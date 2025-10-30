@@ -2,11 +2,21 @@ import type { CoinbaseCDP } from '@/tools/CoinbaseCDP';
 import type { RampConfigResponse } from '@/types/ramp';
 
 /**
- * Ramp namespace to manage ramp operations via {@link CoinbaseCDP} service
+ * Namespace to manage funding & payouts of an account
  * @public
- * @category Tools
+ * @remarks
+ * Contains 2 methods to get available options to top up an account and cash out funds
+ * - {@link getTopUpConfig} to get available options to top up an account
+ * - {@link getCashOutConfig} to get available options to cash out funds
+ *
+ * @example
+ * ```ts
+ * const topUpConfig = await myceliumSDK.funding.getTopUpConfig();
+ * const cashOutConfig = await myceliumSDK.funding.getCashOutConfig();
+ * ```
+ * @category 4. Funding & payouts
  */
-export class RampNamespace {
+export class FundingNamespace {
   private readonly coinbaseCDP: CoinbaseCDP | null = null;
 
   constructor(coinbaseCDP: CoinbaseCDP) {
@@ -22,7 +32,7 @@ export class RampNamespace {
   /**
    * Return all supported countries and payment methods for on-ramp by Coinbase CDP
    * @public
-   * @category Ramp
+   * @category Funding
    *
    * @returns @see {@link RampConfigResponse} with supported countries and payment methods for top-up
    * @throws If API returned an error
@@ -34,7 +44,7 @@ export class RampNamespace {
   /**
    * Return all supported countries and payment methods for off-ramp by Coinbase CDP
    * @public
-   * @category Ramp
+   * @category Funding
    *
    *
    * @returns @see {@link RampConfigResponse} with supported countries and payment methods for cash out

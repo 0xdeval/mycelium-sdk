@@ -11,6 +11,7 @@ export * from '@/public/types';
 
 /** @internal */
 export { DefaultSmartWallet } from '@/wallet/DefaultSmartWallet';
+export { FundingNamespace } from '@/ramp/FundingNamespace';
 
 import { ChainManager } from '@/tools/ChainManager';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
@@ -25,14 +26,14 @@ import { PrivyClient } from '@privy-io/server-auth';
 import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
-import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from './tools/CoinbaseCDP';
-import { RampNamespace } from './ramp/RampNamespace';
+import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from '@/tools/CoinbaseCDP';
+import { FundingNamespace } from '@/ramp/FundingNamespace';
 
 /**
  * Main SDK facade for integrating wallets and protocols.
  *
  * @public
- * @category Get started
+ * @category 1. Getting started
  * @remarks
  * This class encapsulates:
  * - protocol selection and initialization (`Smart Router`),
@@ -56,17 +57,13 @@ import { RampNamespace } from './ramp/RampNamespace';
  *
  * const sdk = new MyceliumSDK(config);
  *
- * const embeddedWallet = await sdk.wallet.createEmbeddedWallet();
- * const wallet = await sdk.wallet.createSmartWallet({
- *     owners: [embeddedWallet.address],
- *     signer: await embeddedWallet.account(),
- * })
- * const balance = await wallet.getBalance();
+ * const {embeddedWalletId, smartWallet} = await sdk.wallet.createAccount();
+ * const balance = await smartWallet.getBalance();
  * ```
  */
 export class MyceliumSDK {
   /**
-   * Unified wallet namespace to manage embedded/smart wallets and related operations
+   * Returns a unified wallet namespace to manage embedded/smart wallets and related operations
    * @public
    * @category Wallets
    */
@@ -74,13 +71,13 @@ export class MyceliumSDK {
 
   /**
    * Ramp namespace to manage ramp operations. Methods are available on {@link RampNamespace}
-   * @public
+   * @internal
    * @remarks
    * If the Coinbase CDP configuration is not provided, the ramp functionality will be disabled.
    * Calling the respective method will throw an error
    * @category Tools
    */
-  public readonly rampNamespace: RampNamespace | null = null;
+  public readonly fundingNamespace: FundingNamespace | null = null;
 
   /**
    * Chain manager instance to manage chain related entities
@@ -140,7 +137,7 @@ export class MyceliumSDK {
         this.chainManager,
       );
 
-      this.rampNamespace = new RampNamespace(this.coinbaseCDP);
+      this.fundingNamespace = new FundingNamespace(this.coinbaseCDP);
     }
 
     const protocolsRouterConfig = config.protocolsRouterConfig || {
@@ -156,6 +153,8 @@ export class MyceliumSDK {
   /**
    * Returns the chain manager instance for multi-chain operations
    * @public
+   * @remarks
+   * More about methods in {@link ChainManager}
    * @category Tools
    *
    * @returns ChainManager instance of the type {@link ChainManager}
@@ -164,14 +163,23 @@ export class MyceliumSDK {
     return this._chainManager;
   }
 
-  get ramp(): RampNamespace {
-    if (!this.rampNamespace) {
+  /**
+   * Returns a funding namespace to manage top ups & cash outs configurations
+   * @public
+   * @remarks
+   * More about methods in {@link FundingNamespace}
+   * @category Tools
+   *
+   * @returns Funding namespace of the type {@link FundingNamespace}
+   */
+  get funding(): FundingNamespace {
+    if (!this.fundingNamespace) {
       throw new Error(
         'Ramp namespace is not initialized. Please, provide the configuration in the SDK initialization',
       );
     }
 
-    return this.rampNamespace;
+    return this.fundingNamespace;
   }
 
   /**
@@ -192,9 +200,6 @@ export class MyceliumSDK {
 
     const protocol: Protocol = protocolRouter.recommend();
 
-    // Right now we have a protocol instance to manage a protocol instance + all protocol info
-
-    // Initialize the selected protocol
     protocol.instance.init(this.chainManager);
 
     return protocol;
