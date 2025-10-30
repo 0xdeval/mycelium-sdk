@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { MyceliumService } from '@/libs/MyceliumService';
-import type { RampConfigResponse } from '@mycelium-sdk/core';
+import type { FundingOptionsResponse } from '@mycelium-sdk/core';
 
 export async function GET(_request: NextRequest) {
   try {
@@ -8,7 +8,7 @@ export async function GET(_request: NextRequest) {
     await myceliumService.init();
 
     try {
-      const topUpOptions: RampConfigResponse = await myceliumService.getTopUpOptions();
+      const topUpOptions: FundingOptionsResponse = await myceliumService.getTopUpOptions();
 
       return NextResponse.json({
         success: true,

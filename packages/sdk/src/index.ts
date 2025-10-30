@@ -11,6 +11,7 @@ export * from '@/public/types';
 
 /** @internal */
 export { DefaultSmartWallet } from '@/wallet/DefaultSmartWallet';
+export { FundingNamespace } from '@/ramp/FundingNamespace';
 
 import { ChainManager } from '@/tools/ChainManager';
 import type { SmartWalletProvider } from '@/wallet/base/providers/SmartWalletProvider';
@@ -25,13 +26,14 @@ import { PrivyClient } from '@privy-io/server-auth';
 import { ProtocolRouter } from '@/router/ProtocolRouter';
 import type { Protocol } from '@/types/protocols/general';
 import { logger } from '@/tools/Logger';
-import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from './tools/CoinbaseCDP';
+import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from '@/tools/CoinbaseCDP';
+import { FundingNamespace } from '@/ramp/FundingNamespace';
 
 /**
  * Main SDK facade for integrating wallets and protocols.
  *
  * @public
- * @category Get started
+ * @category 1. Getting started
  * @remarks
  * This class encapsulates:
  * - protocol selection and initialization (`Smart Router`),
@@ -55,21 +57,27 @@ import { CoinbaseCDP, type CoinbaseCDP as CoinbaseCDPType } from './tools/Coinba
  *
  * const sdk = new MyceliumSDK(config);
  *
- * const embeddedWallet = await sdk.wallet.createEmbeddedWallet();
- * const wallet = await sdk.wallet.createSmartWallet({
- *     owners: [embeddedWallet.address],
- *     signer: await embeddedWallet.account(),
- * })
- * const balance = await wallet.getBalance();
+ * const {embeddedWalletId, smartWallet} = await sdk.wallet.createAccount();
+ * const balance = await smartWallet.getBalance();
  * ```
  */
 export class MyceliumSDK {
   /**
-   * Unified wallet namespace to manage embedded/smart wallets and related operations
+   * Returns a unified wallet namespace to manage embedded/smart wallets and related operations
    * @public
    * @category Wallets
    */
   public readonly wallet: WalletNamespace;
+
+  /**
+   * Ramp namespace to manage ramp operations. Methods are available on {@link RampNamespace}
+   * @internal
+   * @remarks
+   * If the Coinbase CDP configuration is not provided, the ramp functionality will be disabled.
+   * Calling the respective method will throw an error
+   * @category Tools
+   */
+  public readonly fundingNamespace: FundingNamespace | null = null;
 
   /**
    * Chain manager instance to manage chain related entities
@@ -128,6 +136,8 @@ export class MyceliumSDK {
         config.integratorId,
         this.chainManager,
       );
+
+      this.fundingNamespace = new FundingNamespace(this.coinbaseCDP);
     }
 
     const protocolsRouterConfig = config.protocolsRouterConfig || {
@@ -143,6 +153,8 @@ export class MyceliumSDK {
   /**
    * Returns the chain manager instance for multi-chain operations
    * @public
+   * @remarks
+   * More about methods in {@link ChainManager}
    * @category Tools
    *
    * @returns ChainManager instance of the type {@link ChainManager}
@@ -152,47 +164,23 @@ export class MyceliumSDK {
   }
 
   /**
-   * Coinbase CDP configuration methods for ramp operations
+   * Returns a funding namespace to manage top ups & cash outs configurations
    * @public
+   * @remarks
+   * More about methods in {@link FundingNamespace}
    * @category Tools
+   *
+   * @returns Funding namespace of the type {@link FundingNamespace}
    */
-  public readonly rampConfig = {
-    /**
-     * Return all supported countries and payment methods for on-ramp by Coinbase CDP
-     * @public
-     * @category Ramp
-     *
-     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for top-up
-     * @throws If API returned an error
-     */
-    getTopUpConfig: async () => {
-      if (!this.coinbaseCDP) {
-        throw new Error(
-          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
-        );
-      }
+  get funding(): FundingNamespace {
+    if (!this.fundingNamespace) {
+      throw new Error(
+        'Ramp namespace is not initialized. Please, provide the configuration in the SDK initialization',
+      );
+    }
 
-      return await this.coinbaseCDP.getOnRampConfig();
-    },
-    /**
-     * Return all supported countries and payment methods for off-ramp by Coinbase CDP
-     * @public
-     * @category Ramp
-     *
-     *
-     * @returns @see {@link RampConfigResponse} with supported countries and payment methods for cash out
-     * @throws If API returned an error
-     */
-    getCashOutConfig: async () => {
-      if (!this.coinbaseCDP) {
-        throw new Error(
-          'Coinbase CDP is not initialized. Please, provide the configuration in the SDK initialization',
-        );
-      }
-
-      return await this.coinbaseCDP.getOffRampConfig();
-    },
-  };
+    return this.fundingNamespace;
+  }
 
   /**
    * Recommends and initializes a protocol based on router settings
@@ -212,9 +200,6 @@ export class MyceliumSDK {
 
     const protocol: Protocol = protocolRouter.recommend();
 
-    // Right now we have a protocol instance to manage a protocol instance + all protocol info
-
-    // Initialize the selected protocol
     protocol.instance.init(this.chainManager);
 
     return protocol;
