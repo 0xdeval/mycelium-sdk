@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 import { CustomButton } from '@/components/ui/button';
 import { getName } from 'country-list';
-import type { RampConfigResponse } from '@mycelium-sdk/core';
+import type { FundingOptionsResponse } from '@mycelium-sdk/core';
 import { toaster } from '@/components/ui/toaster';
 import { CustomSelector } from '@/components/ui/selector';
 
@@ -27,7 +27,7 @@ export const RampDialog = ({ buttonText, rampType, walletId }: RampDialogProps) 
   const [isActionExecuting, setIsActionExecuting] = useState(false);
   const [areOptionsLoading, setAreOptionsLoading] = useState(false);
 
-  const [rampOptions, setRampOptions] = useState<RampConfigResponse | null>(null);
+  const [rampOptions, setRampOptions] = useState<FundingOptionsResponse | null>(null);
 
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
