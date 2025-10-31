@@ -46,7 +46,7 @@ The built SDK can then be used in your application or imported as a local librar
 ## Initialization Example
 
 ```typescript
-this.sdk = new MyceliumSDK({
+const sdk = new MyceliumSDK({
   walletsConfig: {
     embeddedWalletConfig: {
       provider: {
@@ -71,7 +71,15 @@ this.sdk = new MyceliumSDK({
   protocolsRouterConfig: {
     riskLevel: 'medium',
   },
-});
+  coinbaseCDPConfig: {
+    apiKeyId: process.env.NEXT_PUBLIC_COINBASE_CDP_API_KEY_ID;
+    apiKeySecret: process.env.NEXT_PUBLIC_COINBASE_CDP_API_KEY_SECRET;
+  },
+  integratorId: 'MyceliumApp',
+ });
+
+ const {embeddedWalletId, smartWallet} = await sdk.wallet.createAccount();
+ const balance = await smartWallet.getBalance();
 ```
 
 > To get more information about what protocols and chains are available for SDK, refer to the `Protocol router` section below
